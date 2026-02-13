@@ -1,0 +1,4 @@
+target
+Dockerfile
+.dockerignore
+docker-compose.yml
