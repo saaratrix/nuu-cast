@@ -2,6 +2,7 @@ mod explorer;
 mod uploader;
 mod io;
 mod file_fetcher;
+mod html;
 
 use axum::{Router, routing::get};
 use axum::routing::put;
