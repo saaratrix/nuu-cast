@@ -2,37 +2,37 @@ use std::path::{ PathBuf, Path };
 use axum::{
     extract::Path as AxumPath,
     http::StatusCode,
-    response::IntoResponse,
-    response::Response,
+    response::{
+        IntoResponse,
+        Response,
+        Html,
+        Redirect
+    }
 };
-use axum::response::Redirect;
-use crate::io::file_utility::{get_path_from_url, get_path_details, get_directory_children, PathType, MEDIA_ROOT};
+
+use crate::io::file_utility::{get_path_from_url, get_path_details, get_directory_children, PathType, MediaType, UrlAndFilePath, get_media_type, get_mime_type, MEDIA_ROOT};
 
 pub async fn explore_path_root() -> impl IntoResponse {
-    let path = PathBuf::new();
-    explore_path(path).await
+    let paths = UrlAndFilePath { url: PathBuf::new(), file: PathBuf::new() };
+    explore_path(paths).await
 }
 
 pub async fn explore_path_wildcard(AxumPath(url) : AxumPath<String>
 ) -> impl IntoResponse {
-    let path = get_path_from_url(url);
-
-    let result = path.unwrap_or_else(|| PathBuf::new());
+    let result = get_path_from_url(&url).unwrap_or_else(|| UrlAndFilePath { url: PathBuf::new(), file: PathBuf::new() });
     explore_path(result).await
 }
 
-async fn explore_path(path: PathBuf) -> impl IntoResponse {
+async fn explore_path(paths: UrlAndFilePath) -> impl IntoResponse {
     // Check if at index/root
-    if path.as_os_str().is_empty() || path == PathBuf::from("/") {
-        let joined_path = MEDIA_ROOT.join(path);
-        return explore_directory(&joined_path).await;
+    if paths.url.as_os_str().is_empty() || paths.url == PathBuf::from("/") {
+        return explore_directory(&paths).await;
     }
 
-    let joined_path = MEDIA_ROOT.join(path);
     // Check cache/filesystem
-    match get_path_details(&joined_path) {
-        PathType::File => explore_file(&joined_path).await,
-        PathType::Directory => return explore_directory(&joined_path).await,
+    match get_path_details(&paths.file) {
+        PathType::File => explore_file(&paths).await,
+        PathType::Directory => return explore_directory(&paths).await,
         PathType::Unknown | PathType::NotFound => {
             // Path doesn't exist, redirect to index
             Redirect::temporary("/").into_response()
@@ -40,14 +40,39 @@ async fn explore_path(path: PathBuf) -> impl IntoResponse {
     }
 }
 
-async fn explore_file(path: &PathBuf) -> Response {
-    (StatusCode::OK, format!("File: {}", path.display())).into_response()
+async fn explore_file(paths: &UrlAndFilePath) -> Response {
+    let stream_path = format!("/stream/{}", paths.url.display());
+    let media_type = get_media_type(&paths.file);
+
+    let item_html = match media_type {
+        MediaType::Image => format!(r#"<img src="{}" >"#, &stream_path),
+        MediaType::Video => {
+            let mime_type = get_mime_type(&paths.file);
+            format!(r#"<video autoplay="true" controls><source src="{}" type=""{}></video>"#, &stream_path, &mime_type)
+        },
+        MediaType::Audio => format!("Not implemented"),
+        MediaType::Text => format!("Not implemented."),
+        MediaType::Attachment => format!("Not implemented")
+    };
+
+    let html = format!(
+        r#"<html>
+<body>
+    <h1>File: {}</h1>
+    {}
+</body>
+</html>"#,
+        paths.url.display(),
+        item_html
+    );
+
+    Html(html).into_response()
 }
 
-async fn explore_directory(path: &PathBuf) -> Response {
-    let directory_items = get_directory_children(path);
+async fn explore_directory(paths: &UrlAndFilePath) -> Response {
+    let directory_items = get_directory_children(&paths.file);
 
-    let mut output = format!("Directory: {}\n\n", path.display());
+    let mut output = format!("Directory: {}\n\n", paths.file.display());
     output.push_str("Directories:\n");
     for dir in &directory_items.directories {
         output.push_str(&format!("  {}\n", dir.display()));
