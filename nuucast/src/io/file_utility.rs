@@ -21,10 +21,10 @@ static PATH_CACHE: LazyLock<PathCache> = LazyLock::new(|| PathCache::new());
 #[derive(Debug, Clone)]
 pub struct UrlAndFilePath {
     pub url: PathBuf,
-    pub file: PathBuf,
+    pub filepath: PathBuf,
 }
 
-pub fn get_path_from_url(url: &str) -> Option<UrlAndFilePath> {
+pub fn get_url_and_filepath_from_url(url: &str) -> Option<UrlAndFilePath> {
     let clean_url = url.trim_matches('/');
     let full_path = MEDIA_ROOT.join(clean_url);
 
@@ -36,7 +36,22 @@ pub fn get_path_from_url(url: &str) -> Option<UrlAndFilePath> {
 
     Some(UrlAndFilePath {
         url: PathBuf::from(clean_url),
-        file: canonical,
+        filepath: canonical,
+    })
+}
+
+pub fn get_url_and_filepath_from_path(path: &PathBuf) -> Option<UrlAndFilePath> {
+    let canonical = path.canonicalize().ok()?;
+
+    if !canonical.starts_with(MEDIA_ROOT.as_path()) {
+        return None;
+    }
+
+    let relative = canonical.strip_prefix(MEDIA_ROOT.as_path()).ok()?;
+
+    Some(UrlAndFilePath {
+        url: relative.to_path_buf(),
+        filepath: canonical,
     })
 }
 
@@ -52,10 +67,10 @@ pub fn get_path_details(path: &PathBuf) -> PathType {
     PATH_CACHE.get_path_details(path)
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DirectoryChildren {
-    pub directories: Vec<PathBuf>,
-    pub files: Vec<PathBuf>,
+    pub directories: Vec<UrlAndFilePath>,
+    pub files: Vec<UrlAndFilePath>,
 }
 
 pub fn get_directory_children(path: &PathBuf) -> DirectoryChildren {
@@ -74,9 +89,13 @@ pub fn get_directory_children(path: &PathBuf) -> DirectoryChildren {
         let entry_path = entry.path();
         let path_type = PATH_CACHE.get_path_details(&entry_path);
         if matches!(path_type, PathType::Directory) {
-            directories.push(entry_path);
+            if let Some(paths) = get_url_and_filepath_from_path(&entry_path) {
+                directories.push(paths);
+            }
         } else if matches!(path_type, PathType::File) {
-            files.push(entry_path);
+            if let Some(paths) = get_url_and_filepath_from_path(&entry_path) {
+                files.push(paths);
+            }
         }
     }
 

@@ -5,14 +5,14 @@ use axum::http::{header, HeaderMap, HeaderValue, StatusCode};
 use tokio_util::io::ReaderStream;
 use tokio::fs::File;
 use tokio::io::{AsyncReadExt, AsyncSeekExt};
-use crate::io::file_utility::{ get_path_from_url, get_mime_type };
+use crate::io::file_utility::{get_url_and_filepath_from_url, get_mime_type };
 
 pub async fn stream_file(Path(url): Path<String>, headers: HeaderMap) -> Response {
-    let Some(paths) = get_path_from_url(&url) else {
+    let Some(paths) = get_url_and_filepath_from_url(&url) else {
         return (StatusCode::NOT_FOUND, "File not found").into_response();
     };
 
-    let mut file = match File::open(&paths.file).await {
+    let mut file = match File::open(&paths.filepath).await {
         Ok(f) => f,
         Err(_) => return (StatusCode::NOT_FOUND, "File not found").into_response(),
     };
@@ -21,7 +21,7 @@ pub async fn stream_file(Path(url): Path<String>, headers: HeaderMap) -> Respons
         Ok(meta) => meta.len(),
         Err(_) => return (StatusCode::INTERNAL_SERVER_ERROR).into_response(),
     };
-    let mime_type = get_mime_type(&paths.file);
+    let mime_type = get_mime_type(&paths.filepath);
 
     if let Some(range) = headers.get(header::RANGE) {
         if let Some(response) = stream_file_range(range, &mut file, file_size, mime_type).await {
