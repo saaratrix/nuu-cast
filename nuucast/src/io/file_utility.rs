@@ -1,5 +1,5 @@
 use std::{env, fs};
-use std::path::PathBuf;
+use std::path::{Component, PathBuf};
 use std::sync::LazyLock;
 use crate::io::file_lookup_cache::PathCache;
 
@@ -26,17 +26,19 @@ pub struct UrlAndFilePath {
 
 pub fn get_url_and_filepath_from_url(url: &str) -> Option<UrlAndFilePath> {
     let clean_url = url.trim_matches('/');
-    let full_path = MEDIA_ROOT.join(clean_url);
 
-    let canonical = full_path.canonicalize().ok()?;
-
-    if !canonical.starts_with(MEDIA_ROOT.as_path()) {
-        return None;
+    let mut filepath = MEDIA_ROOT.clone();
+    for component in PathBuf::from(clean_url).components() {
+        if let Component::Normal(segment) = component {
+            filepath.push(segment);
+        } else {
+            return None; // Reject anything suspicious
+        }
     }
 
     Some(UrlAndFilePath {
         url: PathBuf::from(clean_url),
-        filepath: canonical,
+        filepath,
     })
 }
 
