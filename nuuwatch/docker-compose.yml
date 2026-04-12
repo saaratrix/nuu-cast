@@ -1,0 +1,11 @@
+services:
+  media-server:
+    build: .
+    container_name: nuuwatch
+    ports:
+      - "8080:3001"
+    volumes:
+        - ./data:/data:ro
+    environment:
+      - RUST_LOG=info
+    restart: unless-stopped

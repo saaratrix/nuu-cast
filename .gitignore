@@ -21,3 +21,9 @@ target
 #.idea/
 
 nuucast/media/*
+nuucast/temp_files/*
+nuuwatch/data/*
+nuuwatch/static/js/*
+nuuwatch/static/css/*
+nuuwatch/static/index.html
+nuuwatch/frontend/node_modules

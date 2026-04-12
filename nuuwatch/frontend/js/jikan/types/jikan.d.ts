@@ -1,203 +1,142 @@
-export interface Pagination {}
+// Define common sub-interfaces first to keep the main interface clean
 
-  "pagination": {
-  "last_visible_page": 5,
-    "has_next_page": true,
-    "current_page": 1,
-    "items": {
-    "count": 25,
-      "total": 123,
-      "per_page": 25
-  }
+
+interface PaginationItems {
+  count: number;
+  total: number;
+  per_page: number;
+}
+
+export interface Pagination {
+  last_visible_page: number;
+  has_next_page: boolean;
+  current_page: number;
+  items: PaginationItems;
 }
 
 
-{
-  "0": {
-  "mal_id": 61316,
-    "url": "https://myanimelist.net/anime/61316/Re_Zero_kara_Hajimeru_Isekai_Seikatsu_4th_Season",
-    "images": {
-    "jpg": {
-      "image_url": "https://myanimelist.net/images/anime/1540/155824.jpg",
-        "small_image_url": "https://myanimelist.net/images/anime/1540/155824t.jpg",
-        "large_image_url": "https://myanimelist.net/images/anime/1540/155824l.jpg"
-    },
-    "webp": {
-      "image_url": "https://myanimelist.net/images/anime/1540/155824.webp",
-        "small_image_url": "https://myanimelist.net/images/anime/1540/155824t.webp",
-        "large_image_url": "https://myanimelist.net/images/anime/1540/155824l.webp"
-    }
-  },
-  "trailer": {
-    "youtube_id": null,
-      "url": null,
-      "embed_url": "https://www.youtube-nocookie.com/embed/jVl4bY81iIs?enablejsapi=1&wmode=opaque&autoplay=1",
-      "images": {
-      "image_url": null,
-        "small_image_url": null,
-        "medium_image_url": null,
-        "large_image_url": null,
-        "maximum_image_url": null
-    }
-  },
-  "approved": true,
-    "titles": [
-    {
-      "type": "Default",
-      "title": "Re:Zero kara Hajimeru Isekai Seikatsu 4th Season"
-    },
-    {
-      "type": "Synonym",
-      "title": "Re: Life in a different world from zero"
-    },
-    {
-      "type": "Synonym",
-      "title": "ReZero"
-    },
-    {
-      "type": "Japanese",
-      "title": "Re:ゼロから始める異世界生活 4th season"
-    },
-    {
-      "type": "English",
-      "title": "Re:ZERO -Starting Life in Another World- Season 4"
-    }
-  ],
-    "title": "Re:Zero kara Hajimeru Isekai Seikatsu 4th Season",
-    "title_english": "Re:ZERO -Starting Life in Another World- Season 4",
-    "title_japanese": "Re:ゼロから始める異世界生活 4th season",
-    "title_synonyms": [
-    "Re: Life in a different world from zero",
-    "ReZero"
-  ],
-    "type": "TV",
-    "source": "Light novel",
-    "episodes": 19,
-    "status": "Currently Airing",
-    "airing": true,
-    "aired": {
-    "from": "2026-04-08T00:00:00+00:00",
-      "to": null,
-      "prop": {
-      "from": {
-        "day": 8,
-          "month": 4,
-          "year": 2026
-      },
-      "to": {
-        "day": null,
-          "month": null,
-          "year": null
-      }
-    },
-    "string": "Apr 8, 2026 to ?"
-  },
-  "duration": "23 min per ep",
-    "rating": "R - 17+ (violence & profanity)",
-    "score": 8.77,
-    "scored_by": 8875,
-    "rank": 45,
-    "popularity": 1611,
-    "members": 169748,
-    "favorites": 1184,
-    "synopsis": "In the deadly battle at the Watergate City of Priestella, Subaru and his allies barely emerged victorious—but their triumph came at a great cost. Through the \"Authority of Gluttony,\" Rem was put into suspended animation, while Crusch's memories and even Julius’s name were devoured. As he searches for a way to save them, Subaru learns of the \"wise man\" Shaula—an all-seeing being said to possess every form of knowledge. His next destination is the Pleiades Watchtower, home to a wise man, the farthest tower standing in the vast, uncharted desert known as the Auguria Dunes—a place so perilous that even the mightiest \"Sword Saint,\" Reinhard, failed to conquer it. The fury of nature, unknown magical beasts, and unimaginable dangers lie ahead. Together with his friends, Subaru embarks on a life-risking journey to reclaim what was lost.\n\n(Source: Kadokawa)",
-    "background": "Re:Zero kara Hajimeru Isekai Seikatsu 4th Season is comprised of two arcs. The first eleven episodes are subtitled Soushitsu-hen (Loss Arc). The latter eight, subtitled Dakkan-hen (Recapture Arc), began airing on August 12, 2026.",
-    "season": "spring",
-    "year": 2026,
-    "broadcast": {
-    "day": "Wednesdays",
-      "time": "22:00",
-      "timezone": "Asia/Tokyo",
-      "string": "Wednesdays at 22:00 (JST)"
-  },
-  "producers": [
-    {
-      "mal_id": 238,
-      "type": "anime",
-      "name": "AT-X",
-      "url": "https://myanimelist.net/anime/producer/238/AT-X"
-    },
-    {
-      "mal_id": 306,
-      "type": "anime",
-      "name": "Magic Capsule",
-      "url": "https://myanimelist.net/anime/producer/306/Magic_Capsule"
-    },
-    {
-      "mal_id": 647,
-      "type": "anime",
-      "name": "Memory-Tech",
-      "url": "https://myanimelist.net/anime/producer/647/Memory-Tech"
-    },
-    {
-      "mal_id": 1333,
-      "type": "anime",
-      "name": "Hakuhodo DY Music & Pictures",
-      "url": "https://myanimelist.net/anime/producer/1333/Hakuhodo_DY_Music___Pictures"
-    },
-    {
-      "mal_id": 1696,
-      "type": "anime",
-      "name": "Kadokawa",
-      "url": "https://myanimelist.net/anime/producer/1696/Kadokawa"
-    },
-    {
-      "mal_id": 2927,
-      "type": "anime",
-      "name": "DAXEL",
-      "url": "https://myanimelist.net/anime/producer/2927/DAXEL"
-    }
-  ],
-    "licensors": [],
-    "studios": [
-    {
-      "mal_id": 314,
-      "type": "anime",
-      "name": "White Fox",
-      "url": "https://myanimelist.net/anime/producer/314/White_Fox"
-    }
-  ],
-    "genres": [
-    {
-      "mal_id": 8,
-      "type": "anime",
-      "name": "Drama",
-      "url": "https://myanimelist.net/anime/genre/8/Drama"
-    },
-    {
-      "mal_id": 10,
-      "type": "anime",
-      "name": "Fantasy",
-      "url": "https://myanimelist.net/anime/genre/10/Fantasy"
-    },
-    {
-      "mal_id": 41,
-      "type": "anime",
-      "name": "Suspense",
-      "url": "https://myanimelist.net/anime/genre/41/Suspense"
-    }
-  ],
-    "explicit_genres": [],
-    "themes": [
-    {
-      "mal_id": 62,
-      "type": "anime",
-      "name": "Isekai",
-      "url": "https://myanimelist.net/anime/genre/62/Isekai"
-    },
-    {
-      "mal_id": 40,
-      "type": "anime",
-      "name": "Psychological",
-      "url": "https://myanimelist.net/anime/genre/40/Psychological"
-    },
-    {
-      "mal_id": 78,
-      "type": "anime",
-      "name": "Time Travel",
-      "url": "https://myanimelist.net/anime/genre/78/Time_Travel"
-    }
-  ],
-    "demographics": []
+/**
+ * Represents a set of image URLs (used in root images, trailer images, etc.)
+ */
+interface ImageUrls {
+  image_url: string;
+  small_image_url?: string;
+  medium_image_url?: string | null;
+  large_image_url?: string;
+  maximum_image_url?: string | null;
 }
+
+/**
+ * Specific interface for the main `images` object which has jpg/webp variants
+ */
+interface MainImages {
+  jpg: ImageUrls;
+  webp: ImageUrls;
+}
+
+/**
+ * Represents a single title entry (e.g., Default, Synonym)
+ */
+interface TitleEntry {
+  type: string; // e.g., "Default", "Synonym", "English"
+  title: string;
+}
+
+/**
+ * Represents an entity related to the anime that shares id/name/url structure
+ * (Used for Producers, Studios, Genres, Themes)
+ */
+interface RelatedEntity {
+  mal_id: number;
+  type: string; // e.g., "anime"
+  name: string;
+  url: string;
+}
+
+
+interface AiredDataDate {
+  day?: number; month?: number; year?: number;
+}
+/**
+ * Represents the 'aired' section which includes dates and a detailed 'prop' object
+ */
+interface AiredData {
+  from: string; // ISO8601 format example: "2026-04-08T00:00:00+00:00"
+  to?: string | null; // Can be null if not finished/unknown
+
+  prop: {
+    from: AiredDataDate;
+    to: AiredDataDate;
+  };
+
+  string?: string; // Example: "Apr 8, 2026 to ?"
+}
+
+/**
+ * Represents the 'trailer' section of an Anime object
+ */
+interface TrailerData {
+  youtube_id?: string | null;
+  url?: string | null;
+  embed_url?: string | null; // eg https://www.youtube-nocookie.com/embed/...
+  images: ImageUrls;
+}
+
+/**
+ * Main Anime Interface matching the provided JSON structure
+ */
+export interface MALAnime {
+  mal_id: number;
+  url: string; // https://myanimelist.net/anime/{id}/{title}
+  images: MainImages;
+  trailer: TrailerData;
+  approved: boolean;
+
+  // Titles & Metadata
+  titles: TitleEntry[];
+  title: string;
+  title_english?: string | null;
+  title_japanese?: string | null;
+  title_synonyms: string[];
+
+  type: string; // e.g., "TV", "Movie"
+  source?: string; // e.g., "Light novel"
+
+  episodes: number;
+  status?: string; // e.g., "Currently Airing", "Finished Airing"
+  airing?: boolean;
+  aired?: AiredData;
+
+  duration?: string; // e.g. "23 min per ep"
+  rating?: string; // e.g., "R - 17+ (violence & profanity)"
+
+  score: number;
+  scored_by: number;
+  rank: number;
+  popularity: number;
+  members: number;
+  favorites: number;
+
+  synopsis: string | null;
+  background?: string | null;
+
+  season?: string; // e.g., "spring"
+  year?: number;
+
+  broadcast?: {
+    day: string; // Wednesdays
+    time: string; // 22:00
+    timezone: string; // Asia/Tokyo
+    string: string; // Wednesdays at 22:000 (JST)
+  };
+
+  producers: RelatedEntity[];
+  licensors: RelatedEntity[];
+  studios: RelatedEntity[];
+
+  genres: RelatedEntity[];
+  explicit_genres?: RelatedEntity[];
+
+  themes: RelatedEntity[];
+  demographics?: RelatedEntity[];
 }

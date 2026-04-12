@@ -1,0 +1,17 @@
+{
+  "name": "nuuwatch",
+  "version": "0.0.1",
+  "description": "nuuwatch package",
+  "main": "index.js",
+  "scripts": {
+    "build": "node scripts/build_and_copy.mjs",
+    "watch": "",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Luna",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "@mateoaranda/jikanjs": "1.3.1"
+  }
+}
