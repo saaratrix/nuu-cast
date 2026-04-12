@@ -12,3 +12,4 @@ hyper="1.8.1"
 tower-http = { version = "0.6.8", features = ["fs"] }
 tokio-util = "0.7.18"
 rsubs-lib = "0.3.3"
+rand = "0.10.0"

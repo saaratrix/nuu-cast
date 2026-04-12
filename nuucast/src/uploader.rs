@@ -1,23 +1,38 @@
 use std::path::PathBuf;
-use axum::{
-    extract::Path as AxumPath,
-    body::Bytes,
-    http::StatusCode,
-};
+use axum::{extract::Path as AxumPath, body::Bytes, http::StatusCode, Json};
+use crate::converters::conversion::{convert_file, should_convert};
 use crate::io::file_utility::{get_url_and_filepath_from_url, UrlAndFilePath, MEDIA_ROOT};
 
 pub async fn handle_upload(
-    AxumPath(url) : AxumPath<String>,
+    AxumPath(url): AxumPath<String>,
     body: Bytes,
-) -> StatusCode {
-    let paths = get_url_and_filepath_from_url(&url).unwrap_or_else(|| UrlAndFilePath { url: PathBuf::new(), filepath: MEDIA_ROOT.clone() });
+) -> Result<Json<Vec<PathBuf>>, (StatusCode, String)> {
+    let paths = get_url_and_filepath_from_url(&url)
+        .ok_or((StatusCode::BAD_REQUEST, "Could not parse upload url".to_string()))?;
 
-    match tokio::fs::write(&paths.filepath, &body).await {
-        Ok(_) => {
-            StatusCode::OK
-        }
-        Err(e) => {
-            StatusCode::INTERNAL_SERVER_ERROR
-        }
+    let extension = paths.filepath
+        .extension()
+        .and_then(|e| e.to_str())
+        .unwrap_or("");
+
+    let added_files = if should_convert(extension) {
+        convert_file(&paths, &extension, &body).await
+            .map_err(|e| {
+                println!("Conversion error: {}", e);
+                (StatusCode::INTERNAL_SERVER_ERROR, e)
+            })?
+    } else {
+        tokio::fs::write(&paths.filepath, &body).await
+            .map_err(|e| {
+                println!("write error: {}", e);
+                (StatusCode::INTERNAL_SERVER_ERROR, e.to_string())
+            })?;
+        vec![paths.url.clone()]
+    };
+
+    if added_files.is_empty() {
+        return Err((StatusCode::INTERNAL_SERVER_ERROR, "No files uploaded".to_string()));
     }
+
+    Ok(Json(added_files))
 }

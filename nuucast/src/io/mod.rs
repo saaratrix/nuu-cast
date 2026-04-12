@@ -1,4 +1,4 @@
 pub mod file_utility;
 pub mod file_lookup_cache;
-pub mod mkv_utility;
-pub mod subtitles_utility;
+pub mod temp_files_directory;
+pub mod file_copier;

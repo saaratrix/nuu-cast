@@ -3,7 +3,7 @@ use std::path::{Component, PathBuf};
 use std::sync::LazyLock;
 use crate::io::file_lookup_cache::PathCache;
 
-pub static PROJECT_ROOT: LazyLock<PathBuf> =
+pub static NUUCAST_PROJECT_ROOT: LazyLock<PathBuf> =
     LazyLock::new(|| {
         env::var("PROJECT_ROOT")
             .map(PathBuf::from)
@@ -11,11 +11,13 @@ pub static PROJECT_ROOT: LazyLock<PathBuf> =
     });
 
 pub static MEDIA_ROOT: LazyLock<PathBuf> =
-    LazyLock::new(|| PathBuf::from(&*PROJECT_ROOT).join("media"));
+    LazyLock::new(|| PathBuf::from(&*NUUCAST_PROJECT_ROOT).join("media"));
 
 pub static STATIC_ROOT: LazyLock<PathBuf> =
-    LazyLock::new(|| PathBuf::from(&*PROJECT_ROOT).join("static"));
+    LazyLock::new(|| PathBuf::from(&*NUUCAST_PROJECT_ROOT).join("static"));
 
+pub static TEMP_FILES_ROOT: LazyLock<PathBuf> =
+    LazyLock::new(|| PathBuf::from(&*NUUCAST_PROJECT_ROOT).join("temp_files"));
 static PATH_CACHE: LazyLock<PathCache> = LazyLock::new(|| PathCache::new());
 
 #[derive(Debug, Clone)]

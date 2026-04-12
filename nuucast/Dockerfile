@@ -15,6 +15,7 @@ RUN rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY --from=builder /app/target/release/nuucast /app/nuucast
+RUN mkdir -p /app/temp_files && chmod 777 /app/temp_files
 
 ENV PROJECT_ROOT=/app/
 

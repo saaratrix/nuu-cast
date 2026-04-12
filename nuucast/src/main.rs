@@ -4,6 +4,8 @@ mod io;
 mod file_fetcher;
 mod html;
 mod deleter;
+mod converters;
+mod connected_files;
 
 use std::collections::HashMap;
 use axum::{Form, Router};
