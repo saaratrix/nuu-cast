@@ -1,0 +1,6 @@
+<nav class="navbar">
+  {% for crumb in breadcrumbs %}
+  {% if !loop.first %} / {% endif %}
+  <a class="breadcrumb-link" href="{{ crumb.href }}">{{ crumb.label }}</a>
+  {% endfor %}
+</nav>

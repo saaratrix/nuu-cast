@@ -5,6 +5,7 @@
     --color-text-disabled: #6b6b7a;
     --color-link: #a087d2;
     --color-link-hover: #c8acff;
+    --color-link-pressed: #bb99ff;
     --color-link-contrast: #c8acff;
     --color-link-disabled: #5c5675;
     --color-link-disabled-bg: hsl(240, 12%, 18%);
@@ -32,7 +33,7 @@ h3 {
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 .explorer {
@@ -47,6 +48,7 @@ h3 {
 .item-list {
     display: flex;
     gap: 0.5rem;
+    flex-wrap: wrap;
     list-style: none;
     padding: 0;
     margin: 1rem 0;
@@ -112,18 +114,54 @@ item-file {
     background: #f0f0f0;
 }
 
+.filters {
+
+}
+
+.filter-button {
+    font-size: 2rem;
+    cursor: pointer;
+    user-select: none;
+    color: var(--color-link-disabled);
+}
+
+.filter-button:hover, .filter-button.active:hover {
+    color: var(--color-link-hover);
+}
+
+.filter-button:active, .filter-button.active:active {
+    color: var(--color-link-pressed);
+}
+
+.filter-button.active {
+    color: var(--color-link);
+}
+
 #upload-form {
     display: flex;
     flex-direction: column;
     margin-top: 1rem;
     gap: 0.25rem;
     width: 100%;
-    max-width: 30ch;
+    max-width: 50ch;
+}
+
+.upload-file-items {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 .upload-group {
     display: grid;
     grid-template-columns: 6ch auto;
+    gap: 0.25rem;
+}
+
+.upload-group-3-columns {
+    grid-template-columns: 6ch auto 2ch
 }
 
 .upload-group label {

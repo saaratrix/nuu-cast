@@ -1,9 +1,61 @@
 document.addEventListener('DOMContentLoaded', () => {
   initItems();
-
-  initUploadForm();
-
+  initFilters();
 });
+
+/** @typdef {{tag: 'subtitle', active: boolean, items: HTMLElement[]}} Filter */
+/**
+ * @type {{ subtitle: Filter }}
+ */
+const filters = {
+  subtitle: {
+    tag: 'subtitle',
+    active: false,
+    items: []
+  },
+}
+
+function initFilters() {
+  const filtersElement = document.getElementById('filters');
+  const filterSubtitlesButton = filtersElement.querySelector('.filter-subtitles');
+
+  filters.subtitle.active = (localStorage.getItem('filter-subtitles') ?? '1') !== '0';
+  filters.subtitle.active && filterSubtitlesButton.classList.add('active');
+  filterSubtitlesButton.addEventListener('click', () => {
+    const isActive = !filters.subtitle.active
+    filters.subtitle.active = isActive;
+    filterSubtitlesButton.classList.toggle('active');
+    localStorage.setItem('filter-subtitles', isActive ? '1' : '0');
+    filterItems()
+  });
+
+  filterItems();
+}
+
+function filterItems() {
+  const filterList = Object.values(filters);
+  /** @type {Set<HTMLButtonElement>} */
+  const visibleItems = new Set();
+  /** @type {Set<HTMLButtonElement>} */
+  const hiddenItems = new Set();
+
+  for (const filter of filterList) {
+    const target = filter.active ? hiddenItems : visibleItems;
+
+    for (const item of filter.items) {
+      target.add(item);
+    }
+  }
+
+  for (const item of hiddenItems) {
+    visibleItems.delete(item);
+    item.classList.add('hidden');
+  }
+
+  for (const item of visibleItems) {
+    item.classList.remove('hidden');
+  }
+}
 
 function initItems() {
   const items = document.querySelectorAll('.item-card');
@@ -21,8 +73,12 @@ function initItem(item) {
 
   actions.classList.add('hidden');
   initItemContextMenu(item);
+  initItemTags(item);
 }
 
+/**
+ * @param {HTMLElement} item
+ */
 function initItemContextMenu(item) {
   const contextMenuOpenEvent = 'nuucast:contextmenu:open';
 
@@ -69,68 +125,29 @@ function initItemContextMenu(item) {
   });
 }
 
-function initUploadForm() {
-  /** @type {HTMLFormElement} */
-  const uploadForm = document.getElementById('upload-form');
-  uploadForm.classList.remove('hidden');
-  /** @type {HTMLInputElement} */
-  const fileInput = document.getElementById('upload-file-input');
-  const nameInput = document.getElementById('upload-name-input');
-  /** @type {HTMLButtonElement} */
-  const submitButton = document.querySelector('.upload-button');
-  const informationElement = uploadForm.querySelector('.upload-information');
+/**
+ * @param {HTMLElement} item
+ */
+function initItemTags(item) {
+  const isDirectory = item.classList.contains('item-directory');
+  const isFile = !isDirectory;
 
-  /**
-   * @param {string} value
-   */
-  function setInformation(value) {
-    informationElement.textContent = value;
-    value === '' ? informationElement.classList.add('hidden') : informationElement.classList.remove('hidden');
+  if (!isFile) {
+    return;
   }
 
-  fileInput.addEventListener('change', () => {
-    if (fileInput.files.length > 1) {
-      setInformation("Too many files selected can only upload 1.");
-      return;
-    }
-    setInformation("");
-    if (fileInput.files.length === 0) {
-      return;
-    }
-    const file = fileInput.files[0];
-    nameInput.value = file.name;
-    nameInput.focus();
-  });
+  const link = item.querySelector('.item-body');
+  const url = link?.href;
 
-  uploadForm.addEventListener('change', () => submitButton.disabled = !uploadForm.checkValidity());
-  uploadForm.addEventListener('input', () => submitButton.disabled = !uploadForm.checkValidity());
+  const itemTags = [];
 
-  uploadForm.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    let filename = nameInput.value.replace(/[/\\]/g, '').trim();
+  const isSubtitle = url.endsWith('.vtt');
+  if (isSubtitle) {
+    itemTags.push(filters.subtitle.tag);
+    filters.subtitle.items.push(item);
+  }
 
-    if (!filename) {
-      setInformation('Please enter a valid filename');
-      return;
-    }
-    const root = document.getElementById('upload-root').value;
-    const uploadUrl = `${root}/${filename}`;
-
-    setInformation('');
-    const file = fileInput.files[0];
-    try {
-      const response = await fetch(uploadUrl, {
-        method: 'PUT',
-        body: file
-      });
-
-      if (response.ok) {
-        location.reload();
-      } else {
-        setInformation(`Upload failed: ${response.statusText}`);
-      }
-    } catch (err) {
-      setInformation(`Upload error: ${err.message}`);
-    }
-  });
+  if (itemTags.length > 0) {
+    item.dataset.tags = itemTags.join(' ');
+  }
 }

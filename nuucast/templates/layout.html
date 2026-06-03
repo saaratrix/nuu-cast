@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/js/app.js" type="module"></script>
+    {% if script_url.is_some() %}
+    <script src="/static/{{ script_url.as_ref().unwrap() }}" type="module"></script>
+    {% endif %}
+</head>
+<body class="{{ body_class }}">
+{% include "partials/navbar.html" %}
+{% block content %}{% endblock %}
+</body>
+</html>

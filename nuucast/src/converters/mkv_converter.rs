@@ -1,10 +1,11 @@
 use std::path::{PathBuf};
 use std::time::Instant;
 use axum::body::Bytes;
-use crate::converters::subtitles_utility::{convert_srt_to_vtt, extract_srt_files_from_mkv_with_track_ids, extract_subtitle_track_ids_from_mkv};
+use crate::converters::subtitles_utility::{convert_srt_to_vtt, extract_subtitle_files_from_mkv_with_track_ids, extract_subtitle_track_ids_from_mkv};
 use crate::io::file_copier::copy_converted_files;
 use crate::io::file_utility::UrlAndFilePath;
 use crate::io::temp_files_directory::TempFilesDirectory;
+use tokio::process::Command;
 
 pub async fn convert_mkv(paths: &UrlAndFilePath, body: &Bytes) -> Result<Vec<PathBuf>, String> {
     let temp_directory = TempFilesDirectory::new()?;
@@ -16,16 +17,15 @@ pub async fn convert_mkv(paths: &UrlAndFilePath, body: &Bytes) -> Result<Vec<Pat
     let video_fileconvert_time = Instant::now();
     println!("convert mkv to mp4 {:?}", video_fileconvert_time.duration_since(mkv_file_time));
 
-
     if !mp4_file.exists() {
         return Err("MP4 conversion failed, file does not exist".to_string());
     }
 
     let subtitle_paths = extract_subtitles(&mkv_file, &temp_directory).await?;
     let subtitle_paths_time = Instant::now();
-    println!("extract subtitles to srt files took {:?}", subtitle_paths_time.duration_since(video_fileconvert_time));
+    println!("extract subtitles ({}) to srt files took {:?}", subtitle_paths.len() , subtitle_paths_time.duration_since(video_fileconvert_time));
 
-    let vtt_paths = convert_subtitles_srt_to_vtt(&subtitle_paths).await?;
+    let vtt_paths = convert_subtitles_to_vtt(&subtitle_paths).await?;
     let vtt_paths_time = Instant::now();
     println!("convert srt to vtt took {:?}", vtt_paths_time.duration_since(subtitle_paths_time));
 
@@ -55,6 +55,8 @@ async fn save_mkv_file(paths: &UrlAndFilePath, temp_files_directory: &TempFilesD
 }
 
 async fn convert_mkv_to_mp4(mkv_file: &PathBuf, temp_files_directory: &TempFilesDirectory) -> Result<PathBuf, String> {
+    println!("starting converting {} to mp4...", mkv_file.display());
+
     let stem = mkv_file.file_stem()
         .ok_or("Could not extract filename stem")?;
 
@@ -78,16 +80,46 @@ async fn extract_subtitles(mkv_file: &PathBuf, temp_files_directory: &TempFilesD
     let filestem =  mkv_file.file_stem().unwrap().to_str().unwrap();
     let track_ids = extract_subtitle_track_ids_from_mkv(mkv_file_str).await?;
 
-    let subtitle_paths = extract_srt_files_from_mkv_with_track_ids(mkv_file_str, filestem, &track_ids, &temp_files_directory).await?;
+    println!("found {} track_ids from mkv file: {}", track_ids.len(), mkv_file_str);
+
+    let subtitle_paths = extract_subtitle_files_from_mkv_with_track_ids(mkv_file_str, filestem, &track_ids, &temp_files_directory).await?;
+
     Ok(subtitle_paths)
 }
 
-async fn convert_subtitles_srt_to_vtt(srt_files: &Vec<PathBuf>) -> Result<Vec<PathBuf>, String> {
-    let mut result = Vec::new();
-    for srt_file in srt_files.iter() {
-        let output_file = srt_file.with_extension("vtt");
-        let vtt_file = convert_srt_to_vtt(srt_file, &output_file)?;
-        result.push(vtt_file);
+pub async fn convert_subtitles_to_vtt(
+    subtitle_files: &Vec<PathBuf>,
+) -> Result<Vec<PathBuf>, String> {
+    let mut vtt_files = Vec::new();
+
+    for input_file in subtitle_files {
+        let output_file = input_file.with_extension("vtt");
+
+        let output = Command::new("ffmpeg")
+            .arg("-y")
+            .arg("-i")
+            .arg(input_file)
+            .arg(&output_file)
+            .output()
+            .await
+            .map_err(|e| {
+                format!(
+                    "Failed to start ffmpeg for {}: {}",
+                    input_file.display(),
+                    e
+                )
+            })?;
+
+        if !output.status.success() {
+            return Err(format!(
+                "ffmpeg failed converting {}\nstderr:\n{}",
+                input_file.display(),
+                String::from_utf8_lossy(&output.stderr)
+            ));
+        }
+
+        vtt_files.push(output_file);
     }
-    Ok(result)
+
+    Ok(vtt_files)
 }
