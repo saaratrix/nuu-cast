@@ -1,0 +1,23 @@
+.invisible {
+    opacity: 0 !important;
+}
+
+.items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 192px);
+}
+
+.item-card {
+    position: relative;
+}
+
+.item-synopsis {
+    position: absolute;
+    max-width: 100%;
+    opacity: 1;
+    transition: opacity 100ms ease-in;
+}
+
+.item-synopsis.invisible {
+    pointer-events: none;
+}

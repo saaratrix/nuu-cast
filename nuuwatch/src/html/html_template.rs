@@ -14,7 +14,7 @@ pub fn get_html(title: &str, body_class: &str, scripts_url: Option<&str>, url: &
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{title}</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
     <script src="/static/js/app.js" type="module" ></script>
 </head>
 <body class="{body_class}">
@@ -45,6 +45,6 @@ pub fn get_navbar(url: &PathBuf) -> String {
 
 pub fn get_browser_html() -> String {
     let title = "Browser";
-    let html = get_html(&title, "browser", None, &PathBuf::from(""), "Hello world");
+    let html = get_html(&title, "browser", None, &PathBuf::from(""), "<div class='items'></div>");
     html
 }
