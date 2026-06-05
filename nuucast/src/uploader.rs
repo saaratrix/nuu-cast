@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 use axum::{extract::Path as AxumPath, body::Bytes, http::StatusCode, Json};
 use crate::converters::conversion::{convert_file, should_convert};
-use crate::io::file_utility::{get_url_and_filepath_from_url, UrlAndFilePath, MEDIA_ROOT};
+use crate::io::file_utility::{get_url_and_filepath_from_url, invalidate_path_details, UrlAndFilePath, MEDIA_ROOT};
 
 pub async fn handle_upload(
     AxumPath(url): AxumPath<String>,
@@ -32,6 +32,10 @@ pub async fn handle_upload(
 
     if added_files.is_empty() {
         return Err((StatusCode::INTERNAL_SERVER_ERROR, "No files uploaded".to_string()));
+    }
+    // This doesn't invalidate directories but a future problem.
+    for path in &added_files {
+        invalidate_path_details(path);
     }
 
     Ok(Json(added_files))

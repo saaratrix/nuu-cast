@@ -7,6 +7,25 @@ use tokio::fs::File;
 use tokio::io::{AsyncReadExt, AsyncSeekExt};
 use crate::io::file_utility::{get_url_and_filepath_from_url, get_mime_type };
 
+pub async fn get_file(Path(url): Path<String>, headers: HeaderMap) -> Response {
+    let Some(paths) = get_url_and_filepath_from_url(&url) else {
+        return (StatusCode::NOT_FOUND, "File not found").into_response();
+    };
+
+    let bytes = match tokio::fs::read(&paths.filepath).await {
+        Ok(bytes) => bytes,
+        Err(_) => return (StatusCode::NOT_FOUND, "File not found").into_response(),
+    };
+
+    let mime_type = get_mime_type(&paths.filepath);
+
+    let header = [
+        (header::CONTENT_TYPE, mime_type),
+        (header::CONTENT_LENGTH, &bytes.len().to_string()),
+    ];
+    (header, bytes).into_response()
+}
+
 pub async fn stream_file(Path(url): Path<String>, headers: HeaderMap) -> Response {
     let Some(paths) = get_url_and_filepath_from_url(&url) else {
         return (StatusCode::NOT_FOUND, "File not found").into_response();

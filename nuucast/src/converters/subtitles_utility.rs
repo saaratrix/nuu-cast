@@ -1,26 +1,7 @@
-use std::fs;
-use rsubs_lib::SRT;
 use std::path::PathBuf;
 use tokio::process::Command;
 use crate::io::temp_files_directory::TempFilesDirectory;
 
-// Convert SRT into VTT for <video> support.
-pub fn convert_srt_to_vtt(srt_file: &PathBuf, output_path: &PathBuf) -> Result<PathBuf, String> {
-    let srt_content = fs::read_to_string(srt_file)
-        .map_err(|e| format!("Could not read srt file: {} - error: {}", srt_file.display(), e))?;
-
-    println!("SRT size: {} bytes", srt_content.len());
-
-    let vtt_content = SRT::parse(&srt_content)
-        .map_err(|e| format!("Failed to convert srt file: {}", e))?
-        .to_vtt()
-        .to_string();
-
-    fs::write(output_path, vtt_content)
-        .map_err(|e| format!("Could not write vtt file: {} - error: {}", output_path.display(), e))?;
-
-    Ok(output_path.clone())
-}
 
 pub async fn extract_subtitle_track_ids_from_mkv(
     mkv_file: &str,

@@ -1,7 +1,7 @@
 use std::path::{PathBuf};
 use std::time::Instant;
 use axum::body::Bytes;
-use crate::converters::subtitles_utility::{convert_srt_to_vtt, extract_subtitle_files_from_mkv_with_track_ids, extract_subtitle_track_ids_from_mkv};
+use crate::converters::subtitles_utility::{extract_subtitle_files_from_mkv_with_track_ids, extract_subtitle_track_ids_from_mkv};
 use crate::io::file_copier::copy_converted_files;
 use crate::io::file_utility::UrlAndFilePath;
 use crate::io::temp_files_directory::TempFilesDirectory;

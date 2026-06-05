@@ -5,7 +5,6 @@ mod file_fetcher;
 mod html;
 mod deleter;
 mod converters;
-mod connected_files;
 
 use std::collections::HashMap;
 use axum::{Form, Router};
@@ -22,6 +21,7 @@ async fn main() {
     let app = Router::new()
         .nest_service("/static", ServeDir::new("static"))
         .route("/stream/{*path}", get(file_fetcher::stream_file))
+        .route("/file/{*path}", get(file_fetcher::get_file))
         .route("/{*path}", get(explorer::explore_path_wildcard))
         .route("/{*path}", put(uploader::handle_upload).layer(DefaultBodyLimit::max(upload_max_size)))
         .route("/{*path}", delete(deleter::delete_path))

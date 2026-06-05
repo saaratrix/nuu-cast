@@ -1,4 +1,4 @@
-use std::path::{ PathBuf, Path };
+use std::path::{ PathBuf };
 use axum::{
     extract::Path as AxumPath,
     http::StatusCode,
@@ -10,8 +10,8 @@ use axum::{
     }
 };
 
-use crate::io::file_utility::{get_url_and_filepath_from_url, get_path_details, get_directory_children, PathType, MediaType, UrlAndFilePath, get_media_type, get_mime_type, MEDIA_ROOT};
-use crate::html::html_template::{get_directory_html, get_file_html};
+use crate::io::file_utility::{get_url_and_filepath_from_url, get_path_details, get_directory_children, PathType, MediaType, UrlAndFilePath, get_media_type, get_mime_type, MEDIA_ROOT, get_files_of_types};
+use crate::html::html_template::{get_directory_html, get_explore_file_html};
 
 pub async fn explore_path_root() -> impl IntoResponse {
     let paths = UrlAndFilePath { url: PathBuf::new(), filepath: MEDIA_ROOT.clone() };
@@ -43,7 +43,8 @@ async fn explore_path(paths: UrlAndFilePath) -> impl IntoResponse {
 
 async fn explore_file(paths: &UrlAndFilePath) -> Response {
     let media_type = get_media_type(&paths.filepath);
-    let html = get_file_html(paths, &media_type);
+    let subtitles =  try_get_subtitles(paths, &media_type);
+    let html = get_explore_file_html(paths, &subtitles, &media_type);
 
     Html(html).into_response()
 }
@@ -53,4 +54,17 @@ async fn explore_directory(paths: &UrlAndFilePath) -> Response {
 
     let html = get_directory_html(paths, &directory_items);
     (StatusCode::OK, Html(html)).into_response()
+}
+
+pub fn try_get_subtitles(
+    paths: &UrlAndFilePath,
+    media_type: &MediaType,
+) -> Vec<UrlAndFilePath> {
+    if *media_type != MediaType::Video {
+        print!("No video, skipping subtitles search.");
+        return Vec::new();
+    }
+
+    paths.filepath.parent().map(|dir| get_files_of_types(&dir.to_path_buf(), &["vtt"]))
+        .unwrap_or_default()
 }

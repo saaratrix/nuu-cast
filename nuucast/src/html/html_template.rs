@@ -26,7 +26,7 @@ pub fn get_directory_html(
     template.render().unwrap()
 }
 
-pub fn get_file_html(paths: &UrlAndFilePath, media_type: &MediaType) -> String {
+pub fn get_explore_file_html(paths: &UrlAndFilePath, subtitles: &Vec<UrlAndFilePath>, media_type: &MediaType) -> String {
     let stream_path = format!("/stream/{}", paths.url.display());
 
     let media_type = match media_type {
@@ -39,12 +39,14 @@ pub fn get_file_html(paths: &UrlAndFilePath, media_type: &MediaType) -> String {
 
     let mime_type = get_mime_type(&paths.filepath);
 
+    let subtitle_urls: Vec<String> = subtitles.iter().map(|subtitle| format!("/file/{}", subtitle.url.display())).collect();
+
     let template = FileTemplate {
         title: paths.url.display().to_string(),
         body_class: "viewer".to_string(),
         script_url: Some("js/file-viewer.js".to_string()),
         breadcrumbs: build_breadcrumbs(&paths.url),
-        subtitles: Vec::new(),
+        subtitles: subtitle_urls,
 
         media_type,
         stream_path: stream_path.to_string(),

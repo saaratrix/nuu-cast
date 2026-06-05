@@ -1,5 +1,5 @@
 use std::{env, fs};
-use std::path::{Component, PathBuf};
+use std::path::{Component, Path, PathBuf};
 use std::sync::LazyLock;
 use crate::io::file_lookup_cache::PathCache;
 
@@ -22,7 +22,9 @@ static PATH_CACHE: LazyLock<PathCache> = LazyLock::new(|| PathCache::new());
 
 #[derive(Debug, Clone)]
 pub struct UrlAndFilePath {
+    // Url for browser.
     pub url: PathBuf,
+    // filepath to media folder: /media/file.txt
     pub filepath: PathBuf,
 }
 
@@ -71,6 +73,10 @@ pub fn get_path_details(path: &PathBuf) -> PathType {
     PATH_CACHE.get_path_details(path)
 }
 
+pub fn invalidate_path_details(path: &PathBuf) {
+    PATH_CACHE.invalidate(path)
+}
+
 #[derive(Debug, Clone)]
 pub struct DirectoryChildren {
     pub directories: Vec<UrlAndFilePath>,
@@ -106,7 +112,23 @@ pub fn get_directory_children(path: &PathBuf) -> DirectoryChildren {
     DirectoryChildren { directories, files }
 }
 
-#[derive(Debug, Clone)]
+pub fn get_files_of_types(
+    path: &PathBuf,
+    extensions: &[&str],
+) -> Vec<UrlAndFilePath> {
+    get_directory_children(path)
+        .files
+        .into_iter()
+        .filter(|file| {
+            file.filepath
+                .extension()
+                .and_then(|e| e.to_str())
+                .is_some_and(|ext| extensions.contains(&ext))
+        })
+        .collect()
+}
+
+#[derive(Debug, Clone, PartialEq)]
 pub enum MediaType {
     Image,
     Video,
@@ -151,8 +173,10 @@ pub fn get_mime_type(path: &PathBuf) -> &'static str {
         Some("aac") => "audio/aac",
         // Text
         Some("txt") => "text/plain",
-        Some("srt") => "text/plain",
-        Some("vtt") => "text/plain",
+        Some("srt") => "application/x-subrip",
+        Some("ass") => "text/x-ssa",
+        Some("ssa") => "text/x-ssa",
+        Some("vtt") => "text/vtt",
         _ => "application/octet-stream",
     }
 }
