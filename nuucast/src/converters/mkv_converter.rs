@@ -1,7 +1,7 @@
 use std::path::{PathBuf};
 use std::time::Instant;
 use axum::body::Bytes;
-use crate::converters::subtitles_utility::{extract_subtitle_files_from_mkv_with_track_ids, extract_subtitle_track_ids_from_mkv};
+use crate::converters::subtitles_utility::{extract_subtitle_files_from_mkv_with_track_ids, extract_subtitle_track_ids_from_mkv, extract_subtitle_tracks_with_language};
 use crate::io::file_copier::copy_converted_files;
 use crate::io::file_utility::UrlAndFilePath;
 use crate::io::temp_files_directory::TempFilesDirectory;
@@ -78,11 +78,12 @@ async fn convert_mkv_to_mp4(mkv_file: &PathBuf, temp_files_directory: &TempFiles
 async fn extract_subtitles(mkv_file: &PathBuf, temp_files_directory: &TempFilesDirectory) -> Result<Vec<PathBuf>, String> {
     let mkv_file_str = mkv_file.to_str().unwrap();
     let filestem =  mkv_file.file_stem().unwrap().to_str().unwrap();
-    let track_ids = extract_subtitle_track_ids_from_mkv(mkv_file_str).await?;
+    // let track_ids = extract_subtitle_track_ids_from_mkv(mkv_file_str).await?;
+    let tracks = extract_subtitle_tracks_with_language(mkv_file_str).await?;
 
-    println!("found {} track_ids from mkv file: {}", track_ids.len(), mkv_file_str);
+    println!("found {} track_ids from mkv file: {}", tracks.len(), mkv_file_str);
 
-    let subtitle_paths = extract_subtitle_files_from_mkv_with_track_ids(mkv_file_str, filestem, &track_ids, &temp_files_directory).await?;
+    let subtitle_paths = extract_subtitle_files_from_mkv_with_track_ids(mkv_file_str, filestem, &tracks, &temp_files_directory).await?;
 
     Ok(subtitle_paths)
 }

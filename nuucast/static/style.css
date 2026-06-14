@@ -10,11 +10,18 @@
     --color-link-disabled: #5c5675;
     --color-link-disabled-bg: hsl(240, 12%, 18%);
 }
+
+* {
+    box-sizing: border-box;
+}
+
 body {
     min-height: 100dvh;
     background-color: var(--color-bg);
     color: var(--color-text);
     font-family: sans-serif;
+    margin: 0;
+    padding: 0.5rem;
 }
 
 a {
@@ -42,7 +49,7 @@ h3 {
 }
 
 .navbar {
-    margin: 1rem 0;
+    margin: 0 0 1rem 0;
 }
 
 .item-list {

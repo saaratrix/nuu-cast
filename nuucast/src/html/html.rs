@@ -31,7 +31,7 @@ pub struct FileTemplate {
     pub body_class: String,
     pub script_url: Option<String>,
     pub breadcrumbs: Vec<Breadcrumb>,
-    pub subtitles: Vec<String>,
+    pub subtitles: String,
 
     pub media_type: &'static str,
     pub stream_path: String,

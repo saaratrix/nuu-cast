@@ -1,32 +1,7 @@
 {% extends "layout.html" %}
 
 {% block content %}
-{% match media_type %}
-{% when "image" %}
-<img src="{{ stream_path }}">
-{% when "video" %}
-<video autoplay controls>
-    <source src="{{ stream_path }}" type="{{ mime_type }}">
-</video>
+<media-viewer src="{{ stream_path }}" auto-height="true" subtitles="{{ subtitles }}"></media-viewer>
+<script src="/static/vendor/nui/media-viewer/media-viewer.js" type="module"></script>
 
-{% if subtitles.len() > 0 %}
-<div class="hidden">
-    <h1>Subtitles Picker</h1>
-    <select id="subtitle-picker">
-        {% for subtitle in subtitles %}
-        <option value="{{ subtitle }}">
-            {{ subtitle }}
-        </option>
-        {% endfor %}
-    </select>
-</div>
-{% endif %}
-
-{% when "audio" %}
-<audio controls>
-    <source src="{{ stream_path }}" type="{{ mime_type }}">
-</audio>
-{% else %}
-<p>Not implemented.</p>
-{% endmatch %}
 {% endblock %}

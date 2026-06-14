@@ -1,67 +1,35 @@
 use std::path::PathBuf;
 use tokio::process::Command;
+use serde::Deserialize;
 use crate::io::temp_files_directory::TempFilesDirectory;
-
-
-pub async fn extract_subtitle_track_ids_from_mkv(
-    mkv_file: &str,
-) -> Result<Vec<u16>, String> {
-    let output = Command::new("mkvmerge")
-        .args(["--identify", mkv_file])
-        .output()
-        .await
-        .map_err(|e| format!("Could not run mkvmerge - {}", e))?;
-
-    if !output.status.success() {
-        return Err(format!(
-            "mkvmerge failed: {}",
-            String::from_utf8_lossy(&output.stderr)
-        ));
-    }
-
-    let stdout = String::from_utf8_lossy(&output.stdout);
-
-    let ids = stdout
-        .lines()
-        .filter(|line| line.contains(": subtitles"))
-        .filter_map(parse_track_id)
-        .collect();
-
-    Ok(ids)
-}
-
-fn parse_track_id(line: &str) -> Option<u16> {
-    // Example:
-    // Track ID 2: subtitles (Woof/SRT)
-
-    let rest = line.strip_prefix("Track ID ")?;
-    let id_part = rest.split_once(':')?.0;
-
-    id_part.parse::<u16>().ok()
-}
 
 /// We extract the subtitle as is, it can be .srt, .ass and more and then ffmpeg will convert it to vtt.
 pub async fn extract_subtitle_files_from_mkv_with_track_ids(
     mkv_file: &str,
     mkv_filestem: &str,
-    track_ids: &[u16],
+    // track_ids: &[u16],
+    tracks: &[SubtitleTrack],
     temp_files_directory: &TempFilesDirectory,
 ) -> Result<Vec<PathBuf>, String> {
     let mut paths = Vec::new();
     let mut args = vec!["tracks".to_string(), mkv_file.to_string()];
 
-    for id in track_ids {
+    for track in tracks {
+        if !matches!(track.language.as_str(), "en" | "fi" | "sv") {
+            continue;
+        }
+
         let srt_path = temp_files_directory
             .path
-            .join(format!("{}.{}.sub", mkv_filestem, id));
+            .join(format!("{}.{}.sub", mkv_filestem, track.language));
 
-        println!("Track {} -> {}", id, srt_path.display());
+        println!("Track {} -> {}", track.track_id, srt_path.display());
 
         let srt_str = srt_path
             .to_str()
-            .ok_or_else(|| format!("Invalid output path for track {}", id))?;
+            .ok_or_else(|| format!("Invalid output path for track {}", track.track_id))?;
 
-        args.push(format!("{}:{}", id, srt_str));
+        args.push(format!("{}:{}", track.track_id, srt_str));
         paths.push(srt_path);
     }
 
@@ -78,4 +46,64 @@ pub async fn extract_subtitle_files_from_mkv_with_track_ids(
             String::from_utf8_lossy(&output.stderr)
         ))
     }
+}
+
+#[derive(Debug, Deserialize)]
+struct MkvMergeJson {
+    tracks: Vec<Track>,
+}
+
+#[derive(Debug, Deserialize)]
+struct Track {
+    id: u16,
+
+    #[serde(rename = "type")]
+    kind: String,
+
+    properties: Properties,
+}
+
+#[derive(Debug, Deserialize)]
+struct Properties {
+    language_ietf: Option<String>,
+}
+
+#[derive(Debug)]
+pub struct SubtitleTrack {
+    track_id: u16,
+    language: String,
+}
+
+pub async fn extract_subtitle_tracks_with_language(
+    mkv_file: &str,
+) -> Result<Vec<SubtitleTrack>, String> {
+    let output = Command::new("mkvmerge")
+        .args(["-J", mkv_file])
+        .output()
+        .await
+        .map_err(|e| format!("Could not run mkvmerge - {}", e))?;
+
+    if !output.status.success() {
+        return Err(format!(
+            "mkvmerge failed: {}",
+            String::from_utf8_lossy(&output.stderr)
+        )
+            .into());
+    }
+
+    let parsed: MkvMergeJson = serde_json::from_slice(&output.stdout).unwrap();
+
+    let subtitles = parsed
+        .tracks
+        .into_iter()
+        .filter(|track| track.kind == "subtitles")
+        .filter_map(|track| {
+            track.properties.language_ietf.map(|language| SubtitleTrack {
+                track_id: track.id,
+                language,
+            })
+        })
+        .collect();
+
+    Ok(subtitles)
 }

@@ -1,5 +1,6 @@
 use std::path::{Component, PathBuf};
 use askama::Template;
+use crate::explorer::Subtitle;
 use crate::html::html::{build_breadcrumbs, DirectoryTemplate, FileTemplate, Item};
 use crate::io::file_utility::{get_mime_type, DirectoryChildren, MediaType, UrlAndFilePath};
 
@@ -26,7 +27,7 @@ pub fn get_directory_html(
     template.render().unwrap()
 }
 
-pub fn get_explore_file_html(paths: &UrlAndFilePath, subtitles: &Vec<UrlAndFilePath>, media_type: &MediaType) -> String {
+pub fn get_explore_file_html(paths: &UrlAndFilePath, subtitles: &Vec<Subtitle>, media_type: &MediaType) -> String {
     let stream_path = format!("/stream/{}", paths.url.display());
 
     let media_type = match media_type {
@@ -39,14 +40,22 @@ pub fn get_explore_file_html(paths: &UrlAndFilePath, subtitles: &Vec<UrlAndFileP
 
     let mime_type = get_mime_type(&paths.filepath);
 
-    let subtitle_urls: Vec<String> = subtitles.iter().map(|subtitle| format!("/file/{}", subtitle.url.display())).collect();
+    let subtitle_data = subtitles
+        .iter()
+        .flat_map(|subtitle| [
+            format!("/file/{}", subtitle.path.url.display()),
+            subtitle.label.clone(),
+            subtitle.srclang.clone(),
+        ])
+        .collect::<Vec<_>>()
+        .join("|");
 
     let template = FileTemplate {
         title: paths.url.display().to_string(),
         body_class: "viewer".to_string(),
         script_url: Some("js/file-viewer.js".to_string()),
         breadcrumbs: build_breadcrumbs(&paths.url),
-        subtitles: subtitle_urls,
+        subtitles: subtitle_data,
 
         media_type,
         stream_path: stream_path.to_string(),
