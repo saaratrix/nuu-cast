@@ -1,7 +1,16 @@
 import { Request } from './jikan-request.js';
 import { Settings, settings } from './jikan-settings.js';
 
+type AnimePeopleType = 'people' | 'characters';
+type AnimeType = 'anime' | 'manga';
+type ReviewsType = 'reviews';
+type UsersType = 'users';
+type AnimeTypeFull = AnimeType | AnimePeopleType | ReviewsType | UsersType;
+
 export class JikanAPI {
+
+  public settings: Settings;
+  public request: Request;
 
   /**
    *
@@ -18,7 +27,7 @@ export class JikanAPI {
    * @param {{}} [parameters] - Query, check docs for more info
    * @see {@link https://docs.api.jikan.moe/#tag/anime}
    */
-  loadAnime(id, request, parameters) {
+  loadAnime(id: number, request: string, parameters: any) {
     if(request === 'episodes' && typeof parameters === 'number'){
       return this.request.send(['anime', id, request, parameters]);
     }
@@ -33,7 +42,7 @@ export class JikanAPI {
    * @param {number} id - Character ID
    * @param {string} [request] - full, anime, manga, voices, pictures
    */
-  loadCharacter(id, request) {
+  loadCharacter(id: number, request: string) {
     return this.request.send(['characters', id, request]);
   }
 
@@ -43,7 +52,7 @@ export class JikanAPI {
    * @param {string} [request] - members, staff, relations
    * @param {number} [page=1] - Page Number, available on members request
    */
-  loadClub(id, request, page = 1){
+  loadClub(id: number, request: string, page: number = 1){
     return this.request.send(['clubs', id, request], { page });
   }
 
@@ -52,7 +61,7 @@ export class JikanAPI {
    * @param {string} type - anime or manga
    * @param {string} [filter] - genres, explicit_genres, themes, demographics
    */
-  loadGenres(type, filter){
+  loadGenres(type: AnimeTypeFull, filter: string){
     return this.request.send(['genres', type], { filter });
   }
 
@@ -60,7 +69,7 @@ export class JikanAPI {
    *
    * @param {number} [page=1] - Page Number
    */
-  loadMagazines(page = 1){
+  loadMagazines(page: number = 1){
     return this.request.send(['magazines'], { page });
   }
 
@@ -70,7 +79,7 @@ export class JikanAPI {
    * @param {string} [request] - full, characters, news, forum, pictures, statistics, moreinfo, recommendations, userupdates, reviews, relations, external
    * @param {number} [page=1] - Page number, available on news, userupdates, reviews requests
    */
-  loadManga(id, request, page = 1) {
+  loadManga(id: number, request: string, page: number = 1) {
     return this.request.send(['manga', id, request], { page });
   }
 
@@ -79,7 +88,7 @@ export class JikanAPI {
    * @param {number} id - Person ID
    * @param {string} [request] - full, anime, voices, manga, pictures
    */
-  loadPerson(id, request) {
+  loadPerson(id: number, request: string) {
     return this.request.send(['people', id, request]);
   }
 
@@ -88,16 +97,16 @@ export class JikanAPI {
    * @param {string} [request] - full, external
    * @param {number} [page=1] - Page Number
    */
-  loadProducers(id = null, request, page = 1){
+  loadProducers(id: number | null = null, request: string, page: number = 1){
     if(id) return this.request.send(['producers', id, request], { page });
     return this.request.send(['producers'], { page });
   }
 
   /**
    *
-   * @param {string} type - anime, manga, characters, people, users
+   * @param {AnimeTypeFull} type - anime, manga, characters, people, users
    */
-  loadRandom(type){
+  loadRandom(type: AnimeType | AnimePeopleType | UsersType){
     return this.request.send(['random', type]);
   }
 
@@ -106,7 +115,7 @@ export class JikanAPI {
    * @param {string} type - anime or manga
    * @param {number} [page=1] - Page Number
    */
-  loadRecommendations(type, page = 1){
+  loadRecommendations(type: AnimeType, page: number = 1){
     return this.request.send(['recommendations', type], { page });
   }
 
@@ -117,7 +126,7 @@ export class JikanAPI {
    * @param {boolean} [preliminary=false] - Receive reviews that are tagged as preliminary
    * @param {boolean} [spoiler=false] - Receive reviews that are tagged as a spoiler
    */
-  loadReviews(type, page = 1, preliminary, spoiler){
+  loadReviews(type: AnimeType, page: number = 1, preliminary: boolean, spoiler: boolean){
     return this.request.send(['reviews', type], { page, preliminary, spoiler });
   }
 
@@ -130,7 +139,14 @@ export class JikanAPI {
    * @param {boolean} [sfw=false] - Filter entries with the Hentai Genre
    * @param {boolean} [unapproved=false] - Include entries which are unapproved
    */
-  loadSchedule(day, page = 1, limit, kids=false, sfw=false, unapproved=false){
+  loadSchedule(
+    day: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday' | 'other' | 'unknown',
+    page: number = 1,
+    limit: number,
+    kids: boolean=false,
+    sfw: boolean=false,
+    unapproved: boolean=false
+  ){
     return this.request.send(['schedules'], { filter: day, page, limit: limit, kids, sfw, unapproved});
   }
 
@@ -140,7 +156,7 @@ export class JikanAPI {
    * @param {string} [request] - full, statistics, favorites, userupdates, about, history, friends, reviews, recommendations, clubs, external
    * @param {number} [page=1] - Page number, available on friends, reviews, recommendations, clubs requests
    */
-  loadUser(username, request, page = 1){
+  loadUser(username: string, request: string, page: number = 1){
     return this.request.send(['users', username, request], { page });
   }
 
@@ -150,7 +166,7 @@ export class JikanAPI {
    * @param {number} [limit=1000] - Amount of elements to receive
    * @param {number} [offset=0] - Offset
    */
-  loadAnimelist(username, limit = 1000, offset = 0){
+  loadAnimelist(username: string, limit: number = 1000, offset: number = 0){
     return this.request.send(['users', username, 'animelist'], { fields: 'list_status', limit, offset }, true);
   }
 
@@ -160,7 +176,7 @@ export class JikanAPI {
    * @param {number} [limit=1000] - Amount of elements to receive
    * @param {number} [offset=0] - Offset
    */
-  loadMangalist(username, limit = 1000, offset = 0){
+  loadMangalist(username: string, limit: number = 1000, offset: number = 0){
     return this.request.send(['users', username, 'mangalist'], { fields: 'list_status', limit, offset }, true);
   }
 
@@ -170,7 +186,7 @@ export class JikanAPI {
    * @param {string} season - winter, spring, summer, fall
    * @param {number} [page=1] - Page Number
    */
-  loadSeason(year, season, page = 1){
+  loadSeason(year: number, season: string, page: number = 1){
     return this.request.send(['seasons', year, season], { page });
   }
 
@@ -206,7 +222,7 @@ export class JikanAPI {
    * @param {string} [filter] - Check docs for more info
    * @see {@link https://docs.api.jikan.moe/#tag/top}
    */
-  loadTop(type, page = 1, subtype, filter){
+  loadTop(type: AnimeType | AnimePeopleType | ReviewsType, page: number = 1, subtype: string, filter: string){
     return this.request.send(
       ['top', type], { type: subtype, filter, page }
     );
@@ -219,7 +235,7 @@ export class JikanAPI {
    * @param {number} [limit] - Limit (episodes only)
    * @param {boolean} [popular] - popular items?
    */
-  loadWatch(type, page = 1, limit, popular){
+  loadWatch(type: 'episodes' | 'promos', page: number = 1, limit: number, popular: boolean){
     return this.request.send(['watch', type, popular ? 'popular' : undefined], { page, limit: limit });
   }
 
@@ -230,7 +246,7 @@ export class JikanAPI {
    * @param {number} [limit] - Result limit
    * @param {{}} [parameters] - extra query parameters, see docs for more info on this
    */
-  search(type, query, limit, parameters = {}){
+  search(type: AnimeType | AnimePeopleType | 'clubs', query: string, limit: number, parameters: any = {}){
     if(!parameters.q && query) parameters.q = query;
     if(!parameters.limit && limit) parameters.limit = limit;
 
@@ -243,7 +259,7 @@ export class JikanAPI {
    * @param {Object} [queryParameters] - query Parameters. Needs to be a key value pair like {type: 'tv', status: 'airing'}
    * @param {boolean} [mal=false] - request to official MAL API?
    */
-  raw(urlParts, queryParameters, mal = false) {
+  raw(urlParts: any[], queryParameters: any, mal: boolean = false) {
     if(!Array.isArray(urlParts)) return Promise.reject(new Error(`The given parameter should be an array like [anime, 1] but given was ${urlParts}`));
     return this.request.send(urlParts, queryParameters, mal);
   }

@@ -1,5 +1,7 @@
 export class Settings {
   protocol = 'https:';
+  private baseURL!: URL;
+  private v: number | undefined;
 
   constructor(baseURL = 'https://api.jikan.moe', version = 4) {
     this.setBaseURL(baseURL, version);
@@ -18,12 +20,12 @@ export class Settings {
    * @param {string} baseURL
    * @param {number} [version]
    */
-  setBaseURL(baseURL, version) {
+  setBaseURL(baseURL: string, version?: number) {
     if(version) this.v = version;
     this.baseURL = new URL(`/v${this.v}`, baseURL);
   }
 
-  setBaseURLAbsolute(pathname, origin = location.origin) {
+  setBaseURLAbsolute(pathname: string, origin: string = location.origin) {
     this.baseURL = new URL(pathname, origin);
 
     this.protocol = this.baseURL.protocol;

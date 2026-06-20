@@ -1,4 +1,4 @@
-import { Settings, settings } from './jikan-settings.js';
+import { settings } from './jikan-settings.js';
 
 export class Request {
 
@@ -9,7 +9,7 @@ export class Request {
    * @param {boolean} [mal=false]      Request to official MAL API?
    * @returns {Promise<*>} returns the request response or an error
    */
-  async send(args, parameter, mal = false) {
+  async send(args: any[], parameter?: any, mal: boolean = false) {
     const response = await jikanFetch(
       this.urlBuilder(args, parameter, mal),
       mal ? { headers: { 'X-MAL-CLIENT-ID': '6114d00ca681b7701d1e15fe11a4987e' } } : {}
@@ -32,14 +32,15 @@ export class Request {
    * @param {boolean} [mal]       Request to official MAL API?
    * @returns {string}            URL
    */
-  urlBuilder(args, parameter, mal) {
+  urlBuilder(args: any[], parameter: any, mal: boolean) {
     const url = new URL(mal ? 'https://api.myanimelist.net/v2' : settings.getBaseURL());
     url.protocol = settings.protocol;
 
     const prefix = url.pathname.endsWith('/') ? '' : '/';
     url.pathname += prefix + args.filter(x => x).join('/');
     if(parameter){
-      for(const [key, value] of Object.entries(parameter)){
+      for(const key of Object.keys(parameter)){
+        const value = parameter[key];
         if(value !== 0 && !value) continue;
         url.searchParams.append(key, value);
       }
@@ -55,7 +56,7 @@ export class Request {
  * @param {RequestInit} options
  * @returns {Promise<Response>}
  */
-async function jikanFetch(url, options = {}) {
+async function jikanFetch(url: string, options: RequestInit = {}) {
   const parsedURL = new URL(url);
 
   return fetch(parsedURL, options);

@@ -1,23 +1,120 @@
-.invisible {
-    opacity: 0 !important;
+:root {
+    --color-bg: #2c2c38;
+    --color-bg-contrast: #4e4166;
+    --color-bg-highlight: hsl(261 22% 35%);
+    --color-text: #e1e1e8;
+    --color-text-disabled: #6b6b7a;
+    --color-link: #a087d2;
+    --color-link-hover: #c8acff;
+    --color-link-pressed: #bb99ff;
+    --color-link-contrast: #c8acff;
+    --color-link-disabled: #5c5675;
+    --color-link-disabled-bg: hsl(240, 12%, 18%);
+}
+
+html, body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: Calibri, serif;
 }
 
 .items {
     display: grid;
     grid-template-columns: repeat(auto-fill, 192px);
+    grid-gap: 0.25rem;
 }
 
 .item-card {
     position: relative;
+    padding: 0.25rem 0;
 }
 
+.item-card a {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    text-decoration: none;
+    gap: 0.25rem;
+}
+
+.item-card a span {
+    flex: 0 0 auto;
+}
+
+.item-card a img {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    object-fit: contain;
+}
+
+.item-card:hover {
+    /*.item-synopsis {*/
+    /*    opacity: 1;*/
+    /*    pointer-events: auto;*/
+    /*}*/
+}
+
+a {
+    color: var(--color-link);
+    text-decoration: none;
+}
+a:visited {
+    color: var(--color-link);
+}
+a:hover {
+    color: var(--color-link-hover);
+}
+
+
 .item-synopsis {
-    position: absolute;
-    max-width: 100%;
-    opacity: 1;
+    /*position: absolute;*/
+    /*top: 100%;*/
+    /*max-width: 100%;*/
     transition: opacity 100ms ease-in;
+    /*opacity: 0;*/
+    pointer-events: none;
+
+    /*z-index: 10;*/
+    padding: 0.5rem;
 }
 
 .item-synopsis.invisible {
     pointer-events: none;
+}
+
+#item-popover {
+    position: absolute;
+    z-index: 100;
+    max-width: min(80vw, 400px);
+    max-height: calc(100vh - 24px);
+    background-color: var(--color-bg-contrast);
+    border-radius: 0.75rem;
+}
+
+.item-popover-content {
+    position: relative;
+    overflow: auto;
+    max-height: inherit;
+}
+
+.item-popover-arrow {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: inherit;
+    transform: rotate(45deg);
+    background-color: var(--color-bg-highlight);
+}
+
+#item-popover[data-placement="bottom"] .item-popover-arrow {
+    top: -6px;
+}
+
+#item-popover[data-placement="right"] .item-popover-arrow {
+    left: -6px;
+}
+
+#item-popover[data-placement="left"] .item-popover-arrow {
+    right: -6px;
 }
