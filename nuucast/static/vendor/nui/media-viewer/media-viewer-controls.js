@@ -1,12 +1,27 @@
 import { MediaType, viewingFailedToLoadEvent, viewingItemChangedEvent, defaultControlsPlacement, ControlsPlacements, controlsPlacementValues } from './media-viewer-models.js';
 import './media-viewer-controls-rotate.js';
 export class MediaViewerControls extends HTMLElement {
-    static observedAttributes = ['placement'];
-    shadow;
-    featuresElement;
-    activeFeatures = new Set();
     constructor() {
         super();
+        this.activeFeatures = new Set();
+        this._mediaViewer = null;
+        this._viewerControls = null;
+        this.onViewingItemChanged = (e) => {
+            const event = e;
+            if (event.detail.mediaViewer !== this.mediaViewer) {
+                return;
+            }
+            this.setFeatures();
+            this.updateView();
+        };
+        this.onViewingFailedToLoad = (e) => {
+            const event = e;
+            if (event.detail.mediaViewer !== this.mediaViewer) {
+                return;
+            }
+            this.activeFeatures = new Set();
+            this.updateView();
+        };
         this.shadow = this.attachShadow({ mode: 'open' });
         this.shadow.innerHTML = `
       <style>
@@ -59,7 +74,7 @@ export class MediaViewerControls extends HTMLElement {
         return this.getAttribute('placement');
     }
     set placement(value) {
-        value = value?.toLowerCase();
+        value = value === null || value === void 0 ? void 0 : value.toLowerCase();
         if (!controlsPlacementValues.has(value)) {
             value = defaultControlsPlacement;
         }
@@ -73,7 +88,6 @@ export class MediaViewerControls extends HTMLElement {
         oldClass && this.viewerControls.classList.remove(oldClass);
         this.viewerControls.classList.add(newClass);
     }
-    _mediaViewer = null;
     get mediaViewer() {
         if (!this._mediaViewer) {
             const rootNode = this.getRootNode();
@@ -81,7 +95,6 @@ export class MediaViewerControls extends HTMLElement {
         }
         return this._mediaViewer;
     }
-    _viewerControls = null;
     get viewerControls() {
         if (!this._viewerControls) {
             this._viewerControls = this.shadow.querySelector('.controls');
@@ -130,22 +143,6 @@ export class MediaViewerControls extends HTMLElement {
             return;
         }
     }
-    onViewingItemChanged = (e) => {
-        const event = e;
-        if (event.detail.mediaViewer !== this.mediaViewer) {
-            return;
-        }
-        this.setFeatures();
-        this.updateView();
-    };
-    onViewingFailedToLoad = (e) => {
-        const event = e;
-        if (event.detail.mediaViewer !== this.mediaViewer) {
-            return;
-        }
-        this.activeFeatures = new Set();
-        this.updateView();
-    };
     setFeatures() {
         const features = [];
         switch (this.mediaViewer.activeMediaType) {
@@ -162,4 +159,5 @@ export class MediaViewerControls extends HTMLElement {
         this.activeFeatures = new Set(features);
     }
 }
+MediaViewerControls.observedAttributes = ['placement'];
 customElements.define('media-viewer-controls', MediaViewerControls);

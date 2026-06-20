@@ -1,15 +1,6 @@
 import { viewingItemChangedEvent } from './media-viewer-models.js';
-import { mediaViewerSharedCSS } from './media-viewer-shared.js';
+import { applyMediaViewerSharedCSS } from './media-viewer-shared.js';
 export class MediaViewerControlsRotate extends HTMLElement {
-    shadow;
-    _rotation = 0;
-    mediaViewer;
-    rotateLeft = null;
-    rotateRight = null;
-    // TODO: This needs to be updated also if parentContainer changes, not if just view item changes.
-    viewContainerSize = undefined;
-    // Bit excessive typing, was just curious if it works, and it does :P
-    translatePart = '';
     get rotation() {
         return this._rotation;
     }
@@ -19,24 +10,55 @@ export class MediaViewerControlsRotate extends HTMLElement {
     ;
     constructor() {
         super();
+        this._rotation = 0;
+        this.rotateLeft = null;
+        this.rotateRight = null;
+        // TODO: This needs to be updated also if parentContainer changes, not if just view item changes.
+        this.viewContainerSize = undefined;
+        // Bit excessive typing, was just curious if it works, and it does :P
+        this.translatePart = '';
+        this.onViewingItemChanged = (e) => {
+            const event = e;
+            if (this.mediaViewer !== event.detail.mediaViewer) {
+                return;
+            }
+            this.rotation = 0;
+            this.viewContainerSize = undefined;
+            this.translatePart = '';
+        };
+        this.onRotateLeft = () => {
+            console.log('rotate left!');
+            this.rotation -= 90;
+            // Need to blur or the :active state gets stuck.
+            this.rotateLeft.blur();
+            this.calculateTranslation();
+            this.mediaViewer.viewItemElement.style.transform = `rotate(${this.rotation}deg)${this.translatePart}`;
+        };
+        this.onRotateRight = () => {
+            this.rotation += 90;
+            // Need to blur or the :active state gets stuck.
+            this.rotateRight.blur();
+            this.calculateTranslation();
+            this.mediaViewer.viewItemElement.style.transform = `rotate(${this.rotation}deg)${this.translatePart}`;
+        };
         this.shadow = this.attachShadow({ mode: 'open' });
-        this.shadow.adoptedStyleSheets = [mediaViewerSharedCSS];
+        applyMediaViewerSharedCSS(this.shadow);
         this.shadow.innerHTML = `
-        <style>
-            .controls-rotate {
-                display: inline-flex;
-                gap: 0.5rem;
-            }
-            
-            .icon-action {
-            
-            }
-        </style>
-        <div class="controls-rotate">
-            <button class="rotate-left icon-action" title="Rotate 90° left.">⟲ 90°</button>
-            <button class="rotate-right icon-action" title="Rotate 90° right.">⟳ 90°</button>
-        </div>
-      `;
+      <style>
+          .controls-rotate {
+              display: inline-flex;
+              gap: 0.5rem;
+          }
+          
+          .icon-action {
+          
+          }
+      </style>
+      <div class="controls-rotate">
+          <button class="rotate-left icon-action" title="Rotate 90° left.">⟲ 90°</button>
+          <button class="rotate-right icon-action" title="Rotate 90° right.">⟳ 90°</button>
+      </div>
+    `;
     }
     connectedCallback() {
         window.addEventListener(viewingItemChangedEvent, this.onViewingItemChanged);
@@ -44,7 +66,7 @@ export class MediaViewerControlsRotate extends HTMLElement {
         this.rotateRight = this.shadow.querySelector('.rotate-right');
         if (!this.mediaViewer) {
             const host = this.getRootNode().host;
-            this.mediaViewer = host?.mediaViewer;
+            this.mediaViewer = host === null || host === void 0 ? void 0 : host.mediaViewer;
         }
         if (!this.rotateLeft || !this.rotateRight || !this.mediaViewer) {
             return;
@@ -60,30 +82,6 @@ export class MediaViewerControlsRotate extends HTMLElement {
         this.rotateLeft.removeEventListener('click', this.onRotateLeft);
         this.rotateRight.removeEventListener('click', this.onRotateRight);
     }
-    onViewingItemChanged = (e) => {
-        const event = e;
-        if (this.mediaViewer !== event.detail.mediaViewer) {
-            return;
-        }
-        this.rotation = 0;
-        this.viewContainerSize = undefined;
-        this.translatePart = '';
-    };
-    onRotateLeft = () => {
-        console.log('rotate left!');
-        this.rotation -= 90;
-        // Need to blur or the :active state gets stuck.
-        this.rotateLeft.blur();
-        this.calculateTranslation();
-        this.mediaViewer.viewItemElement.style.transform = `rotate(${this.rotation}deg)${this.translatePart}`;
-    };
-    onRotateRight = () => {
-        this.rotation += 90;
-        // Need to blur or the :active state gets stuck.
-        this.rotateRight.blur();
-        this.calculateTranslation();
-        this.mediaViewer.viewItemElement.style.transform = `rotate(${this.rotation}deg)${this.translatePart}`;
-    };
     calculateTranslation() {
         if (!this.viewContainerSize) {
             // For example a too wide image will be pushed too far up so you can't see the full picture.

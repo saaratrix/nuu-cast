@@ -32,14 +32,15 @@ const mediaAndMimeTypesFromExtension = new Map([
 const mimeTypesToMediaType = new Map([...mediaAndMimeTypesFromExtension.values()].map(([mediaType, mimeType]) => [mimeType, mediaType]));
 let _createdElements = 0;
 export class MediaViewer extends HTMLElement {
-    static observedAttributes = ['src', 'mime-type', 'parent', 'auto-height', 'subtitles'];
-    shadow;
-    activeMediaType = MediaType.Unknown;
-    _createdId;
-    _showControls = false;
-    _controlsElement = null;
     constructor() {
         super();
+        this.activeMediaType = MediaType.Unknown;
+        this._showControls = false;
+        this._controlsElement = null;
+        this._parentContainer = null;
+        this._viewerContainerElement = null;
+        this._viewItemElement = null;
+        this._subtitles = null;
         this._createdId = _createdElements++;
         this.shadow = this.attachShadow({ mode: 'open' });
         this.shadow.innerHTML = `
@@ -78,15 +79,17 @@ export class MediaViewer extends HTMLElement {
     `;
     }
     get eventId() {
-        return this.id ?? this._createdId;
+        var _a;
+        return (_a = this.id) !== null && _a !== void 0 ? _a : this._createdId;
     }
     get src() {
-        return this.getAttribute("src") ?? '';
+        var _a;
+        return (_a = this.getAttribute("src")) !== null && _a !== void 0 ? _a : '';
     }
     set src(value) {
         value == null
-            ? this.removeAttribute("src")
-            : this.setAttribute("src", value);
+          ? this.removeAttribute("src")
+          : this.setAttribute("src", value);
     }
     get mimeType() {
         return this.getAttribute("mime-type");
@@ -100,7 +103,6 @@ export class MediaViewer extends HTMLElement {
             mimeTypesToMediaType.has(valueLower) ? this.setAttribute("mime-type", valueLower) : this.removeAttribute("mime-type");
         }
     }
-    _parentContainer = null;
     get parentContainer() {
         if (this._parentContainer) {
             return this._parentContainer;
@@ -113,19 +115,22 @@ export class MediaViewer extends HTMLElement {
         this._parentContainer = value;
     }
     get automaticallyAdjustHeight() {
-        const value = this.getAttribute("auto-height") ?? '';
+        var _a;
+        const value = (_a = this.getAttribute("auto-height")) !== null && _a !== void 0 ? _a : '';
         return value.toLowerCase() === 'true';
     }
     set automaticallyAdjustHeight(value) {
+        var _a;
         value == null
-            ? this.removeAttribute('auto-height')
-            : this.setAttribute('auto-height', value ? 'true' : 'false');
-        if (!value && this.viewItemElement?.firstElementChild) {
+          ? this.removeAttribute('auto-height')
+          : this.setAttribute('auto-height', value ? 'true' : 'false');
+        if (!value && ((_a = this.viewItemElement) === null || _a === void 0 ? void 0 : _a.firstElementChild)) {
             this.viewItemElement.firstElementChild.style.maxHeight = '';
         }
     }
     get controlsPlacement() {
-        const value = this.getAttribute('controls-placement')?.toLowerCase();
+        var _a;
+        const value = (_a = this.getAttribute('controls-placement')) === null || _a === void 0 ? void 0 : _a.toLowerCase();
         if (!value) {
             return null;
         }
@@ -154,31 +159,29 @@ export class MediaViewer extends HTMLElement {
             controlsElement = document.createElement('media-viewer-controls');
         }
         const containerItem = this.shadow.querySelector('.item-container');
-        containerItem?.appendChild(controlsElement);
+        containerItem === null || containerItem === void 0 ? void 0 : containerItem.appendChild(controlsElement);
         controlsElement.placement = placement;
     }
     hideControls() {
+        var _a;
         if (!this._showControls) {
             return;
         }
         this._showControls = false;
-        this.controlsElement?.remove();
+        (_a = this.controlsElement) === null || _a === void 0 ? void 0 : _a.remove();
     }
-    _viewerContainerElement = null;
     get viewerContainer() {
         if (!this._viewerContainerElement) {
             this._viewerContainerElement = this.shadow.querySelector('.container');
         }
         return this._viewerContainerElement;
     }
-    _viewItemElement = null;
     get viewItemElement() {
         if (!this._viewItemElement) {
             this._viewItemElement = this.shadow.querySelector('.item');
         }
         return this._viewItemElement;
     }
-    _subtitles = null;
     get subtitles() {
         if (this._subtitles) {
             return this._subtitles;
@@ -229,8 +232,9 @@ export class MediaViewer extends HTMLElement {
         this.renderViewItem(true);
     }
     attributeChangedCallback(name, oldValue, newValue) {
+        var _a;
         if (name === 'auto-height') {
-            const item = this.viewItemElement?.firstElementChild;
+            const item = (_a = this.viewItemElement) === null || _a === void 0 ? void 0 : _a.firstElementChild;
             item && this.setMaxDimensions(item);
             return;
         }
@@ -240,25 +244,25 @@ export class MediaViewer extends HTMLElement {
         let shouldRender = oldValue !== newValue;
         this.renderViewItem(shouldRender);
     }
-    _lastRender;
     renderViewItem(render) {
+        var _a, _b, _c;
         if (!render) {
             return;
         }
         const src = this.src;
-        const [mediaType, mimeType] = this.getTypes(src) ?? [];
+        const [mediaType, mimeType] = (_a = this.getTypes(src)) !== null && _a !== void 0 ? _a : [];
         if (!mediaType || !mimeType) {
-            this.viewItemElement.replaceChildren();
+            this.viewItemElement.textContent = '';
             this._lastRender = undefined;
             this.activeMediaType = MediaType.Unknown;
             dispatchViewingItemChangedEvent(this.eventId, this, this.activeMediaType);
             return;
         }
-        if (this._lastRender?.src === src && this._lastRender?.mediaType === mediaType) {
+        if (((_b = this._lastRender) === null || _b === void 0 ? void 0 : _b.src) === src && ((_c = this._lastRender) === null || _c === void 0 ? void 0 : _c.mediaType) === mediaType) {
             return;
         }
         this.activeMediaType = mediaType;
-        this.viewItemElement.replaceChildren();
+        this.viewItemElement.textContent = '';
         this._lastRender = { src, mediaType };
         if (mediaType === MediaType.Image) {
             this.renderImage(src);
@@ -358,13 +362,14 @@ export class MediaViewer extends HTMLElement {
         return bodyPaddingHeight + itemPaddingHeight + siblingHeight;
     }
     setMaxDimensions(element) {
+        var _a;
         const parentContainer = this.parentContainer;
         const viewItem = this.viewItemElement;
         const viewItemStyle = getComputedStyle(viewItem);
         const maxHeight = window.innerHeight - this.getOccupiedHeight(parentContainer, viewItemStyle);
         const horizontalPadding = parseInt(viewItemStyle.paddingLeft) + parseInt(viewItemStyle.paddingRight);
         const scrollbarWidth = 19;
-        const containerWidth = parentContainer?.clientWidth ?? 0;
+        const containerWidth = (_a = parentContainer === null || parentContainer === void 0 ? void 0 : parentContainer.clientWidth) !== null && _a !== void 0 ? _a : 0;
         element.style.maxWidth = `${containerWidth - scrollbarWidth - horizontalPadding}px`;
         if (this.automaticallyAdjustHeight) {
             element.style.maxHeight = `${maxHeight}px`;
@@ -375,4 +380,5 @@ export class MediaViewer extends HTMLElement {
         dispatchViewingFailedToLoadEvent(this.eventId, this);
     }
 }
+MediaViewer.observedAttributes = ['src', 'mime-type', 'parent', 'auto-height', 'subtitles'];
 customElements.define("media-viewer", MediaViewer);

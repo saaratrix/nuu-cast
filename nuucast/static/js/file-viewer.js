@@ -6,9 +6,9 @@ function tryInitializeSubtitlesPicker() {
   const subtitlesPicker = document.getElementById('subtitle-picker');
 
   /** @type {NodeListOf<HTMLOptionElement> | undefined} */
-  const subtitleOptions = subtitlesPicker?.querySelectorAll('option');
+  const subtitleOptions = subtitlesPicker && subtitlesPicker.querySelectorAll('option');
   // No subtitles if the element doesn't exist
-  if (!subtitleOptions?.length) {
+  if (!subtitleOptions || !subtitleOptions.length) {
     return;
   }
 
