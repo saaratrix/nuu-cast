@@ -1,12 +1,12 @@
 use axum::{
-    routing::{get, put},
-    Router, Json,
+    routing::{get},
+    Router,
 };
-
+use crate::AppState;
 use crate::modules::anime::anime_routes::{handle_get_current_season, handle_mal_image};
 
 /// Initialize the module by binding routes to an existing Axum Router
-pub fn get_routes() -> Router {
+pub fn get_routes() -> Router<AppState> {
     let mod_routes = Router::new()
     .route(
         "/anime/seasons/now",

@@ -1,4 +1,3 @@
-use std::num::IntErrorKind::Empty;
 use std::path::PathBuf;
 
 pub fn get_html(title: &str, body_class: &str, scripts_url: Option<&str>, url: &PathBuf, content: &str) -> String {
@@ -45,6 +44,6 @@ pub fn get_navbar(url: &PathBuf) -> String {
 
 pub fn get_browser_html() -> String {
     let title = "Browser";
-    let html = get_html(&title, "browser", None, &PathBuf::from(""), "<div class='items'></div>");
+    let html = get_html(&title, "browser", None, &PathBuf::from(""), "<div class='items-container'></div>");
     html
 }

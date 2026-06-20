@@ -1,9 +1,8 @@
-use std::io::Cursor;
-use std::path::PathBuf;
+use std::path::{Component, Path as StdPath};
 use axum::extract::{Path, Query, };
 use axum::http::{StatusCode};
 use axum::Json;
-use axum::response::{Html, IntoResponse, Response};
+use axum::response::{IntoResponse, Response};
 use serde::Deserialize;
 use crate::modules::anime::jikan::jikan::Jikan;
 use crate::modules::anime::anime_request_cacher::{try_get_cached_mal_image, DATA_ANIME_ROOT};
@@ -29,6 +28,12 @@ pub async fn handle_mal_image(Path(url) : Path<String>
 ) -> Response {
     println!("handle_mal_image: {}", url);
 
+    if !StdPath::new(&url)
+        .components()
+        .all(|c| matches!(c, Component::Normal(_))) {
+        return (StatusCode::NOT_FOUND, "Image not found").into_response()
+    }    
+
     if let Some(cached_response) = try_get_cached_mal_image(&url).await {
         return cached_response;
     }
@@ -45,7 +50,7 @@ pub async fn handle_mal_image(Path(url) : Path<String>
     // Build full external URL for fetching from MAL
     let image_url = format!("https://myanimelist.net/images/anime/{}", url);
     // Fetch the image using reqwest in blocking mode
-    let mut response = reqwest::get(image_url).await.unwrap();
+    let response = reqwest::get(image_url).await.unwrap();
     if !response.status().is_success() {
         return (StatusCode::INTERNAL_SERVER_ERROR, "Unexpected error fetching MAL image.").into_response();
     }

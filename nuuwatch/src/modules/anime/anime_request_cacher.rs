@@ -20,10 +20,10 @@ pub fn get_cache_key(url: &Url) -> Option<String> {
         .join("");
 
     let query = &url.query().unwrap_or_else(||"").to_owned();
-    let sanitizedQuery = query.replace(&['&', '[', '?', '<', '>', ':', '*', '/', '\\', '|', '"'][..], "");
+    let sanitized_query = query.replace(&['&', '[', '?', '<', '>', ':', '*', '/', '\\', '|', '"'][..], "");
 
     Some(
-        segments_key + &sanitizedQuery
+        segments_key + &sanitized_query
     )
 }
 
@@ -37,7 +37,7 @@ pub async fn try_get_cached_request_json(url: &Url) -> Option<String> {
     let cache_key = get_cache_key(url); // Returns String or Option<String>? Assume String for now
     println!("cache key: {:?}", cache_key);
 
-    if let Some(key) = cache_key {
+    if let Some(_) = cache_key {
         let path = get_cache_key_path(&url)?;
 
         if tokio::fs::metadata(path.clone()).await.is_ok() {
@@ -78,7 +78,7 @@ pub async fn try_get_cached_mal_image(url: &str) -> Option<Response> {
         return None;
     }
 
-    let mut file = match File::open(path).await {
+    let file = match File::open(path).await {
         Ok(f) => f,
         Err(_) => return None,
     };

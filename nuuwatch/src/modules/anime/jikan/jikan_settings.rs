@@ -6,7 +6,7 @@ pub struct Settings {
 
 impl Settings {
     pub fn new(url: &str) -> Self {
-        let mut url = Url::parse(url).unwrap();
+        let url = Url::parse(url).unwrap();
         // Default to v4 if not set in constructor, or pass version arg
         Settings { base_url: url}
     }

@@ -27,3 +27,4 @@ nuuwatch/static/js/*
 nuuwatch/static/css/*
 nuuwatch/static/index.html
 nuuwatch/frontend/node_modules
+nuuwatch/frontend/js/**/*.js

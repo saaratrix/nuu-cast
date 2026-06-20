@@ -40,7 +40,7 @@ impl Request {
         let is_success = response.status().is_success();
         let json_text = response.text().await?;
 
-        if (is_success) {
+        if is_success {
             add_cached_request_json(&url, &json_text).await.ok();
         }
 
