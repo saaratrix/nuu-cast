@@ -99,7 +99,7 @@ export interface MALAnime {
   title_japanese?: string | null;
   title_synonyms: string[];
 
-  type: string; // e.g., "TV", "Movie"
+  type: 'TV' | 'Movie' | 'OVA' | 'ONA' | 'TV Special'; // e.g., "TV", "Movie"
   source?: string; // e.g., "Light novel"
 
   episodes: number;

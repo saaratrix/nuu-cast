@@ -68,3 +68,11 @@ pub async fn handle_mal_image(Path(url) : Path<String>
     (StatusCode::INTERNAL_SERVER_ERROR, "Failed to properly get image").into_response()
 }
 
+pub async fn update_viewing_anime() -> Response {
+    (StatusCode::INTERNAL_SERVER_ERROR, "Not implemented.").into_response()
+}
+
+pub async fn get_anime_status() -> Response {
+    (StatusCode::INTERNAL_SERVER_ERROR, "Not implemented.").into_response()
+}
+
