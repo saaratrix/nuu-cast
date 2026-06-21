@@ -4,7 +4,7 @@ use axum::{
 };
 use axum::routing::put;
 use crate::AppState;
-use crate::modules::anime::anime_routes::{get_anime_status, handle_get_current_season, handle_mal_image, update_viewing_anime};
+use crate::modules::anime::anime_routes::{get_anime_status, handle_get_current_season, handle_mal_image, update_anime_status};
 
 /// Initialize the module by binding routes to an existing Axum Router
 pub fn get_routes() -> Router<AppState> {
@@ -23,9 +23,9 @@ pub fn get_routes() -> Router<AppState> {
     //     );
     .route(
         "/anime/view/{mal_id}",
-        put(update_viewing_anime),
+        put(update_anime_status),
     )
-        .route("/anime/status/{mal_id}", get(get_anime_status));
+        .route("/anime/view/{mal_id}", get(get_anime_status));
 
     mod_routes
 }

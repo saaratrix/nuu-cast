@@ -44,6 +44,6 @@ pub fn get_navbar(url: &PathBuf) -> String {
 
 pub fn get_browser_html() -> String {
     let title = "Browser";
-    let html = get_html(&title, "browser", None, &PathBuf::from(""), "<div class='items-container'></div>");
+    let html = get_html(&title, "browser", None, &PathBuf::from(""), "<div class='page-container'></div>");
     html
 }

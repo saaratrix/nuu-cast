@@ -1,16 +1,21 @@
 import { showPopover, hidePopover } from './popover.js';
-import { AnimeAppState, jikan, appState, addItem, AnimeItem, ItemsKey } from './app-state.js';
+import { jikan, appState, addItem, AnimeItem, ItemsKey } from './app-state.js';
 import { MALAnime } from './jikan/types/jikan.js';
+import { openEditor } from './item-editor.js';
+import { escapeHtml } from './utility.js';
 
 export function loadMainPage() {
   let currentPage = 1;
 
+  const pageContainer = document.querySelector('.page-container');
+  if (!pageContainer) {
+    return;
+  }
+  pageContainer.innerHTML = `<div class="items-container"></div>`;
   fetchCurrentSeason(currentPage).then();
 }
 
 async function fetchCurrentSeason(currentPage: number) {
-
-
   const res = await jikan.loadCurrentSeason(currentPage);
   console.log(res);
   const { pagination, data } = res;
@@ -73,52 +78,65 @@ function onCurrentSeasonLoaded() {
 
 function createAnimeItem(item: MALAnime): AnimeItem {
   // Background exists along with synopsis for a shorter description.
-  const { title, title_english, url, images, broadcast, background, synopsis, score, scored_by, episodes } = item;
+  const { mal_id, title, title_english, url, images, broadcast, background, synopsis, score, scored_by, episodes } = item;
 
+  const id = Number(mal_id);
   const airing = getAiring(broadcast, 'Europe/Helsinki');
   const airingHtml = airing ? `<div class="airing">${airing}</div>` : '';
 
-  const titleHtml = `<div class="meta-title">${title_english || title}</div>`
-  const ratingHtml = score ? `<div class="rating">★ ${score} ${scored_by ? `(${scored_by})` : ''}</div>` : '';
-  const episodesHtml = episodes ? `<div class="episodes">${episodes} Episodes</div>` : '';
+  const visualTitle = escapeHtml(title_english || title || '');
+  const titleHtml = `<div class="meta-title">${visualTitle}</div>`
+  const ratingHtml = score ? `<div class="rating">★ ${Number(score)} ${scored_by ? `(${Number(scored_by)})` : ''}</div>` : '';
+  const episodesHtml = episodes ? `<div class="episodes">${Number(episodes)} Episodes</div>` : '';
   const synopsisText = (synopsis || background || '').replace(/\r?\n/g, '<br>');
-
-  const visualTitle = title_english || title || '';
 
   const image_url = images.webp.image_url.replace("https://myanimelist.net/images/anime/", "/anime/malimage/");
 
   const metalinebreakHtml = (!!ratingHtml || !!episodesHtml || !!airingHtml) ? '<hr>' : '';
 
+  const viewAnimeUrl = `#/view/${id}`;
+
   const itemCardElement = document.createElement('div');
   itemCardElement.className = 'item-card';
   itemCardElement.innerHTML = `
-  <a href="${url}">
+  <a href="${viewAnimeUrl}">
       <span class="title">${visualTitle}</span>
-      <img src="${image_url}" width="128" height="128">
-        <div class="item-synopsis" hidden>
-          <div class="synopsis-metadata">
-            ${titleHtml}
-            ${metalinebreakHtml}
-            ${ratingHtml}
-            ${episodesHtml}            
-            ${airingHtml}
-          </div>
-          <hr>
-          <div class="synopsis-text">
-              ${synopsisText}
-          </div>
+      <img src="${escapeHtml(image_url)}" width="128" height="128">            
+  </a>
+  <div class="item-synopsis" hidden>
+        <div class="synopsis-metadata">
+          ${titleHtml}
+          ${metalinebreakHtml}
+          ${ratingHtml}
+          ${episodesHtml}            
+          ${airingHtml}
         </div>
-  </a>`;
+        <hr>
+        <div class="synopsis-text">
+            ${escapeHtml(synopsisText)}
+        </div>
+      </div>
+  <div class="item-actions">
+    <span class="item-action mal-link" title="Goto MAL"><a href="${escapeHtml(url)}">🔗</a></span>
+    <span class="item-action edit-anime" title="Edit anime">✎⋮</span>
+  </div>
+`;
 
-  itemCardElement.addEventListener('pointerenter', () => showPopover(itemCardElement));
-  itemCardElement.addEventListener('pointerleave', () => hidePopover());
-
-  return {
+  const animeItem: AnimeItem = {
+    id,
     data: item,
     title: visualTitle,
     type: 'anime',
     element: itemCardElement,
-  }
+  };
+
+  itemCardElement.addEventListener('pointerenter', () => showPopover(itemCardElement));
+  itemCardElement.addEventListener('pointerleave', () => hidePopover());
+
+  const editAnimeBtn = itemCardElement.querySelector<HTMLElement>('.edit-anime');
+  editAnimeBtn?.addEventListener('click', () => openEditor(animeItem));
+
+  return animeItem;
 }
 
 const weekdayMap = {

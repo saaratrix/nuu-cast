@@ -1,5 +1,6 @@
 :root {
     --color-bg: #2c2c38;
+    --color-bg-contrast-low: #383847;
     --color-bg-contrast: #4e4166;
     --color-bg-highlight: hsl(261 22% 35%);
     --color-text: #e1e1e8;
@@ -66,6 +67,44 @@ a:hover {
     color: var(--color-link-hover);
 }
 
+.item-actions {
+    position: absolute;
+    bottom: 0.25rem;
+    left: 0;
+    right: 0;
+    padding: 0.25rem 0.5rem;
+    background-color: rgba(49, 49, 63, 0.8);
+
+    display: flex;
+    justify-content: right;
+    gap: 0.5rem;
+
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s ease;
+}
+
+.item-card:hover .item-actions {
+    opacity: 0.2;
+    visibility: visible;
+}
+
+.item-actions:hover {
+    opacity: 1 !important;
+}
+
+.item-action {
+    cursor: pointer;
+    color: var(--color-link);
+}
+
+.item-action:hover {
+    color: var(--color-link-hover);
+}
+
+.item-action:active {
+    color: var(--color-link-pressed);
+}
 
 .item-synopsis {
     /*position: absolute;*/

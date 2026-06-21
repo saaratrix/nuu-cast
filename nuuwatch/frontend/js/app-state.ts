@@ -1,11 +1,16 @@
 import { MALAnime } from './jikan/types/jikan.js';
 import { JikanAPI } from './jikan/jikan.js';
+import { AnimeModel } from './anime-model.js';
+
+
 
 export interface AnimeItem {
-  data: MALAnime,
+  id: number,
+  data: MALAnime;
   title: string;
-  type: 'anime',
-  element: HTMLElement,
+  type: 'anime';
+  element: HTMLElement;
+  model?: AnimeModel | undefined;
 }
 
 export type ItemsKey = MALAnime['type'];
