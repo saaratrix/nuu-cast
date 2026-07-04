@@ -2,33 +2,56 @@ import { MALAnime } from './jikan/types/jikan.js';
 import { JikanAPI } from './jikan/jikan.js';
 import { AnimeModel } from './anime-model.js';
 
-
+export interface AnimeItemParts {
+  visualTitle: string;
+  rating: string;
+  airing: string;
+  imageUrl: string;
+}
 
 export interface AnimeItem {
   id: number,
   data: MALAnime;
   title: string;
   type: 'anime';
-  element: HTMLElement;
+  parts: AnimeItemParts;
+  cardElement: HTMLElement;
   model?: AnimeModel | undefined;
 }
 
 export type ItemsKey = MALAnime['type'];
 export interface AnimeAppState {
   animes: Map<number, MALAnime>;
+  animeModels: Map<number, AnimeModel>;
+  itemsByMalId: Map<number, AnimeItem>;
   items: Partial<Record<ItemsKey, AnimeItem[]>>;
+  activeMalId: number | undefined;
 }
 
 export const jikan = new JikanAPI();
 jikan.settings.setBaseURLAbsolute('/anime/');
 
-
 export const appState: AnimeAppState = {
   animes: new Map(),
+  animeModels: new Map(),
+  itemsByMalId: new Map(),
   items: {},
+  activeMalId: undefined,
+}
+
+export function changeItem(malId: AnimeAppState['activeMalId']): void {
+  const before = appState.activeMalId;
+  if (before === malId) {
+    return;
+  }
+
+  appState.activeMalId = malId;
+  document.dispatchEvent(new CustomEvent('anime:itemChanged', { detail: malId }));
 }
 
 export const addItem = (type: ItemsKey, item: AnimeItem) => {
+  appState.itemsByMalId.set(item.id, item);
+
   if (!appState.items[type]) {
     appState.items[type] = [];
   }

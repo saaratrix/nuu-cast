@@ -25,6 +25,7 @@ async fn main() -> Result<(), sqlx::Error> {
         .nest_service("/static", ServeDir::new("static"))
         .route("/", get(browser::browse))
         .merge(anime_module::get_routes())
+        .merge(modules::modules_fetcher::get_modules_routes())
         .with_state(state);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3001").await.unwrap();

@@ -1,24 +1,17 @@
 import { loadMainPage } from './main-page-renderer.js';
 import { loadAnimeViewPage } from './anime-page.js';
 import { hidePopover } from './popover.js';
+import { getCurrentRoute } from './router.js';
 
 function router() {
-  const hash = window.location.hash || '#';
-
-  const path = hash.slice(1);
-  const routes = path.split('/').filter(Boolean);
-
-  let route ='main';
-  if (path.startsWith('/view/')) {
-    route = 'view'
-  }
+  const [route, routes] = getCurrentRoute();
 
   hidePopover();
 
   let loaded = true;
   switch (route) {
     case 'view':
-      loaded = loadViewAnime(routes);
+      loaded = loadViewAnime(routes as string[]);
       break;
     default:
       loadMainPage();

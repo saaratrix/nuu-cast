@@ -46,9 +46,12 @@ function onCurrentSeasonLoaded() {
   const movies = [];
 
   const animes = appState.animes.values();
-  const items = appState.items;
 
   for (const anime of animes) {
+    if (appState.itemsByMalId.has(anime.mal_id)) {
+      continue;
+    }
+
     const type = anime.type;
     switch (type.toLowerCase()) {
       case 'tv':
@@ -127,7 +130,13 @@ function createAnimeItem(item: MALAnime): AnimeItem {
     data: item,
     title: visualTitle,
     type: 'anime',
-    element: itemCardElement,
+    parts: {
+      visualTitle,
+      rating: ratingHtml,
+      airing: airingHtml,
+      imageUrl: image_url,
+    },
+    cardElement: itemCardElement,
   };
 
   itemCardElement.addEventListener('pointerenter', () => showPopover(itemCardElement));
@@ -260,7 +269,7 @@ function tryRenderItems(items: AnimeItem[], type: string, addLinebreak: boolean)
   }
 
   for (const item of items) {
-    itemsElement.appendChild(item.element);
+    itemsElement.appendChild(item.cardElement);
   }
 
   fragment.appendChild(itemsElement);

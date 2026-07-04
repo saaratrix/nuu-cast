@@ -14,6 +14,7 @@ const folders = [
   'img',
   'js',
   'css',
+  'modules',
 ];
 
 /**

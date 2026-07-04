@@ -1,20 +1,65 @@
+import { AnimeItem, appState, changeItem } from './app-state.js';
+import { escapeHtml } from './utility.js';
+import { loadModules } from './module-handler.js';
+import { gotoRoute } from './router.js';
+
 export async function loadAnimeViewPage(malId: number) {
   const pageContainer = document.querySelector('.page-container');
   if (!pageContainer) {
+    return gotoMain();
+  }
+
+  loadModules('anime').then(result => console.log(`${result ? 'succesfully loaded' : 'failed to load'} module anime `));
+
+  let animeItem: AnimeItem | undefined
+  try {
+    animeItem = await getMalAnimeItem(malId);
+  } catch (e) {
+    pageContainer.innerHTML = `
+      <div class="error"><p>Failed to load anime from MAL: ${e}</p></div>
+    `;
+    changeItem(undefined);
     return;
   }
-  pageContainer.innerHTML = `<div>Viewing an anime!</div>`;
-  // const app = document.querySelector('#app');
-  //
-  // if (!app) return;
-  //
-  // app.innerHTML = `<p>Loading anime ${malId}...</p>`;
-  //
-  // const response = await fetch(`/api/anime/${malId}`);
-  // const anime = await response.json();
-  //
-  // app.innerHTML = `
-  //   <h1>${anime.title}</h1>
-  //   <p>${anime.synopsis}</p>
-  // `;
+
+  if (!animeItem) {
+    return gotoMain();
+  }
+
+  pageContainer.innerHTML = `
+    <div class="anime-item-page">
+      <header>
+        <h1>${animeItem.title}</h1>
+      </header>
+      <section>
+        <div>
+            ${animeItem.parts.rating} - ${animeItem.parts.airing}
+        </div>
+        <div>
+            <img src="${escapeHtml(animeItem.parts.imageUrl)}" width="128" height="128" >
+        </div>
+        <div class="content"></div>
+      </section>
+    </div>
+  `;
+
+  changeItem(malId);
+}
+
+function gotoMain() {
+  changeItem(undefined);
+  gotoRoute('main');
+}
+
+async function getMalAnimeItem(malId: number): Promise<AnimeItem> {
+  let animeItem = appState.itemsByMalId.get(malId);
+  if (animeItem) {
+    return animeItem;
+  }
+
+  return loadMalItem(malId);
+}
+
+async function loadMalItem(malId: number): Promise<AnimeItem> {
+  return {} as AnimeItem;
 }
