@@ -16,7 +16,7 @@ pub fn get_modules_routes() -> Router<AppState> {
 async fn get_module_assets(
     Path(module_type): Path<String>,
 ) -> Result<Json<Vec<String>>, StatusCode> {
-    let modules_root = STATIC_ROOT.join("modules");
+    let modules_root = STATIC_ROOT.join("modules").join("local");
 
     let dir = modules_root
         .join(&module_type)
@@ -43,7 +43,7 @@ async fn get_module_assets(
         match path.extension().and_then(|s| s.to_str()) {
             Some("js") | Some("css") => {
                 if let Some(name) = path.file_name().and_then(|s| s.to_str()) {
-                    files.push(format!("/static/modules/{}/{}", module_type, name));
+                    files.push(format!("/static/modules/local/{}/{}", module_type, name));
                 }
             }
             _ => {}

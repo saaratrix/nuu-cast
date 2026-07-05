@@ -8,6 +8,8 @@ export interface AnimeModel {
   episodes_watched: number;
   status: Status;
   tags: string;
+  /** Le JSON! */
+  modules_data: string;
 }
 
 export enum Rating {

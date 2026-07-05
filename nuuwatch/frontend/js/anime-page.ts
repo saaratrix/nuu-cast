@@ -10,6 +10,7 @@ export async function loadAnimeViewPage(malId: number) {
   }
 
   loadModules('anime').then(result => console.log(`${result ? 'succesfully loaded' : 'failed to load'} module anime `));
+  loadModules('crunchyroll').then(result => console.log(`${result ? 'succesfully loaded' : 'failed to load'} module crunchyroll`));
 
   let animeItem: AnimeItem | undefined
   try {

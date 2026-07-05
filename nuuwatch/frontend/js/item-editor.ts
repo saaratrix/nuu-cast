@@ -93,6 +93,7 @@ export async function openEditor(
 
       rating: Number(rating.value) as Rating,
       status: Number(status.value) as Status,
+      modules_data: '',
     };
 
     // onSave?.(updated);

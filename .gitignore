@@ -25,8 +25,9 @@ nuucast/temp_files/*
 nuuwatch/data/*
 nuuwatch/static/js/*
 nuuwatch/static/css/*
+nuuwatch/static/modules/*
 nuuwatch/static/index.html
 nuuwatch/frontend/node_modules
 nuuwatch/frontend/js/**/*.js
-nuuwatch/frontend/modules/anime
-nuuwatch/static/modules/anime
+nuuwatch/frontend/modules/**/*.js
+nuuwatch/frontend/modules/local
