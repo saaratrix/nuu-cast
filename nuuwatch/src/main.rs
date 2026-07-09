@@ -2,13 +2,13 @@ mod browser;
 mod html;
 mod modules;
 mod data_utility;
-pub mod db;
+mod database;
 
 use axum::{Router};
 use axum::routing::{get};
 use tower_http::services::ServeDir;
-use sqlx::{sqlite::SqlitePoolOptions, SqlitePool};
-use crate::db::init_db;
+use sqlx::{SqlitePool};
+use crate::database::db::init_db;
 use crate::modules::anime::anime_module;
 
 #[derive(Clone)]

@@ -25,7 +25,7 @@ export enum Status {
 }
 
 export async function fetchAnimeModel(malId: number): Promise<AnimeModel | undefined> {
-  const response = await fetch(`/api/anime/view/${malId}`);
+  const response = await fetch(`/anime/view/${malId}`);
 
   if (response.status === 404) {
     return undefined

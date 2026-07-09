@@ -1,7 +1,8 @@
+use serde::Serialize;
 use sqlx::{FromRow, Pool, Sqlite};
 use sqlx::sqlite::SqlitePoolOptions;
 
-#[derive(Debug, Clone, FromRow)]
+#[derive(Debug, Clone, Serialize, FromRow)]
 pub struct Anime {
     pub mal_id: i64,
     pub rating: Option<i64>,
@@ -9,6 +10,7 @@ pub struct Anime {
     pub episodes_watched: i64,
     pub status: i64,
     pub tags: String,
+    pub modules_data: String,
 }
 
 #[repr(i64)]
@@ -45,7 +47,9 @@ pub async fn init_db() -> Result<Pool<Sqlite>, sqlx::Error> {
 
             status INTEGER NOT NULL DEFAULT 0,
 
-            tags TEXT NOT NULL DEFAULT ''
+            tags TEXT NOT NULL DEFAULT '',
+
+            modules_data TEXT NOT NULL DEFAULT ''
         );
         "#,
     )

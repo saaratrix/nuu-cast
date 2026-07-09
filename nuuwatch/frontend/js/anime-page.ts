@@ -1,7 +1,8 @@
-import { AnimeItem, appState, changeItem } from './app-state.js';
+import { AnimeItem, appState, changeItem, jikan } from './app-state.js';
 import { escapeHtml } from './utility.js';
 import { loadModules } from './module-handler.js';
 import { gotoRoute } from './router.js';
+import { openEditor } from './item-editor.js';
 
 export async function loadAnimeViewPage(malId: number) {
   const pageContainer = document.querySelector('.page-container');
@@ -39,10 +40,16 @@ export async function loadAnimeViewPage(malId: number) {
         <div>
             <img src="${escapeHtml(animeItem.parts.imageUrl)}" width="128" height="128" >
         </div>
+        <div>
+            <button class="edit-button">Edit anime</button>
+        </div>
         <div class="content"></div>
       </section>
     </div>
   `;
+
+  const editButton = pageContainer.querySelector('.edit-button');
+  editButton?.addEventListener('click', () => openEditor(animeItem));
 
   changeItem(malId);
 }
@@ -62,5 +69,7 @@ async function getMalAnimeItem(malId: number): Promise<AnimeItem> {
 }
 
 async function loadMalItem(malId: number): Promise<AnimeItem> {
+  const request = jikan.loadAnime(malId, 'full', )
+
   return {} as AnimeItem;
 }
