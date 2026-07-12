@@ -64,10 +64,16 @@ export function addItemModel(item: AnimeItem, model: AnimeModel | undefined): vo
     return;
   }
   item.model = model;
-  document.dispatchEvent(new CustomEvent('anime:modelUpdated', { detail: { id: item.id, model } }));
+  appState.animeModels.set(item.id, model);
+  if (appState.activeMalId === item.id) {
+    document.dispatchEvent(new CustomEvent('anime:modelUpdated', { detail: { id: item.id, model } }));
+  }
 }
 
 export function updateItemModel(item: AnimeItem, model: AnimeModel): void {
   item.model = model;
-  document.dispatchEvent(new CustomEvent('anime:modelUpdated', { detail: { id: item.id, model } }));
+  appState.animeModels.set(item.id, model);
+  if (appState.activeMalId === item.id) {
+    document.dispatchEvent(new CustomEvent('anime:modelUpdated', { detail: { id: item.id, model } }));
+  }
 }

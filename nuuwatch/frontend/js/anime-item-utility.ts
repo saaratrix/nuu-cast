@@ -1,4 +1,4 @@
-import { AnimeItem, appState, ItemsKey } from './app-state.js';
+import { AnimeItem, appState } from './app-state.js';
 import { MALAnime } from './jikan/types/jikan.js';
 import { escapeHtml } from './utility.js';
 import { hidePopover, showPopover } from './popover.js';
@@ -49,6 +49,7 @@ export function createAnimeItem(item: MALAnime): AnimeItem {
         </div>
       </div>
   <div class="item-actions">
+    <span class="item-action rating">♥</span>
     <span class="item-action mal-link" title="Goto MAL"><a href="${escapeHtml(url)}">🔗</a></span>
     <span class="item-action edit-anime" title="Edit anime">✎⋮</span>
   </div>
