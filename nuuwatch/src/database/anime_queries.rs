@@ -14,6 +14,7 @@ pub async fn get_status(
             tags,
             episodes_watched,
             rating,
+            comment,
             status,
             modules_data
         FROM Anime
@@ -31,11 +32,12 @@ pub struct AnimeStatusPatch {
     pub tags: Option<String>,
     pub episodes_watched: Option<i32>,
     pub rating: Option<i32>,
+    pub comment: Option<String>,
     pub status: Option<i32>,
     pub modules_data: Option<String>,
 }
 
-pub async fn patch_status(
+pub async fn update_status(
     pool: &SqlitePool,
     mal_id: i32,
     patch: AnimeStatusPatch,
@@ -48,6 +50,7 @@ pub async fn patch_status(
             tags = COALESCE(?, tags),
             episodes_watched = COALESCE(?, episodes_watched),
             rating = COALESCE(?, rating),
+            comment = COALESCE(?, comment),
             status = COALESCE(?, status),
             modules_data = COALESCE(?, modules_data)
         WHERE mal_id = ?
@@ -57,9 +60,44 @@ pub async fn patch_status(
         .bind(patch.tags)
         .bind(patch.episodes_watched)
         .bind(patch.rating)
+        .bind(patch.comment)
         .bind(patch.status)
         .bind(patch.modules_data)
         .bind(mal_id)
+        .execute(pool)
+        .await?;
+
+    Ok(result.rows_affected())
+}
+
+pub async fn insert_status(
+    pool: &SqlitePool,
+    mal_id: i32,
+    patch: AnimeStatusPatch,
+) -> Result<u64, sqlx::Error> {
+    let result = sqlx::query(
+        r#"
+        INSERT INTO Anime (
+            mal_id,
+            search_terms,
+            tags,
+            episodes_watched,
+            rating,
+            comment,
+            status,
+            modules_data
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        "#,
+    )
+        .bind(mal_id)
+        .bind(patch.search_terms)
+        .bind(patch.tags)
+        .bind(patch.episodes_watched)
+        .bind(patch.rating)
+        .bind(patch.comment)
+        .bind(patch.status)
+        .bind(patch.modules_data)
         .execute(pool)
         .await?;
 
@@ -82,10 +120,11 @@ pub async fn get_status_all(pool: &SqlitePool, mal_ids: Vec<i32>) -> Result<Vec<
             r#"
             SELECT
                 mal_id,
+                rating,
+                comment,
                 search_terms,
                 tags,
                 episodes_watched,
-                rating,
                 status,
                 modules_data
             FROM Anime

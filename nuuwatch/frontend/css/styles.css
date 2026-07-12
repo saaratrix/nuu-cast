@@ -157,3 +157,52 @@ a:hover {
 #item-popover[data-placement="left"] .item-popover-arrow {
     right: -6px;
 }
+
+.edit-item-dialog {
+    background: var(--color-bg);
+    color: var(--color-text);
+
+    border: 1px solid var(--color-bg-highlight);
+    border-radius: 14px;
+
+    padding: 1.5rem;
+
+    box-shadow:
+            0 0 0 1px rgba(200, 172, 255, 0.08) inset,
+            0 12px 36px rgba(0, 0, 0, 0.5),
+            0 0 24px rgba(160, 135, 210, 0.18);
+
+    opacity: 0;
+    transform: translateY(-10px) scale(0.97);
+    transition:
+            opacity 180ms ease,
+            transform 180ms ease;
+}
+
+input, textarea {
+    background-color: var(--color-bg-contrast-low);
+    color: var(--color-text);
+}
+
+label {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 0.5rem;
+}
+
+dialog[open] {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* Backdrop */
+dialog::backdrop {
+    background: rgba(20, 20, 28, 0.65);
+    backdrop-filter: blur(2px);
+}
+
+.anime-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}

@@ -4,18 +4,21 @@
 export interface AnimeModel {
   mal_id: number;
   rating: Rating;
+  comment: string;
   search_terms: string;
   episodes_watched: number;
   status: Status;
   tags: string;
-  /** Le JSON! */
-  modules_data: string;
+  /** parsed from JSON of same name. */
+  modules_data: any;
+  isNew?: boolean
 }
 
 export enum Rating {
-  Bad = 0,
-  Okay = 1,
-  Good = 2,
+  NoRating = 0,
+  Bad = 1,
+  Okay = 2,
+  Good = 3,
 }
 
 export enum Status {
@@ -35,11 +38,37 @@ export async function fetchAnimeModel(malId: number): Promise<AnimeModel | undef
     throw new Error(`Failed to load anime model: ${response.status}`);
   }
 
-  return await response.json();
+  const model = await response.json();
+  if (!model) {
+    return undefined;
+  }
+
+  try {
+    const modules_data = JSON.parse(model.modules_data);
+    model.modules_data = modules_data;
+  } catch (e) {
+    model.modules_data = {};
+  }
+
+  return model;
 }
 
-export async function saveAnimeModel(model: AnimeModel): Promise<AnimeModel> {
-  const response = await fetch(`/api/anime/view/${model.mal_id}`, {
+export function createDefaultModel(malId: number): AnimeModel {
+  return {
+    mal_id: malId,
+    rating: Rating.NoRating,
+    comment: '',
+    episodes_watched: 0,
+    search_terms: '',
+    status: Status.None,
+    tags: '',
+    modules_data: {},
+    isNew: true,
+  }
+}
+
+export async function putAnimeModel(model: AnimeModel): Promise<boolean> {
+  const response = await fetch(`/anime/view/${model.mal_id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -51,5 +80,23 @@ export async function saveAnimeModel(model: AnimeModel): Promise<AnimeModel> {
     throw new Error(`Failed to save anime model: ${response.status}`);
   }
 
-  return await response.json();
+  const value = Number(await response.text());
+  return !Number.isNaN(value) && value > 0;
+}
+
+export async function patchAnimeModel(model: AnimeModel): Promise<boolean> {
+  const response = await fetch(`/anime/view/${model.mal_id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(model),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to save anime model: ${response.status}`);
+  }
+
+  const value = Number(await response.text());
+  return !Number.isNaN(value) && value > 0;
 }

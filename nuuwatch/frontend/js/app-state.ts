@@ -58,3 +58,16 @@ export const addItem = (type: ItemsKey, item: AnimeItem) => {
 
   appState.items[type].push(item);
 }
+
+export function addItemModel(item: AnimeItem, model: AnimeModel | undefined): void {
+  if (!model) {
+    return;
+  }
+  item.model = model;
+  document.dispatchEvent(new CustomEvent('anime:modelUpdated', { detail: { id: item.id, model } }));
+}
+
+export function updateItemModel(item: AnimeItem, model: AnimeModel): void {
+  item.model = model;
+  document.dispatchEvent(new CustomEvent('anime:modelUpdated', { detail: { id: item.id, model } }));
+}

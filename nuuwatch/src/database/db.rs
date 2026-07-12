@@ -6,6 +6,7 @@ use sqlx::sqlite::SqlitePoolOptions;
 pub struct Anime {
     pub mal_id: i64,
     pub rating: Option<i64>,
+    pub comment: String,
     pub search_terms: String,
     pub episodes_watched: i64,
     pub status: i64,
@@ -16,9 +17,10 @@ pub struct Anime {
 #[repr(i64)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Rating {
-    Bad = 0,
-    Okay = 1,
-    Good = 2,
+    NoRating = 0,
+    Bad = 1,
+    Okay = 2,
+    Good = 3,
 }
 
 #[repr(i64)]
@@ -41,6 +43,7 @@ pub async fn init_db() -> Result<Pool<Sqlite>, sqlx::Error> {
             mal_id INTEGER PRIMARY KEY,
 
             rating INTEGER,
+            comment TEXT NOT NULL,
             search_terms TEXT NOT NULL,
 
             episodes_watched INTEGER NOT NULL DEFAULT 0,

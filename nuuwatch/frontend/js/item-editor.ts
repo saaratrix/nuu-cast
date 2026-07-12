@@ -1,10 +1,10 @@
-import { AnimeItem } from './app-state.js';
-import { AnimeModel, fetchAnimeModel, Rating, Status } from './anime-model.js';
+import { addItemModel, AnimeItem, updateItemModel } from './app-state.js';
+import { AnimeModel, createDefaultModel, fetchAnimeModel, patchAnimeModel, putAnimeModel, Rating, Status } from './anime-model.js';
 import { escapeHtml } from './utility.js';
+import { requestModulesData } from './module-handler.js';
 
 export async function openEditor(
   item: AnimeItem,
-  // onSave?: (updated: AnimeItem) => void,
 ) {
   const model = await getAnimeModel(item);
   if (!model) {
@@ -12,15 +12,18 @@ export async function openEditor(
   }
 
   const dialog = document.createElement("dialog");
-
+  dialog.className = 'edit-item-dialog';
   dialog.innerHTML = `
       <form method="dialog" class="anime-editor">
-        <h2>Edit Anime</h2>
+        <h2>Edit Anime ${item.title}</h2>
+        <label>
+            Comment
+            <textarea id="comment" rows="2">${escapeHtml(model.comment)}</textarea>
+        </label>
 
         <label>
           Search Terms
           <textarea id="searchTerms" rows="6">${escapeHtml(model.search_terms)}</textarea>
-          <small>One term per line</small>
         </label>
 
         <label>
@@ -40,18 +43,19 @@ export async function openEditor(
         <label>
           Rating
           <select id="rating">
-              <option value="0">Bad</option>
-              <option value="1">Okay</option>
-              <option value="2">Good</option>
+              <option value="0" ${item.model?.rating === 0 ? 'selected' : ''}>No Rating</option>
+              <option value="1" ${item.model?.rating === 1 ? 'selected' : ''}>Bad</option>
+              <option value="2" ${item.model?.rating === 2 ? 'selected' : ''}>Okay</option>
+              <option value="3" ${item.model?.rating === 3 ? 'selected' : ''}>Good</option>
           </select>
         </label>
 
         <label>
           Status
           <select id="status">
-              <option value="0">None</option>
-              <option value="1">Watching</option>
-              <option value="2">Completed</option>
+              <option value="0" ${item.model?.status === 0 ? 'selected' : ''}>None</option>
+              <option value="1" ${item.model?.status === 1 ? 'selected' : ''}>Watching</option>
+              <option value="2" ${item.model?.status === 2 ? 'selected' : ''}>Completed</option>
           </select>
         </label>
 
@@ -64,39 +68,47 @@ export async function openEditor(
 
   document.body.appendChild(dialog);
 
-  const rating = dialog.querySelector<HTMLSelectElement>("#rating")!;
-  const status = dialog.querySelector<HTMLSelectElement>("#status")!;
+  const rating = document.getElementById("rating") as HTMLSelectElement;
+  const comment = document.getElementById('comment') as HTMLTextAreaElement;
+  const tags = document.getElementById("tags") as HTMLInputElement;
+  const status = document.getElementById("status") as HTMLSelectElement;
+  const searchTerms = document.getElementById("searchTerms") as HTMLTextAreaElement;
+  const episodesWatched = document.getElementById("episodesWatched") as HTMLInputElement;
 
   rating.value = String(model.rating);
   status.value = String(model.status);
 
-  dialog.addEventListener("close", () => {
+  dialog.addEventListener("close", async () => {
     if (dialog.returnValue !== "save") {
       dialog.remove();
       return;
     }
 
+    const modules_data = {};
+    requestModulesData(item, modules_data);
+
+    const shouldInsert = !!model.isNew
+
     const updated: AnimeModel = {
       mal_id: item.id,
-      search_terms: dialog
-        .querySelector<HTMLTextAreaElement>("#searchTerms")!
-        .value,
+      comment: comment.value,
+      search_terms: searchTerms.value,
 
-      tags: dialog
-        .querySelector<HTMLInputElement>("#tags")!
-        .value,
+      tags: tags.value,
 
-      episodes_watched: Number(
-        dialog.querySelector<HTMLInputElement>("#episodesWatched")!
-          .value,
-      ),
-
-      rating: Number(rating.value) as Rating,
-      status: Number(status.value) as Status,
-      modules_data: '',
+      episodes_watched: Number(episodesWatched.value),
+      rating: !Number.isNaN(Number(rating.value)) ? Number(rating.value) as Rating : Rating.NoRating,
+      status: !Number.isNaN(Number(status.value)) ? Number(status.value) as Status : Status.None,
+      modules_data: JSON.stringify(modules_data),
     };
 
-    // onSave?.(updated);
+    if (shouldInsert) {
+      await putAnimeModel(updated);
+    } else {
+      await patchAnimeModel(updated);
+    }
+    updated.modules_data = modules_data;
+    updateItemModel(item, updated);
     dialog.remove();
   });
 
@@ -107,7 +119,11 @@ async function getAnimeModel(item: AnimeItem): Promise<AnimeModel | undefined> {
   if (item.model) {
     return item.model;
   }
-  const model = await fetchAnimeModel(item.id);
-  item.model = model;
+  let model = await fetchAnimeModel(item.id);
+  if (!model) {
+    model = createDefaultModel(item.id);
+  }
+
+  addItemModel(item, model);
   return model;
 }

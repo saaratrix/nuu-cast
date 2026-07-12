@@ -1,16 +1,28 @@
-use axum::extract::{Path, Query, State};
+use axum::extract::{Path, State};
 use axum::http::{StatusCode};
-use axum::response::{Json, IntoResponse, Response};
+use axum::response::{Json, IntoResponse};
 use serde::Deserialize;
 use crate::AppState;
-use crate::database::anime_queries::{get_status, get_status_all, patch_status, AnimeStatusPatch};
+use crate::database::anime_queries::{get_status, get_status_all, insert_status, update_status, AnimeStatusPatch};
+
+pub async fn put_anime_status(
+    State(state): State<AppState>,
+    Path(mal_id): Path<i32>,
+    Json(patch): Json<AnimeStatusPatch>,
+) -> impl IntoResponse {
+    match insert_status(&state.db, mal_id, patch).await {
+        Ok(rows) if rows > 0 => StatusCode::OK,
+        Ok(_) => StatusCode::NOT_FOUND,
+        Err(_) => StatusCode::INTERNAL_SERVER_ERROR,
+    }
+}
 
 pub async fn patch_anime_status(
     State(state): State<AppState>,
     Path(mal_id): Path<i32>,
     Json(patch): Json<AnimeStatusPatch>,
 ) -> impl IntoResponse {
-    match patch_status(&state.db, mal_id, patch).await {
+    match update_status(&state.db, mal_id, patch).await {
         Ok(rows) if rows > 0 => StatusCode::OK,
         Ok(_) => StatusCode::NOT_FOUND,
         Err(_) => StatusCode::INTERNAL_SERVER_ERROR,
