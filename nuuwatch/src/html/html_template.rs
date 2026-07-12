@@ -28,7 +28,7 @@ pub fn get_navbar(url: &PathBuf) -> String {
     let mut breadcrumbs = String::new();
     let mut accumulated_path = PathBuf::new();
 
-    breadcrumbs.push_str(r#"<a class="breadcrumb-link" href="/">Home</a>"#);
+    breadcrumbs.push_str(r#"<a class="breadcrumb-link" href="/#">Home</a>"#);
     for component in url.components() {
         if let std::path::Component::Normal(segment) = component {
             accumulated_path.push(segment);

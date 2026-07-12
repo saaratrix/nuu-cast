@@ -3,6 +3,7 @@ import { escapeHtml } from './utility.js';
 import { loadModules } from './module-handler.js';
 import { gotoRoute } from './router.js';
 import { openEditor } from './item-editor.js';
+import { createAnimeItem } from './anime-item-utility.js';
 
 export async function loadAnimeViewPage(malId: number) {
   const pageContainer = document.querySelector('.page-container');
@@ -69,7 +70,11 @@ async function getMalAnimeItem(malId: number): Promise<AnimeItem> {
 }
 
 async function loadMalItem(malId: number): Promise<AnimeItem> {
-  const request = jikan.loadAnime(malId, 'full', )
+  const request = jikan.loadAnime(malId, 'full', {});
+  const response = await request;
 
-  return {} as AnimeItem;
+  const malItem = response.data;
+  const animeItem = createAnimeItem(malItem);
+  appState.itemsByMalId.set(malId, animeItem);
+  return animeItem;
 }

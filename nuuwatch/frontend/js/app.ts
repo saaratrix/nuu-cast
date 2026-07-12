@@ -1,4 +1,4 @@
-import { loadMainPage } from './main-page-renderer.js';
+import { loadMainPage } from './main-page.js';
 import { loadAnimeViewPage } from './anime-page.js';
 import { hidePopover } from './popover.js';
 import { getCurrentRoute } from './router.js';

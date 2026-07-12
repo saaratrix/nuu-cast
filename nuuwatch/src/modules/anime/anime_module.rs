@@ -16,7 +16,8 @@ pub fn get_routes() -> Router<AppState> {
     // Jikan Proxy & cache routes
     .route("/anime/seasons/now",   get(handle_get_current_season))
     .route("/anime/seasons/{year}/{season}", get(handle_get_season))
-    .route("/anime/load/{mal_id}/full", get(handle_load_anime_full))
+    // api prefix = anime, jikan api = anime! so we get anime/anime :3
+    .route("/anime/anime/{mal_id}/full", get(handle_load_anime_full))
     .route("/anime/search", get(handle_search_anime))
     .route("/anime/malimage/{*image_url}", get(handle_mal_image));
 

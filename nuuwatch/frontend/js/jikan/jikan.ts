@@ -1,5 +1,6 @@
 import { Request } from './jikan-request.js';
 import { Settings, settings } from './jikan-settings.js';
+import { MALAnime } from './types/jikan';
 
 type AnimePeopleType = 'people' | 'characters';
 type AnimeType = 'anime' | 'manga';
@@ -27,7 +28,7 @@ export class JikanAPI {
    * @param {{}} [parameters] - Query, check docs for more info
    * @see {@link https://docs.api.jikan.moe/#tag/anime}
    */
-  loadAnime(id: number, request: string, parameters: any) {
+  loadAnime(id: number, request: string, parameters: any): Promise<{ data: MALAnime }> {
     if(request === 'episodes' && typeof parameters === 'number'){
       return this.request.send(['anime', id, request, parameters]);
     }

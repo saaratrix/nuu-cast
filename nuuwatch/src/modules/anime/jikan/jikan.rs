@@ -21,4 +21,14 @@ impl Jikan {
         let params = HashMap::from([("page".into(), page.to_string())]);
         self.request.send(args, Some(params)).await
     }
+
+    pub async fn load_anime(&self, mal_id: u32) -> Result<String, reqwest::Error> {
+        let args = vec![
+            "anime".to_string(),
+            mal_id.to_string(),
+            "full".to_string()
+        ];
+
+        self.request.send(args, None).await
+    }
 }

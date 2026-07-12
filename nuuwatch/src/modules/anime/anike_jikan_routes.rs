@@ -43,8 +43,9 @@ pub async fn handle_get_season(
 }
 
 pub async fn handle_load_anime_full(Path(mal_id): Path<u32>,) -> impl IntoResponse {
-    // return this.request.send(['anime', id, request], parameters);
-    (StatusCode::INTERNAL_SERVER_ERROR, "Not Implemented.").into_response()
+    let jikan = Jikan::new();
+    let response = jikan.load_anime(mal_id).await.unwrap();
+    (StatusCode::OK, Json(response)).into_response()
 }
 
 pub async fn handle_search_anime(Query(params): Query<AnimeSearchParams>) -> impl IntoResponse {
