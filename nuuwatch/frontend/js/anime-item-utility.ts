@@ -3,6 +3,7 @@ import { MALAnime } from './jikan/types/jikan.js';
 import { escapeHtml } from './utility.js';
 import { hidePopover, showPopover } from './popover.js';
 import { openEditor } from './item-editor.js';
+import { AnimeModel, getAnimeModel, insertOrUpdateModel, ModelUpdatedEvent, Rating } from './anime-model.js';
 
 export function createAnimeItem(item: MALAnime): AnimeItem {
   // Background exists along with synopsis for a shorter description.
@@ -31,7 +32,7 @@ export function createAnimeItem(item: MALAnime): AnimeItem {
   const itemCardElement = document.createElement('div');
   itemCardElement.className = 'item-card';
   itemCardElement.innerHTML = `
-  <a href="${viewAnimeUrl}">
+  <a class="item-body" href="${viewAnimeUrl}">
       <span class="title">${visualTitle}</span>
       <img src="${escapeHtml(image_url)}" width="128" height="128">            
   </a>
@@ -71,6 +72,8 @@ export function createAnimeItem(item: MALAnime): AnimeItem {
 
   itemCardElement.addEventListener('pointerenter', () => showPopover(itemCardElement));
   itemCardElement.addEventListener('pointerleave', () => hidePopover());
+
+  initRatingEvents(animeItem, itemCardElement);
 
   const editAnimeBtn = itemCardElement.querySelector<HTMLElement>('.edit-anime');
   editAnimeBtn?.addEventListener('click', () => openEditor(animeItem));
@@ -147,4 +150,52 @@ function getAiring(broadcast: MALAnime['broadcast'] | undefined, targetTimeZone:
 
   const dayStr = weekdayFromDay[day as keyof typeof weekdayFromDay];
   return `${dayStr} ${totalHours < 9 ? '0' + totalHours : totalHours}:${minuteStr}`;
+}
+
+function initRatingEvents(item: AnimeItem, cardElement: HTMLElement): void {
+  const ratingAction = cardElement.querySelector('.item-action.rating') as HTMLElement;
+  ratingAction.addEventListener('click', async () => {
+    const model = await getAnimeModel(item);
+
+    switch (model.rating) {
+      case Rating.NoRating:
+        model.rating = Rating.Okay;
+        break;
+      case Rating.Okay:
+        model.rating = Rating.Good;
+        break;
+      case Rating.Good:
+        model.rating = Rating.Bad;
+        break;
+      case Rating.Bad:
+        model.rating = Rating.NoRating;
+        break;
+    }
+    setRatingColour(model);
+    await insertOrUpdateModel(item, model);
+  });
+
+  cardElement.addEventListener('anime:modelUpdated', (e) => {
+    const event = (e as CustomEvent<ModelUpdatedEvent>)
+    if (!event.detail.model) {
+      return;
+    }
+
+    setRatingColour(event.detail.model);
+  });
+
+  function setRatingColour(model: AnimeModel) {
+
+    let className = `rating-${Rating[model.rating].toLowerCase()}`;
+    const oldClass = ratingAction.dataset['ratingClass'];
+    oldClass && ratingAction.classList.remove(oldClass);
+    ratingAction.classList.add(className);
+    ratingAction.dataset['ratingClass'] = className;
+
+    let title = Rating[model.rating];
+    if (title === Rating[Rating.NoRating]) {
+      title = 'Not rated.';
+    }
+    ratingAction.title = title;
+  }
 }

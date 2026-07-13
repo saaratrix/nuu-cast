@@ -32,7 +32,7 @@ export async function loadAnimeViewPage(malId: number) {
   pageContainer.innerHTML = `
     <div class="anime-item-page">
       <header>
-        <h1>${animeItem.title}</h1>
+        <h1><a href="${animeItem.data.url}">${animeItem.title}</a></h1>
       </header>
       <section>
         <div>

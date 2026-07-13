@@ -11,6 +11,11 @@
     --color-link-contrast: #c8acff;
     --color-link-disabled: #5c5675;
     --color-link-disabled-bg: hsl(240, 12%, 18%);
+
+    --rating-color-bad: #ff9a3d;
+    --rating-color-no-rating: var(--color-text-disabled);
+    --rating-color-ok: #ff62e3;
+    --rating-color-good: red;
 }
 
 html, body {
@@ -31,6 +36,9 @@ html, body {
 }
 
 .item-card a {
+}
+
+.item-body {
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -38,15 +46,20 @@ html, body {
     gap: 0.25rem;
 }
 
-.item-card a span {
+.item-body span {
     flex: 0 0 auto;
+    text-align: center;
 }
 
-.item-card a img {
+.item-body img {
     flex: 1 1 auto;
     min-height: 0;
     width: 100%;
     object-fit: contain;
+}
+
+.item-body:hover {
+    background-color: var(--color-bg-contrast-low);
 }
 
 .item-card:hover {
@@ -73,7 +86,7 @@ a:hover {
     left: 0;
     right: 0;
     padding: 0.25rem 0.5rem;
-    background-color: rgba(49, 49, 63, 0.8);
+    background-color: hsl(240 13% 22% / 0.8);
 
     display: flex;
     justify-content: right;
@@ -82,10 +95,11 @@ a:hover {
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.15s ease;
+    user-select: none;
 }
 
 .item-card:hover .item-actions {
-    opacity: 0.2;
+    opacity: 0.0;
     visibility: visible;
 }
 
@@ -99,11 +113,11 @@ a:hover {
 }
 
 .item-action:hover {
-    color: var(--color-link-hover);
+    filter: brightness(1.1);
 }
 
 .item-action:active {
-    color: var(--color-link-pressed);
+    filter: brightness(1.15);
 }
 
 .item-synopsis {
@@ -205,4 +219,20 @@ dialog::backdrop {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+}
+
+.rating-norating {
+    color: var(--rating-color-no-rating);
+}
+
+.rating-bad {
+    color: var(--rating-color-bad) !important;
+}
+
+.rating-okay {
+    color: var(--rating-color-ok) !important;
+}
+
+.rating-good {
+    color: var(--rating-color-good) !important;
 }

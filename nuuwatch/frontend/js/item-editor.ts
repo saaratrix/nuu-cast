@@ -1,5 +1,5 @@
-import { addItemModel, AnimeItem, updateItemModel } from './app-state.js';
-import { AnimeModel, createDefaultModel, fetchAnimeModel, patchAnimeModel, putAnimeModel, Rating, Status } from './anime-model.js';
+import { AnimeItem } from './app-state.js';
+import { AnimeModel, getAnimeModel, insertOrUpdateModel, patchAnimeModel, putAnimeModel, Rating, Status, updateItemModel } from './anime-model.js';
 import { escapeHtml } from './utility.js';
 import { requestModulesData } from './module-handler.js';
 
@@ -84,46 +84,19 @@ export async function openEditor(
       return;
     }
 
-    const modules_data = {};
-    requestModulesData(item, modules_data);
-
-    const shouldInsert = !!model.isNew
-
     const updated: AnimeModel = {
-      mal_id: item.id,
+      ...model,
       comment: comment.value,
       search_terms: searchTerms.value,
-
       tags: tags.value,
-
       episodes_watched: Number(episodesWatched.value),
       rating: !Number.isNaN(Number(rating.value)) ? Number(rating.value) as Rating : Rating.NoRating,
       status: !Number.isNaN(Number(status.value)) ? Number(status.value) as Status : Status.None,
-      modules_data: JSON.stringify(modules_data),
     };
 
-    if (shouldInsert) {
-      await putAnimeModel(updated);
-    } else {
-      await patchAnimeModel(updated);
-    }
-    updated.modules_data = modules_data;
-    updateItemModel(item, updated);
+    await insertOrUpdateModel(item, updated);
     dialog.remove();
   });
 
   dialog.showModal();
-}
-
-async function getAnimeModel(item: AnimeItem): Promise<AnimeModel | undefined> {
-  if (item.model) {
-    return item.model;
-  }
-  let model = await fetchAnimeModel(item.id);
-  if (!model) {
-    model = createDefaultModel(item.id);
-  }
-
-  addItemModel(item, model);
-  return model;
 }

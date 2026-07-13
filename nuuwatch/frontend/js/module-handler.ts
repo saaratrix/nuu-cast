@@ -1,4 +1,4 @@
-import { AnimeItem } from './app-state';
+import { AnimeItem } from './app-state.js';
 
 const loadedModules = new Set<string>();
 

@@ -1,3 +1,6 @@
+import { AnimeItem, appState } from './app-state.js';
+import { requestModulesData } from './module-handler.js';
+
 /**
  * Modeled after the backend SQLite model.
  */
@@ -11,6 +14,7 @@ export interface AnimeModel {
   tags: string;
   /** parsed from JSON of same name. */
   modules_data: any;
+  /** If true, it's made locally and doesn't come from backend */
   isNew?: boolean
 }
 
@@ -26,6 +30,49 @@ export enum Status {
   Watching = 1,
   Completed = 2,
 }
+
+export interface ModelUpdatedEvent {
+  id: number,
+  model: AnimeModel,
+}
+
+let activePromises = new Map<number, Promise<AnimeModel>>
+
+export function getAnimeModel(item: AnimeItem): Promise<AnimeModel> {
+  if (item.model) {
+    return Promise.resolve(item.model);
+  }
+
+  const activePromise = activePromises.get(item.id);
+  if (activePromise) {
+    return activePromise;
+  }
+
+  let promise = fetchAnimeModel(item.id).then(model => model ?? createDefaultModel(item.id))
+  .then((model) => {
+    activePromises.delete(item.id)
+    return model;
+  }).catch(error => {
+    console.error(`Failed to get anime model for ${item.id}`, item, error);
+    activePromises.delete(item.id);
+    throw new Error(`Failed to get anime model for ${item.id} - ${error}`);
+  });
+  activePromises.set(item.id, promise);
+  return promise;
+}
+
+export function addItemModel(item: AnimeItem, model: AnimeModel): void {
+  item.model = model;
+  appState.animeModels.set(item.id, model);
+  item.cardElement.dispatchEvent(new CustomEvent('anime:modelUpdated', { detail: { id: item.id, model } }));
+}
+
+export function updateItemModel(item: AnimeItem, model: AnimeModel): void {
+  item.model = model;
+  appState.animeModels.set(item.id, model);
+  item.cardElement.dispatchEvent(new CustomEvent('anime:modelUpdated', { detail: { id: item.id, model } }));
+}
+
 
 export async function fetchAnimeModel(malId: number): Promise<AnimeModel | undefined> {
   const response = await fetch(`/anime/view/${malId}`);
@@ -65,6 +112,25 @@ export function createDefaultModel(malId: number): AnimeModel {
     modules_data: {},
     isNew: true,
   }
+}
+
+export async function insertOrUpdateModel(item: AnimeItem, model: AnimeModel): Promise<void> {
+  const modules_data = {};
+  requestModulesData(item, modules_data);
+  model.modules_data = modules_data;
+
+  const modules_data_json = JSON.stringify(modules_data);
+  const payload = { ...model, modules_data: modules_data_json };
+
+  if (model.isNew) {
+    if (await putAnimeModel(payload)) {
+      model.isNew = false;
+    }
+  } else {
+    await patchAnimeModel(payload);
+  }
+
+  updateItemModel(item, model);
 }
 
 export async function putAnimeModel(model: AnimeModel): Promise<boolean> {

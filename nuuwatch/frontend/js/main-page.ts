@@ -1,7 +1,7 @@
-import { jikan, appState, addItem, AnimeItem, ItemsKey, changeItem, addItemModel } from './app-state.js';
+import { jikan, appState, addItem, AnimeItem, ItemsKey, changeItem } from './app-state.js';
 import { MALAnime } from './jikan/types/jikan.js';
 import { createAnimeItem } from './anime-item-utility.js';
-import { AnimeModel } from './anime-model';
+import { addItemModel, AnimeModel } from './anime-model.js';
 
 export function loadMainPage() {
   let currentPage = 1;
