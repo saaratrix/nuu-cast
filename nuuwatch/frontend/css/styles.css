@@ -12,7 +12,7 @@
     --color-link-disabled: #5c5675;
     --color-link-disabled-bg: hsl(240, 12%, 18%);
 
-    --rating-color-bad: #ff9a3d;
+    --rating-color-bad: #3de8ff;
     --rating-color-no-rating: var(--color-text-disabled);
     --rating-color-ok: #ff62e3;
     --rating-color-good: red;
@@ -99,7 +99,7 @@ a:hover {
 }
 
 .item-card:hover .item-actions {
-    opacity: 0.0;
+    opacity: 0.2;
     visibility: visible;
 }
 

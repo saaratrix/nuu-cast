@@ -123,9 +123,8 @@ export async function insertOrUpdateModel(item: AnimeItem, model: AnimeModel): P
   const payload = { ...model, modules_data: modules_data_json };
 
   if (model.isNew) {
-    if (await putAnimeModel(payload)) {
-      model.isNew = false;
-    }
+    await putAnimeModel(payload);
+    model.isNew = false;
   } else {
     await patchAnimeModel(payload);
   }

@@ -1,7 +1,7 @@
-import { jikan, appState, addItem, AnimeItem, ItemsKey, changeItem } from './app-state.js';
+import { addItem, AnimeItem, appState, changeItem, ItemsKey, jikan } from './app-state.js';
 import { MALAnime } from './jikan/types/jikan.js';
 import { createAnimeItem } from './anime-item-utility.js';
-import { addItemModel, AnimeModel } from './anime-model.js';
+import { addItemModel, AnimeModel, Rating } from './anime-model.js';
 
 export function loadMainPage() {
   let currentPage = 1;
@@ -18,7 +18,6 @@ export function loadMainPage() {
 
 async function fetchCurrentSeason(currentPage: number) {
   const res = await jikan.loadCurrentSeason(currentPage);
-  console.log(res);
   const { pagination, data } = res;
 
   if (!Array.isArray(data)) {
@@ -82,14 +81,32 @@ function onCurrentSeasonLoaded() {
   fetchAllModels(malIds).then().catch(e => console.error('Fetching all anime models failed', e));
 }
 
+const ratingSortValues = {
+  [Rating.Bad]: 0,
+  [Rating.NoRating]: 1,
+  [Rating.Okay]: 2,
+  [Rating.Good]: 3,
+}
 function sortItems() {
   for (const itemsKey of Object.keys(appState.items)) {
     const items = appState.items[itemsKey as ItemsKey];
-    if (items) {
-      items.sort((a: AnimeItem, b: AnimeItem): number => {
-        return a.title.localeCompare(b.title);
-      });
+    if (!items) {
+      continue;
     }
+
+    items.sort((a: AnimeItem, b: AnimeItem): number => {
+      const modelA = a.model;
+      const modelB = b.model;
+
+      const ratingA = modelA?.rating ?? Rating.NoRating;
+      const ratingB = modelB?.rating ?? Rating.NoRating;
+
+      if (ratingA !== ratingB) {
+        return ratingSortValues[ratingB] > ratingSortValues[ratingA] ? 1 : -1;
+      }
+
+      return a.title.localeCompare(b.title);
+    });
   }
 }
 
@@ -98,6 +115,8 @@ function renderAllItems() {
   if (!itemsContainer) {
     return;
   }
+
+  itemsContainer.innerHTML = '';
 
   let isFirst = true;
   const fragment = document.createDocumentFragment();
@@ -174,4 +193,7 @@ async function fetchAllModels(malIds: Set<number>): Promise<void> {
 
     addItemModel(animeItem, model);
   }
+
+  sortItems();
+  renderAllItems();
 }
