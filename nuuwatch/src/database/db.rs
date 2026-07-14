@@ -29,6 +29,7 @@ pub enum Status {
     None = 0,
     Watching = 1,
     Completed = 2,
+    Hidden = 3,
 }
 
 pub async fn init_db() -> Result<Pool<Sqlite>, sqlx::Error> {

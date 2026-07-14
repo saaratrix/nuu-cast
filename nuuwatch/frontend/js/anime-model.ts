@@ -29,6 +29,7 @@ export enum Status {
   None = 0,
   Watching = 1,
   Completed = 2,
+  Hidden = 3,
 }
 
 export interface ModelUpdatedEvent {
@@ -37,6 +38,15 @@ export interface ModelUpdatedEvent {
 }
 
 let activePromises = new Map<number, Promise<AnimeModel>>
+
+export async function tryInitializeAnimeModel(item: AnimeItem) {
+  if (item.model) {
+    return;
+  }
+
+  const model = await getAnimeModel(item);
+  addItemModel(item, model);
+}
 
 export function getAnimeModel(item: AnimeItem): Promise<AnimeModel> {
   if (item.model) {
@@ -62,6 +72,11 @@ export function getAnimeModel(item: AnimeItem): Promise<AnimeModel> {
 }
 
 export function addItemModel(item: AnimeItem, model: AnimeModel): void {
+  // In case of multiple pending calls we don't spam events!
+  if (item.model) {
+    return;
+  }
+
   item.model = model;
   appState.animeModels.set(item.id, model);
   item.cardElement.dispatchEvent(new CustomEvent('anime:modelUpdated', { detail: { id: item.id, model } }));
@@ -115,11 +130,7 @@ export function createDefaultModel(malId: number): AnimeModel {
 }
 
 export async function insertOrUpdateModel(item: AnimeItem, model: AnimeModel): Promise<void> {
-  const modules_data = {};
-  requestModulesData(item, modules_data);
-  model.modules_data = modules_data;
-
-  const modules_data_json = JSON.stringify(modules_data);
+  const modules_data_json = JSON.stringify(model.modules_data);
   const payload = { ...model, modules_data: modules_data_json };
 
   if (model.isNew) {

@@ -1,0 +1,9 @@
+.crunchyroll-links label {
+    display: inline-flex;
+    margin-top: 0.5rem;
+}
+
+.crunchyroll-links input {
+    width: 80vw;
+    max-width: 100ch;
+}

@@ -5,7 +5,7 @@ const loadedModules = new Set<string>();
 export type StaticModule = 'crunchyroll';
 
 export const staticModuleFiles: Record<StaticModule, string[]> = {
-  'crunchyroll': ['/static/modules/static/crunchyroll.js'],
+  'crunchyroll': ['/static/modules/static/crunchyroll.js', '/static/modules/static/crunchyroll.css'],
 } as const;
 
 export async function loadModules(type: StaticModule | string ): Promise<boolean> {

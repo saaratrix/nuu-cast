@@ -4,8 +4,9 @@ import { loadModules } from './module-handler.js';
 import { gotoRoute } from './router.js';
 import { openEditor } from './item-editor.js';
 import { createAnimeItem } from './anime-item-utility.js';
+import { addItemModel, AnimeModel, fetchAnimeModel, getAnimeModel, tryInitializeAnimeModel } from './anime-model.js';
 
-export async function loadAnimeViewPage(malId: number) {
+async function loadAnimeViewPage(malId: number) {
   const pageContainer = document.querySelector('.page-container');
   if (!pageContainer) {
     return gotoMain();
@@ -14,9 +15,20 @@ export async function loadAnimeViewPage(malId: number) {
   loadModules('anime').then(result => console.log(`${result ? 'succesfully loaded' : 'failed to load'} module anime `));
   loadModules('crunchyroll').then(result => console.log(`${result ? 'succesfully loaded' : 'failed to load'} module crunchyroll`));
 
-  let animeItem: AnimeItem | undefined
+  let animeItem: AnimeItem | undefined;
+  let itemChanged = false;
   try {
+    const onChanged = () => {
+      itemChanged = true;
+    };
+    document.addEventListener('anime:itemChanged', onChanged, { once: true });
+
     animeItem = await getMalAnimeItem(malId);
+    await tryInitializeAnimeModel(animeItem);
+    document.removeEventListener('anime:itemChanged', onChanged);
+    if (itemChanged) {
+      return;
+    }
   } catch (e) {
     pageContainer.innerHTML = `
       <div class="error"><p>Failed to load anime from MAL: ${e}</p></div>
@@ -54,6 +66,8 @@ export async function loadAnimeViewPage(malId: number) {
 
   changeItem(malId);
 }
+
+export default loadAnimeViewPage
 
 function gotoMain() {
   changeItem(undefined);
