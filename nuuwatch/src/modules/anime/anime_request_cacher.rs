@@ -34,7 +34,7 @@ pub fn get_cache_key_path(url: &Url) -> Option<PathBuf> {
 }
 
 pub async fn try_get_cached_request_json(url: &Url) -> Option<String> {
-    let cache_key = get_cache_key(url); // Returns String or Option<String>? Assume String for now
+    let cache_key = get_cache_key(url);
     println!("cache key: {:?}", cache_key);
 
     if let Some(_) = cache_key {
@@ -46,12 +46,11 @@ pub async fn try_get_cached_request_json(url: &Url) -> Option<String> {
                 Err(e) => {
                     println!("Failed to read cache file for path: {} error {}", &path.display(), e);
                     None
-                }, // Read failed (permissions, etc.)
+                },
             };
         }
     }
-
-    None // File missing or key creation failed
+    None
 }
 
 pub async fn add_cached_request_json(url: &Url, response: &str) -> io::Result<()> {

@@ -31,3 +31,7 @@ nuuwatch/frontend/node_modules
 nuuwatch/frontend/js/**/*.js
 nuuwatch/frontend/modules/**/*.js
 nuuwatch/frontend/modules/local
+
+nuuwatch/src/modules/anime/other
+
+nuufetch
