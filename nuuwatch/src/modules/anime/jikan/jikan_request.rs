@@ -2,7 +2,7 @@ use url::Url;
 use std::collections::HashMap;
 use axum::http::HeaderValue;
 use reqwest::header::HeaderMap;
-use crate::modules::anime::anime_request_cacher::{add_cached_request_json, try_get_cached_request_json};
+use crate::modules::anime::anime_request_cacher::{add_cached_request_json, try_get_cached_request_json, CacheOptions};
 use crate::modules::anime::jikan::jikan_settings::{Settings};
 
 #[derive(Clone)]
@@ -26,10 +26,10 @@ impl Request {
         }
     }
 
-    pub async fn send(&self, args: Vec<String>, params: Option<HashMap<String, String>>) -> Result<String, reqwest::Error> {
+    pub async fn send(&self, args: Vec<String>, params: Option<HashMap<String, String>>, options: CacheOptions) -> Result<String, reqwest::Error> {
         let url = self.build_url(args, params.as_ref());
 
-        if let Some(cached_response) = try_get_cached_request_json(&url).await {
+        if !options.ignore_cache && let Some(cached_response) = try_get_cached_request_json(&url, &options).await {
             println!("returning cached request");
             return Ok(cached_response);
         }
@@ -41,7 +41,7 @@ impl Request {
         let json_text = response.text().await?;
 
         if is_success {
-            add_cached_request_json(&url, &json_text).await.ok();
+            add_cached_request_json(&url, None, &json_text).await.ok();
         }
 
         Ok(json_text)

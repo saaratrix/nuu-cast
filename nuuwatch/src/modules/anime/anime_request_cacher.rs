@@ -1,6 +1,8 @@
 use std::io;
+use std::ops::Sub;
 use std::path::PathBuf;
 use std::sync::LazyLock;
+use std::time::{Duration, SystemTime};
 use axum::body::Body;
 use axum::http::{header};
 use axum::response::{IntoResponse, Response};
@@ -11,6 +13,13 @@ use crate::data_utility::data_utility::{DATA_ROOT,};
 
 pub static DATA_ANIME_ROOT: LazyLock<PathBuf> =
     LazyLock::new(|| PathBuf::from(&*DATA_ROOT).join("anime"));
+
+#[derive(Debug, Clone, Default)]
+pub struct CacheOptions {
+    pub cache_prefix: Option<String>,
+    pub ignore_cache: bool,
+    pub ttl: Option<Duration>,
+}
 
 pub fn get_cache_key(url: &Url) -> Option<String> {
     let segments = url.path_segments()?;
@@ -27,36 +36,55 @@ pub fn get_cache_key(url: &Url) -> Option<String> {
     )
 }
 
-pub fn get_cache_key_path(url: &Url) -> Option<PathBuf> {
+pub fn get_cache_key_path(url: &Url, prefix: Option<&str>) -> Option<PathBuf> {
     let cache_key = get_cache_key(url)?;
-    let path = PathBuf::from(&*DATA_ANIME_ROOT.join(&cache_key));
-    Some(path)
+
+    match prefix {
+        Some(prefix) if !prefix.is_empty() => {
+            Some(DATA_ANIME_ROOT.join(prefix).join(cache_key))
+        }
+        _ => Some(DATA_ANIME_ROOT.join(cache_key)),
+    }
 }
 
-pub async fn try_get_cached_request_json(url: &Url) -> Option<String> {
+pub async fn try_get_cached_request_json(url: &Url, options: &CacheOptions) -> Option<String> {
     let cache_key = get_cache_key(url);
     println!("cache key: {:?}", cache_key);
 
     if let Some(_) = cache_key {
-        let path = get_cache_key_path(&url)?;
+        let path = get_cache_key_path(&url, options.cache_prefix.as_deref())?;
 
-        if tokio::fs::metadata(path.clone()).await.is_ok() {
-            return match tokio::fs::read_to_string(path.clone()).await {
-                Ok(content) => Some(content),
-                Err(e) => {
-                    println!("Failed to read cache file for path: {} error {}", &path.display(), e);
-                    None
-                },
-            };
+        let metadata = match tokio::fs::metadata(&path).await {
+            Ok(metadata) => metadata,
+            Err(_) => return None,
+        };
+
+
+        if let Some(ttl) = options.ttl {
+            if let Ok(modified) = metadata.modified() {
+                if let Ok(age) = SystemTime::now().duration_since(modified) {
+                    if age > ttl {
+                        return None;
+                    }
+                }
+            }
         }
+
+        return match tokio::fs::read_to_string(path.clone()).await {
+            Ok(content) => Some(content),
+            Err(e) => {
+                println!("Failed to read cache file for path: {} error {}", &path.display(), e);
+                None
+            },
+        };
     }
     None
 }
 
-pub async fn add_cached_request_json(url: &Url, response: &str) -> io::Result<()> {
+pub async fn add_cached_request_json(url: &Url, cache_prefix: Option<&str>, response: &str) -> io::Result<()> {
     println!("add cached request {}", &url);
 
-    let path = get_cache_key_path(&url).unwrap_or_else(|| PathBuf::new());
+    let path = get_cache_key_path(&url, cache_prefix).unwrap_or_else(|| PathBuf::new());
     println!("add_cached_request cache file path {}", path.display());
 
     if let Some(parent) = path.parent() {

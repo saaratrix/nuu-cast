@@ -1,4 +1,6 @@
 use std::collections::HashMap;
+use std::time::Duration;
+use crate::modules::anime::anime_request_cacher::CacheOptions;
 use crate::modules::anime::jikan::jikan_request::Request;
 
 pub struct Jikan {
@@ -19,7 +21,11 @@ impl Jikan {
         ];
 
         let params = HashMap::from([("page".into(), page.to_string())]);
-        self.request.send(args, Some(params)).await
+        self.request.send(args, Some(params), CacheOptions {
+            cache_prefix: None,
+            ttl: None,
+            ignore_cache: false,
+        }).await
     }
 
     pub async fn load_anime(&self, mal_id: u32) -> Result<String, reqwest::Error> {
@@ -29,6 +35,10 @@ impl Jikan {
             "full".to_string()
         ];
 
-        self.request.send(args, None).await
+        self.request.send(args, None, CacheOptions {
+            ttl: Some(Duration::from_hours(7 * 24)),
+            cache_prefix: None,
+            ignore_cache: false,
+        }).await
     }
 }
