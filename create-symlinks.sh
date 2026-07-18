@@ -2,7 +2,7 @@
 
 set -u
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 NUUCAST_BASE="$SCRIPT_DIR"
 
 if [ $# -ge 1 ]; then
@@ -11,25 +11,24 @@ else
     NUUFETCH_BASE="$(realpath "$SCRIPT_DIR/../nuufetch")"
 fi
 
-NUUFETCH_BASE="$(realpath "$1")"
-NUUCAST_BASE="$(realpath "$(dirname "$0")")"
-
 # Each item is: "target prefix|relative path"
 LINKS=(
-    "nuuwatch-files|frontend/modules/local"
-    "nuuwatch-files|src/components"
-    "|nuufetch"
+    "nuuwatch-files|nuuwatch|frontend/modules/local"
+    "nuuwatch-files|nuuwatch|src/modules/anime/other"
+    "||nuufetch"
 )
 
 for link in "${LINKS[@]}"; do
-    IFS='|' read -r source_prefix relative_path <<< "$link"
+    IFS='|' read -r source_prefix target_prefix relative_path <<< "$link"
 
-    target="$(realpath -m "$NUUCAST_BASE/$source_prefix/$relative_path")"
-    source="$(realpath -m "$NUUFETCH_BASE/$relative_path")"
+    target="$NUUCAST_BASE/$target_prefix/$relative_path"
+    target=${target//\/\//\/}
+    source="$NUUFETCH_BASE/$source_prefix/$relative_path"
+    source=${source//\/\//\/}
 
     if ln -s "$source" "$target" 2>/dev/null; then
         echo "Linked: $target -> $source"
     else
-        echo "Skipping: $target"
+        echo "Failed: ln -s "$source" "$target""
     fi
 done
