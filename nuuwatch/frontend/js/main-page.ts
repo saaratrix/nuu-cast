@@ -6,13 +6,13 @@ import { addItemModel, AnimeModel, Rating } from './anime-model.js';
 export function loadMainPage() {
   let currentPage = 1;
 
-  const pageContainer = document.querySelector('.page-container');
-  if (!pageContainer) {
+  const container = document.querySelector('.content-container');
+  if (!container) {
     return;
   }
 
   changeItem(undefined);
-  pageContainer.innerHTML = `<div class="items-container"></div>`;
+  container.innerHTML = `<div class="items-container"></div>`;
   fetchCurrentSeason(currentPage).then();
 }
 
@@ -50,7 +50,8 @@ function onCurrentSeasonLoaded() {
   const malIds = new Set<number>();
 
   for (const anime of animes) {
-    const type = anime.type;
+    // It could be anything if type is null but movies have less items, so it would stand out more there.
+    const type = anime.type || 'Movie';
     switch (type.toLowerCase()) {
       case 'tv':
       case 'ova':

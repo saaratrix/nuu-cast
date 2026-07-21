@@ -17,9 +17,12 @@ pub fn get_html(title: &str, body_class: &str, scripts_url: Option<&str>, url: &
     <script src="/static/js/app.js" type="module" ></script>
 </head>
 <body class="{body_class}">
+    <div class="page-container">
     {navbar}
     {content}
+    </div>
     {scripts}
+
 </body>
 </html>"#)
 }
@@ -44,6 +47,6 @@ pub fn get_navbar(url: &PathBuf) -> String {
 
 pub fn get_browser_html() -> String {
     let title = "Browser";
-    let html = get_html(&title, "browser", None, &PathBuf::from(""), "<div class='page-container'></div>");
+    let html = get_html(&title, "browser", None, &PathBuf::from(""), "<div class='content-container'></div>");
     html
 }

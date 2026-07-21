@@ -103,6 +103,7 @@ interface CrunchyrollModel {
     fragment.appendChild(element);
 
     const urlLabel = document.createElement('label');
+    urlLabel.className = 'label-inline-flex';
     urlLabel.textContent = 'Direct url: ';
     const urlInput = document.createElement('input');
     urlInput.value = url || '';

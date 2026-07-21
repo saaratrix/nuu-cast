@@ -38,7 +38,8 @@ pub async fn init_db() -> Result<Pool<Sqlite>, sqlx::Error> {
         .connect("sqlite://data/app.db?mode=rwc")
         .await?;
 
-    sqlx::query(
+    println!("db connection established");
+    let success = sqlx::query(
         r#"
         CREATE TABLE IF NOT EXISTS anime (
             mal_id INTEGER PRIMARY KEY,
@@ -59,6 +60,8 @@ pub async fn init_db() -> Result<Pool<Sqlite>, sqlx::Error> {
     )
         .execute(&db)
         .await?;
+
+    println!("database created or already existing.");
 
     Ok(db)
 }

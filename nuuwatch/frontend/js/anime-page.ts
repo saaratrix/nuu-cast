@@ -7,8 +7,8 @@ import { createAnimeItem } from './anime-item-utility.js';
 import { addItemModel, AnimeModel, fetchAnimeModel, getAnimeModel, tryInitializeAnimeModel } from './anime-model.js';
 
 async function loadAnimeViewPage(malId: number) {
-  const pageContainer = document.querySelector('.page-container');
-  if (!pageContainer) {
+  const container = document.querySelector('.content-container');
+  if (!container) {
     return gotoMain();
   }
 
@@ -30,7 +30,7 @@ async function loadAnimeViewPage(malId: number) {
       return;
     }
   } catch (e) {
-    pageContainer.innerHTML = `
+    container.innerHTML = `
       <div class="error"><p>Failed to load anime from MAL: ${e}</p></div>
     `;
     changeItem(undefined);
@@ -41,7 +41,7 @@ async function loadAnimeViewPage(malId: number) {
     return gotoMain();
   }
 
-  pageContainer.innerHTML = `
+  container.innerHTML = `
     <div class="anime-item-page">
       <header>
         <h1><a href="${animeItem.data.url}">${animeItem.title}</a></h1>
@@ -61,7 +61,7 @@ async function loadAnimeViewPage(malId: number) {
     </div>
   `;
 
-  const editButton = pageContainer.querySelector('.edit-button');
+  const editButton = container.querySelector('.edit-button');
   editButton?.addEventListener('click', () => openEditor(animeItem));
 
   changeItem(malId);

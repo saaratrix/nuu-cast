@@ -4,10 +4,15 @@ mod modules;
 mod data_utility;
 mod database;
 
+use std::fs::{Permissions};
+use tokio::fs::{create_dir_all, set_permissions};
+use std::os::unix::fs::PermissionsExt;
+use std::path::{Path, PathBuf};
 use axum::{Router};
 use axum::routing::{get};
 use tower_http::services::ServeDir;
 use sqlx::{SqlitePool};
+use crate::data_utility::data_utility::DATA_ROOT;
 use crate::database::db::init_db;
 use crate::modules::anime::anime_module;
 
@@ -18,6 +23,8 @@ struct AppState {
 
 #[tokio::main]
 async fn main() -> Result<(), sqlx::Error> {
+    ensure_data_folders_existing().await;
+
     let db = init_db().await?;
     let state = AppState { db };
 
@@ -32,4 +39,19 @@ async fn main() -> Result<(), sqlx::Error> {
     axum::serve(listener, app).await.unwrap();
 
     Ok(())
+}
+
+async fn ensure_data_folders_existing() {
+    let paths = vec![
+        DATA_ROOT.clone(),
+        DATA_ROOT.join("anime"),
+    ];
+
+    for path_buf in paths {
+        let path = Path::new(&path_buf);
+        if let Err(e) = create_dir_all(path).await {
+            println!("Failed to create {} directory: {e}", path.display());
+            std::process::exit(1);
+        }
+    }
 }
