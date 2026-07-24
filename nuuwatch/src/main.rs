@@ -4,10 +4,8 @@ mod modules;
 mod data_utility;
 mod database;
 
-use std::fs::{Permissions};
-use tokio::fs::{create_dir_all, set_permissions};
-use std::os::unix::fs::PermissionsExt;
-use std::path::{Path, PathBuf};
+use tokio::fs::{create_dir_all};
+use std::path::{Path};
 use axum::{Router};
 use axum::routing::{get};
 use tower_http::services::ServeDir;

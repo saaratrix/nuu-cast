@@ -5,6 +5,7 @@ use axum::{
 use axum::routing::{patch, post, put};
 use crate::AppState;
 use crate::modules::anime::anike_jikan_routes::{handle_get_current_season, handle_get_season, handle_load_anime_full, handle_mal_image, handle_search_anime};
+use crate::modules::anime::anime_fetch_routes::post_anime_fetch;
 use crate::modules::anime::anime_routes::{get_anime_status, patch_anime_status, post_anime_status_query, put_anime_status};
 use crate::modules::anime::other::anime_other_module::add_other_routes;
 
@@ -15,6 +16,7 @@ pub fn get_routes() -> Router<AppState> {
     .route("/anime/view/{mal_id}", patch(patch_anime_status))
     .route("/anime/view/{mal_id}", get(get_anime_status))
     .route("/anime/view/query", post(post_anime_status_query))
+    .route("/anime/fetch", post(post_anime_fetch))
     // Jikan Proxy & cache routes
     .route("/anime/seasons/now",   get(handle_get_current_season))
     .route("/anime/seasons/{year}/{season}", get(handle_get_season))

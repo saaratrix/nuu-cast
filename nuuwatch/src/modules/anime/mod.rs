@@ -4,3 +4,4 @@ pub mod jikan;
 pub mod anime_routes;
 pub mod anike_jikan_routes;
 pub mod other;
+mod anime_fetch_routes;
