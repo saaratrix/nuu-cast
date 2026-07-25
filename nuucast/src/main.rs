@@ -13,10 +13,13 @@ use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::routing::{get, delete, put, post};
 use tower_http::services::ServeDir;
+use crate::io::file_utility::create_required_folders;
 
 #[tokio::main]
 async fn main() {
     let upload_max_size = 100 * 1024 * 1024 * 1024;
+
+    let _ = create_required_folders();
 
     let app = Router::new()
         .nest_service("/static", ServeDir::new("static"))

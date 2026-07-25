@@ -1,28 +1,17 @@
 use url::Url;
 use std::collections::HashMap;
-use axum::http::HeaderValue;
-use reqwest::header::HeaderMap;
 use crate::modules::anime::anime_request_cacher::{add_cached_request_json, try_get_cached_request_json, CacheOptions};
 use crate::modules::anime::jikan::jikan_settings::{Settings};
 
 #[derive(Clone)]
 pub struct Request {
-    mal: bool,
     http_client: reqwest::Client,
 }
 
 impl Request {
-    pub fn new(mal: bool) -> Self {
-        let mut headers = HeaderMap::new();
-        if mal {
-            headers.insert("X-MAL-CLIENT-ID", HeaderValue::from_static("6114d00ca681b7701d1e15fe11a4987e"));
-        }
-
-        let http_client = reqwest::Client::builder().default_headers(headers).build().unwrap();
-
+    pub fn new(http_client: reqwest::Client) -> Self {
         Request {
             http_client,
-            mal,
         }
     }
 

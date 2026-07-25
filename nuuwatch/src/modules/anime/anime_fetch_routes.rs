@@ -1,13 +1,16 @@
 use std::convert::Infallible;
 use std::time::Duration;
+use axum::extract::State;
 use axum::Json;
-use axum::response::Sse;
+use axum::response::{Sse};
 use axum::response::sse::{Event};
 use nuufetch::fetch_item::{fetch_resource, FetchItem};
 use serde::Serialize;
 use tokio::sync::mpsc;
 use tokio_stream::{Stream, StreamExt};
 use tokio_stream::wrappers::ReceiverStream;
+use crate::AppState;
+use crate::nuucast_api::nuucast_api::upload_file;
 
 #[derive(Debug, Serialize)]
 struct ProgressEvent {
@@ -15,14 +18,15 @@ struct ProgressEvent {
     message: String,
 }
 
-#[derive(Debug, Serialize)]
-struct FetchResult {
-    success: bool,
-    target_name: String,
-    url: String,
-}
+// #[derive(Debug, Serialize)]
+// struct FetchResult {
+//     success: bool,
+//     target_name: String,
+//     url: String,
+// }
 
 pub async fn post_anime_fetch(
+    State(state): State<AppState>,
     Json(item): Json<FetchItem>,
 ) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
 
@@ -38,20 +42,36 @@ pub async fn post_anime_fetch(
             let _ = message_tx.try_send(Ok(event));
         };
 
-        let _ = fetch_resource(&item, &mut on_message).await;
+        let files = fetch_resource(&item, &mut on_message).await.unwrap();
+        if files.len() != 1 {
+            return Err("Too many files fetched.");
+        }
+        let file = files.get(0).unwrap();
 
-        let result = FetchResult {
-            success: true,
-            target_name: item.target_name,
-            url: item.url,
+        let bytes = match tokio::fs::read(&file).await {
+            Ok(bytes) => bytes,
+            Err(error) => {
+                let error_message = format!(
+                    "Failed to read fetched resource file {}: {}",
+                    file.display(),
+                    error
+                );
+
+                on_message(&error_message);
+                return Err("Failed to read fetched resource file");
+            }
         };
 
-        let finished_data = serde_json::to_string(&result).unwrap();
-        let finished_event = Event::default()
-            .event("progress")
-            .data(finished_data);
+        let full_path = format!("{}/{}", &item.base_name, &item.file_name);
+        let uploaded_paths = upload_file(&state.nuucast, &full_path, bytes).await.unwrap();
 
-       let _ =  message_tx.send(Ok(finished_event)).await;
+        Ok(())
+        // let finished_data = serde_json::to_string(&result).unwrap();
+        // let finished_event = Event::default()
+        //     .event("progress")
+        //     .data(finished_data);
+       //
+       // let _ =  message_tx.send(Ok(finished_event)).await;
     });
 
     let event_stream = ReceiverStream::new(message_rx)

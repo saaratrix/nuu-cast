@@ -1,5 +1,5 @@
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 use rand::distr::{Alphanumeric, SampleString};
 use crate::io::file_utility::TEMP_FILES_ROOT;
@@ -11,11 +11,12 @@ pub struct TempFilesDirectory {
 }
 
 impl TempFilesDirectory {
-    pub fn new() -> Result<Self, String> {
+    pub fn new(root: Option<&Path>) -> Result<Self, String> {
         let ts = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis();
         let random_part = Alphanumeric.sample_string(&mut rand::rng(), 8);
         let key = format!("{}{}", ts, random_part);
-        let path = TEMP_FILES_ROOT.join(&key);
+        let root = root.unwrap_or(TEMP_FILES_ROOT.as_path());
+        let path = root.join(&key);
         fs::create_dir_all(&path).map_err(|e| format!("Could not create temp dir: {}", e))?;
         Ok(Self { path, key })
     }

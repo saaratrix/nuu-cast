@@ -8,7 +8,7 @@ use crate::io::temp_files_directory::TempFilesDirectory;
 use tokio::process::Command;
 
 pub async fn convert_mkv(paths: &UrlAndFilePath, body: &Bytes) -> Result<Vec<PathBuf>, String> {
-    let temp_directory = TempFilesDirectory::new()?;
+    let temp_directory = TempFilesDirectory::new(None)?;
     let start = Instant::now();
     let mkv_file = save_mkv_file(paths, &temp_directory, body).await?;
     let mkv_file_time = Instant::now();

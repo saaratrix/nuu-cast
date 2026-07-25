@@ -1,6 +1,7 @@
 use std::{env, fs};
 use std::path::{Component, Path, PathBuf};
 use std::sync::LazyLock;
+use tokio::io;
 use crate::io::file_lookup_cache::PathCache;
 
 pub static NUUCAST_PROJECT_ROOT: LazyLock<PathBuf> =
@@ -19,6 +20,27 @@ pub static STATIC_ROOT: LazyLock<PathBuf> =
 pub static TEMP_FILES_ROOT: LazyLock<PathBuf> =
     LazyLock::new(|| PathBuf::from(&*NUUCAST_PROJECT_ROOT).join("temp_files"));
 static PATH_CACHE: LazyLock<PathCache> = LazyLock::new(|| PathCache::new());
+
+pub fn create_required_folders() -> io::Result<()> {
+    for directory in [
+        MEDIA_ROOT.as_path(),
+        STATIC_ROOT.as_path(),
+        TEMP_FILES_ROOT.as_path(),
+    ] {
+        fs::create_dir_all(directory).map_err(|error| {
+            io::Error::new(
+                error.kind(),
+                format!(
+                    "failed to create required directory '{}': {error}",
+                    directory.display()
+                ),
+            )
+        })?;
+    }
+
+    Ok(())
+}
+
 
 #[derive(Debug, Clone)]
 pub struct UrlAndFilePath {

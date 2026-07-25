@@ -1,11 +1,11 @@
 use std::path::{Component, Path as StdPath};
-use axum::extract::{Path, Query};
+use axum::extract::{Path, Query, State};
 use axum::http::StatusCode;
 use axum::Json;
 use axum::response::{IntoResponse, Response};
 use serde::Deserialize;
+use crate::AppState;
 use crate::modules::anime::anime_request_cacher::{try_get_cached_mal_image, DATA_ANIME_ROOT};
-use crate::modules::anime::jikan::jikan::Jikan;
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct AnimeParams {
@@ -28,9 +28,12 @@ fn default_page() -> u16 {
 fn default_limit() -> u16 { 20 }
 fn default_query() -> String { "".to_string() }
 
-pub async fn handle_get_current_season(Query(params): Query<AnimeParams>) -> impl IntoResponse {
+pub async fn handle_get_current_season(
+    Query(params): Query<AnimeParams>,
+    State(state): State<AppState>,
+) -> impl IntoResponse {
     // params.page will be 1 by default (via serde default) or from URL ?page=2
-    let jikan = Jikan::new();
+    let jikan = state.jikan;
     let response = jikan.load_current_season(params.page).await.unwrap();
     (StatusCode::OK, Json(response)).into_response()
 }
@@ -38,17 +41,22 @@ pub async fn handle_get_current_season(Query(params): Query<AnimeParams>) -> imp
 pub async fn handle_get_season(
     Path(year): Path<u32>,
     Path(season): Path<u32>,
-    Query(params): Query<AnimeParams>) -> impl IntoResponse {
+    Query(params): Query<AnimeParams>,
+    State(state): State<AppState>,
+) -> impl IntoResponse {
     (StatusCode::INTERNAL_SERVER_ERROR, "Not Implemented.").into_response()
 }
 
-pub async fn handle_load_anime_full(Path(mal_id): Path<u32>,) -> impl IntoResponse {
-    let jikan = Jikan::new();
+pub async fn handle_load_anime_full(Path(mal_id): Path<u32>, State(state): State<AppState>,) -> impl IntoResponse {
+    let jikan = state.jikan;
     let response = jikan.load_anime(mal_id).await.unwrap();
     (StatusCode::OK, Json(response)).into_response()
 }
 
-pub async fn handle_search_anime(Query(params): Query<AnimeSearchParams>) -> impl IntoResponse {
+pub async fn handle_search_anime(
+    Query(params): Query<AnimeSearchParams>,
+    State(state): State<AppState>,
+) -> impl IntoResponse {
     (StatusCode::INTERNAL_SERVER_ERROR, "Not Implemented.").into_response()
 }
 

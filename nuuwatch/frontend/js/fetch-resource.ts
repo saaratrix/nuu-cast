@@ -2,7 +2,8 @@ import { createSSEPostRequest } from './sse-handler.js';
 
 export interface FetchItem {
   url: string;
-  target_name: string;
+  base_name: string;
+  file_name: string;
 }
 
 export async function fetchAnimeResource(data: FetchItem): Promise<void> {

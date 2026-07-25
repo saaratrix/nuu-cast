@@ -3,6 +3,7 @@ mod html;
 mod modules;
 mod data_utility;
 mod database;
+mod nuucast_api;
 
 use tokio::fs::{create_dir_all};
 use std::path::{Path};
@@ -13,10 +14,14 @@ use sqlx::{SqlitePool};
 use crate::data_utility::data_utility::DATA_ROOT;
 use crate::database::db::init_db;
 use crate::modules::anime::anime_module;
+use crate::modules::anime::jikan::jikan::Jikan;
+use crate::nuucast_api::nuucast_client::NuucastClient;
 
 #[derive(Clone)]
 struct AppState {
     db: SqlitePool,
+    jikan: Jikan,
+    nuucast: NuucastClient,
 }
 
 #[tokio::main]
@@ -24,7 +29,9 @@ async fn main() -> Result<(), sqlx::Error> {
     ensure_data_folders_existing().await;
 
     let db = init_db().await?;
-    let state = AppState { db };
+    let jikan = Jikan::new(Jikan::create_shared_client(false));
+    let nuucast_client = NuucastClient::new(NuucastClient::create_client());
+    let state = AppState { db, jikan, nuucast: nuucast_client };
 
     let app = Router::new()
         .nest_service("/static", ServeDir::new("static"))

@@ -1,16 +1,18 @@
 use std::collections::HashMap;
 use std::time::Duration;
+use axum::http::{HeaderMap, HeaderValue};
 use crate::modules::anime::anime_request_cacher::CacheOptions;
 use crate::modules::anime::jikan::jikan_request::Request;
 
+#[derive(Clone)]
 pub struct Jikan {
     request: Request,
 }
 
 impl Jikan {
-    pub fn new() -> Self {
+    pub fn new(http_client: reqwest::Client) -> Self {
         Self {
-            request: Request::new(false),
+            request: Request::new(http_client),
         }
     }
 
@@ -40,5 +42,15 @@ impl Jikan {
             cache_prefix: None,
             ignore_cache: false,
         }).await
+    }
+
+    pub fn create_shared_client(mal: bool) -> reqwest::Client {
+        let mut headers = HeaderMap::new();
+        if mal {
+            headers.insert("X-MAL-CLIENT-ID", HeaderValue::from_static("6114d00ca681b7701d1e15fe11a4987e"));
+        }
+
+        let http_client = reqwest::Client::builder().default_headers(headers).build().unwrap();
+        http_client
     }
 }
