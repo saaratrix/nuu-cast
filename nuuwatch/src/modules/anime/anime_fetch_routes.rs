@@ -5,25 +5,11 @@ use axum::Json;
 use axum::response::{Sse};
 use axum::response::sse::{Event};
 use nuufetch::fetch_item::{fetch_resource, FetchItem};
-use serde::Serialize;
 use tokio::sync::mpsc;
 use tokio_stream::{Stream, StreamExt};
 use tokio_stream::wrappers::ReceiverStream;
 use crate::AppState;
 use crate::nuucast_api::nuucast_api::upload_file;
-
-#[derive(Debug, Serialize)]
-struct ProgressEvent {
-    step: u32,
-    message: String,
-}
-
-// #[derive(Debug, Serialize)]
-// struct FetchResult {
-//     success: bool,
-//     target_name: String,
-//     url: String,
-// }
 
 pub async fn post_anime_fetch(
     State(state): State<AppState>,
@@ -65,13 +51,14 @@ pub async fn post_anime_fetch(
         let full_path = format!("{}/{}", &item.base_name, &item.file_name);
         let uploaded_paths = upload_file(&state.nuucast, &full_path, bytes).await.unwrap();
 
+        let finished_data = serde_json::to_string(&uploaded_paths).unwrap();
+
+        let finished_event = Event::default()
+            .event("finished")
+            .data(finished_data);
+       let _ =  message_tx.send(Ok(finished_event)).await;
+
         Ok(())
-        // let finished_data = serde_json::to_string(&result).unwrap();
-        // let finished_event = Event::default()
-        //     .event("progress")
-        //     .data(finished_data);
-       //
-       // let _ =  message_tx.send(Ok(finished_event)).await;
     });
 
     let event_stream = ReceiverStream::new(message_rx)
