@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::path::PathBuf;
 use tokio::process::Command;
 use serde::Deserialize;
@@ -8,22 +9,34 @@ pub async fn extract_subtitle_files_from_mkv_with_track_ids(
     mkv_file: &str,
     mkv_filestem: &str,
     // track_ids: &[u16],
-    tracks: &[SubtitleTrack],
+    tracks: &[SubtitleTrack<'_>],
     temp_files_directory: &TempFilesDirectory,
 ) -> Result<Vec<PathBuf>, String> {
     let mut paths = Vec::new();
     let mut args = vec!["tracks".to_string(), mkv_file.to_string()];
 
+    let mut found_tracks: HashMap<&str, u8> = HashMap::new();
+
     for track in tracks {
-        if !matches!(track.language.as_str(), "en" | "fi" | "sv") {
+        if !matches!(track.language, "en" | "fi" | "sv") {
             continue;
         }
 
+        *found_tracks.entry(&track.language).or_insert(0) += 1;
+
+        let collisions = *found_tracks
+            .get(track.language)
+            .unwrap();
+
+        let track_collision = if collisions == 1 {
+            String::new()
+        } else {
+            format!(".{collisions}")
+        };
+
         let srt_path = temp_files_directory
             .path
-            .join(format!("{}.{}.sub", mkv_filestem, track.language));
-
-        println!("Track {} -> {}", track.track_id, srt_path.display());
+            .join(format!("{}.{}{}.sub", mkv_filestem, track.language, track_collision));
 
         let srt_str = srt_path
             .to_str()
@@ -49,56 +62,44 @@ pub async fn extract_subtitle_files_from_mkv_with_track_ids(
 }
 
 #[derive(Debug, Deserialize)]
-struct MkvMergeJson {
-    tracks: Vec<Track>,
+pub struct MkvMergeMetadataJson {
+    pub tracks: Vec<Track>,
 }
 
 #[derive(Debug, Deserialize)]
-struct Track {
-    id: u16,
+pub struct Track {
+    pub id: u16,
+
+    pub codec: String,
 
     #[serde(rename = "type")]
-    kind: String,
+    pub kind: String,
 
-    properties: Properties,
+    pub properties: Properties,
 }
 
 #[derive(Debug, Deserialize)]
-struct Properties {
-    language_ietf: Option<String>,
+pub struct Properties {
+    pub language_ietf: Option<String>,
 }
 
 #[derive(Debug)]
-pub struct SubtitleTrack {
+pub struct SubtitleTrack<'a> {
     track_id: u16,
-    language: String,
+    language: &'a str,
 }
 
 pub async fn extract_subtitle_tracks_with_language(
-    mkv_file: &str,
+    metadata: &MkvMergeMetadataJson,
 ) -> Result<Vec<SubtitleTrack>, String> {
-    let output = Command::new("mkvmerge")
-        .args(["-J", mkv_file])
-        .output()
-        .await
-        .map_err(|e| format!("Could not run mkvmerge - {}", e))?;
 
-    if !output.status.success() {
-        return Err(format!(
-            "mkvmerge failed: {}",
-            String::from_utf8_lossy(&output.stderr)
-        )
-            .into());
-    }
 
-    let parsed: MkvMergeJson = serde_json::from_slice(&output.stdout).unwrap();
-
-    let subtitles = parsed
+    let subtitles = metadata
         .tracks
-        .into_iter()
+        .iter()
         .filter(|track| track.kind == "subtitles")
         .filter_map(|track| {
-            track.properties.language_ietf.map(|language| SubtitleTrack {
+            track.properties.language_ietf.as_ref().map(|language| SubtitleTrack {
                 track_id: track.id,
                 language,
             })

@@ -8,6 +8,10 @@ pub async fn copy_converted_files(original_paths: &UrlAndFilePath, files_to_copy
         .parent()
         .ok_or(format!("No parent folder for {}", original_paths.filepath.display()))?;
 
+    if !dest_folder.exists() {
+        std::fs::create_dir_all(dest_folder).map_err(|e| format!("Could not create folder: {}", e))?;
+    }
+
     for file in files_to_copy {
         let filename = file
             .file_name()
