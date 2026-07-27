@@ -9,7 +9,7 @@
     <li class="item-card item-directory">
         <a class="item-body" href="{{ dir.url }}" data-file-path="{{ dir.filepath }}">
             <img src="/static/img/directory.svg" alt="directory image for {{ dir.url }}">
-            {{ dir.url }}
+            {{ dir.text }}
         </a>
         <div class="item-actions">
             <form class="delete-form" method="POST" action="delete_path/{{dir.url}}">
@@ -24,7 +24,7 @@
     <li class="item-card item-file">
         <a class="item-body" href="{{ file.url }}" data-file-path="{{ file.filepath }}">
             <img src="/static/img/file.svg" alt="file image for {{ file.url }}">
-            {{ file.url }}
+            {{ file.text }}
         </a>
         <div class="item-actions">
             <form class="delete-form" method="POST" action="delete_path/{{file.url}}">

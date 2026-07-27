@@ -10,6 +10,7 @@ pub struct Breadcrumb {
 pub struct Item {
     pub url: String,
     pub filepath: String,
+    pub text: String,
 }
 
 #[derive(Template)]

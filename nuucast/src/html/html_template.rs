@@ -16,10 +16,12 @@ pub fn get_directory_html(
         directories: directory_items.directories.iter().map(|dir| Item {
             url: dir.url.display().to_string(),
             filepath: dir.filepath.display().to_string(),
+            text: dir.filepath.file_name().unwrap().display().to_string(),
         }).collect(),
         files: directory_items.files.iter().map(|file| Item {
             url: file.url.display().to_string(),
             filepath: file.filepath.display().to_string(),
+            text: file.filepath.file_name().unwrap().display().to_string()
         }).collect(),
         upload_root: paths.url.display().to_string(),
     };
