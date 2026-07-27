@@ -1,4 +1,8 @@
-export async function createSSEPostRequest(url: string, data: unknown, maxTimeoutMs: number = 20 * 60 * 1000): Promise<void> {
+export const defaultTimeout = 20 * 60 * 1000;
+
+export type OnSSEEvent = (type: string, data: unknown) => void;
+
+export async function createSSEPostRequest(url: string, data: unknown, maxTimeoutMs: number = defaultTimeout, onEvent?: OnSSEEvent): Promise<void> {
   console.log(`Creating SSE Request... to ${url}`);
   const response = await fetch(url, {
     method: 'POST',
@@ -17,6 +21,7 @@ export async function createSSEPostRequest(url: string, data: unknown, maxTimeou
 
   const timeoutId = setTimeout(() => {
     if (!finished) {
+      console.log(`Timed out SSE request for ${url}`);
       reader.cancel("Timed out.").then();
       finished = true;
     }
@@ -62,13 +67,13 @@ export async function createSSEPostRequest(url: string, data: unknown, maxTimeou
         continue;
       }
 
-      const event = eventText.substring('event: '.length);
-      const data = dataText.substring('data: '.length);
+      if (!onEvent) {
+        continue;
+      }
 
-      const time = new Date();
-      // For hh:mm:ss format.
-      let timeString = time.toLocaleTimeString('sv');
-      console.log(`${timeString}: event: '${event}'`, `data: '${data}'`);
+      const type = eventText.substring('event: '.length);
+      const data = dataText.substring('data: '.length);
+      onEvent(type, data);
     }
   }
   clearTimeout(timeoutId);

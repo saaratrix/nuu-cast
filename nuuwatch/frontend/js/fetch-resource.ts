@@ -1,4 +1,4 @@
-import { createSSEPostRequest } from './sse-handler.js';
+import { createSSEPostRequest, defaultTimeout, OnSSEEvent } from './sse-handler.js';
 
 export interface FetchItem {
   url: string;
@@ -6,7 +6,7 @@ export interface FetchItem {
   file_name: string;
 }
 
-export async function fetchAnimeResource(data: FetchItem): Promise<void> {
+export async function fetchAnimeResource(data: FetchItem, onEvent?: OnSSEEvent): Promise<void> {
 
-  createSSEPostRequest('/anime/fetch', data).then(result => console.log(`${result}`));
+  createSSEPostRequest('/anime/fetch', data, defaultTimeout, onEvent).then(result => console.log(`${result}`));
 }

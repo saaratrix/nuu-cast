@@ -28,6 +28,14 @@ pub async fn post_anime_fetch(
             let _ = message_tx.try_send(Ok(event));
         };
 
+        let mut on_error = |message: &str| {
+            let event = Event::default()
+                .event("error")
+                .data(message);
+
+            let _ = message_tx.try_send(Ok(event));
+        };
+
         let files = fetch_resource(&item, &mut on_message).await.unwrap();
         if files.len() != 1 {
             return Err("Too many files fetched.");
@@ -43,7 +51,7 @@ pub async fn post_anime_fetch(
                     error
                 );
 
-                on_message(&error_message);
+                on_error(&error_message);
                 return Err("Failed to read fetched resource file");
             }
         };
