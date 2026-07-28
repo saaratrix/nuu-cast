@@ -8,7 +8,6 @@ pub async fn upload_file(nuucast_client: &NuucastClient, file_path: &str, file_b
         .client
         .put(upload_url.clone())
         .header(reqwest::header::CONTENT_TYPE, "application/octet-stream")
-        // .header(reqwest::header::CONTENT_TYPE, "video/x-matroska")
         .body(file_bytes)
         .send()
         .await
@@ -35,4 +34,33 @@ pub async fn upload_file(nuucast_client: &NuucastClient, file_path: &str, file_b
     }
 
     Ok(uploaded_paths)
+}
+
+pub async fn get_files_in_directory(nuucast_client: &NuucastClient, directory_path: &PathBuf) -> Result<Vec<String>, String> {
+    let get_files_url = nuucast_client.get_files_url(directory_path);
+
+    let response = match nuucast_client
+        .client
+        .get(get_files_url.clone())
+        .header(reqwest::header::CONTENT_TYPE, "application/json")
+        .send()
+        .await
+    {
+        Ok(response) => response,
+        Err(e) => {
+            eprintln!("reqwest error: {:#?}", e);
+
+            let mut source = std::error::Error::source(&e);
+            while let Some(err) = source {
+                eprintln!("caused by: {}", err);
+                source = err.source();
+            }
+
+            return Err(e.to_string());
+        }
+    };
+
+    let files = response.json::<Vec<String>>().await.map_err(|e| e.to_string())?;
+
+    Ok(files)
 }

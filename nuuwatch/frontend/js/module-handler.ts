@@ -64,7 +64,3 @@ function loadModuleResource(resource: string, parent: HTMLElement = document.bod
     parent.appendChild(element);
   }
 }
-
-export function requestModulesData(item: AnimeItem, modulesData: any) {
-  document.dispatchEvent(new CustomEvent('module:request-data', { detail: { item, modulesData } }));
-}

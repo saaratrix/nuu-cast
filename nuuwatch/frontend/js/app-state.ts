@@ -1,6 +1,7 @@
 import { MALAnime } from './jikan/types/jikan.js';
 import { JikanAPI } from './jikan/jikan.js';
 import { AnimeModel } from './anime-model.js';
+import { EventHandler } from './event-handler.js';
 
 export interface AnimeItemParts {
   visualTitle: string;
@@ -9,6 +10,8 @@ export interface AnimeItemParts {
   imageUrl: string;
 }
 
+export type AnimeItemEvents = 'anime:modelUpdated' | 'media:updated';
+
 export interface AnimeItem {
   id: number,
   data: MALAnime;
@@ -16,7 +19,9 @@ export interface AnimeItem {
   type: 'anime';
   parts: AnimeItemParts;
   cardElement: HTMLElement;
+  eventHandler: EventHandler<AnimeItemEvents>
   model?: AnimeModel;
+  media?: string[];
 }
 
 export type ItemsKey = MALAnime['type'];
@@ -57,4 +62,8 @@ export const addItem = (type: ItemsKey, item: AnimeItem) => {
   }
 
   appState.items[type].push(item);
+}
+
+export const updateMediaFiles = (animeItem: AnimeItem): void  => {
+  animeItem.eventHandler.dispatchEvent('media:updated');
 }

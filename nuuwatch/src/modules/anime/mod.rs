@@ -1,4 +1,4 @@
-pub mod anime_module;
+pub mod anime_module_router;
 mod anime_request_cacher;
 pub mod jikan;
 pub mod anime_routes;

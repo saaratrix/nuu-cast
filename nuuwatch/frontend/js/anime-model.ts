@@ -1,5 +1,4 @@
 import { AnimeItem, appState } from './app-state.js';
-import { requestModulesData } from './module-handler.js';
 
 /**
  * Modeled after the backend SQLite model.
@@ -79,13 +78,13 @@ export function addItemModel(item: AnimeItem, model: AnimeModel): void {
 
   item.model = model;
   appState.animeModels.set(item.id, model);
-  item.cardElement.dispatchEvent(new CustomEvent('anime:modelUpdated', { detail: { id: item.id, model } }));
+  item.eventHandler.dispatchEvent('anime:modelUpdated', { id: item.id, model });
 }
 
 export function updateItemModel(item: AnimeItem, model: AnimeModel): void {
   item.model = model;
   appState.animeModels.set(item.id, model);
-  item.cardElement.dispatchEvent(new CustomEvent('anime:modelUpdated', { detail: { id: item.id, model } }));
+  item.eventHandler.dispatchEvent('anime:modelUpdated', { id: item.id, model });
 }
 
 

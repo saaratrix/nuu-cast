@@ -1,13 +1,14 @@
-import { AnimeItem, appState, changeItem, jikan } from './app-state.js';
+import { AnimeItem, appState, changeItem, jikan, updateMediaFiles } from './app-state.js';
 import { escapeHtml } from './utility.js';
 import { loadModules } from './module-handler.js';
 import { gotoRoute } from './router.js';
 import { openEditor } from './item-editor.js';
 import { createAnimeItem } from './anime-item-utility.js';
-import { addItemModel, AnimeModel, fetchAnimeModel, getAnimeModel, tryInitializeAnimeModel } from './anime-model.js';
+import { tryInitializeAnimeModel } from './anime-model.js';
+import { nuucastBaseUrl } from './constants.js';
 
 async function loadAnimeViewPage(malId: number) {
-  const container = document.querySelector('.content-container');
+  const container = document.querySelector<HTMLElement>('.content-container');
   if (!container) {
     return gotoMain();
   }
@@ -46,7 +47,7 @@ async function loadAnimeViewPage(malId: number) {
       <header>
         <h1><a href="${animeItem.data.url}">${animeItem.title}</a></h1>
       </header>
-      <section>
+      <section class="anime-info">
         <div>
             ${animeItem.parts.rating} - ${animeItem.parts.airing}
         </div>
@@ -58,13 +59,23 @@ async function loadAnimeViewPage(malId: number) {
         </div>
         <div class="content"></div>
       </section>
+      <section class="media">
+        <h1>Videos</h1>
+        <div class="media-videos"></div>
+      </section>
+      <section class="modules">
+        <div class="module-content"></div>
+      </section>
     </div>
   `;
 
   const editButton = container.querySelector('.edit-button');
   editButton?.addEventListener('click', () => openEditor(animeItem));
 
+  animeItem.eventHandler.addEventListener('media:updated', 'anime-media', () => updateMediaSection(animeItem, container), true);
+
   changeItem(malId);
+  updateMediaFiles(animeItem);
 }
 
 export default loadAnimeViewPage
@@ -91,4 +102,50 @@ async function loadMalItem(malId: number): Promise<AnimeItem> {
   const animeItem = createAnimeItem(malItem);
   appState.itemsByMalId.set(malId, animeItem);
   return animeItem;
+}
+
+async function updateMediaSection(item: AnimeItem, itemContainer: HTMLElement) {
+  const section = itemContainer.querySelector<HTMLElement>('.media')!;
+  const videosElement = section.querySelector<HTMLElement>('.media-videos')!;
+
+  const files = await fetchMediaFiles(item, videosElement).then();
+  // As the fetch can take a little while, maybe id changed.
+  if (appState.activeMalId !== item.id) {
+    return;
+  }
+
+  videosElement.innerHTML = '';
+  const fragment = document.createDocumentFragment();
+  const listElement = document.createElement('li');
+  listElement.className = 'media-list';
+
+  for (const file of files) {
+    const listItemElement = document.createElement('ul');
+    listItemElement.innerHTML = `<a href="${nuucastBaseUrl}/${file}" class="media-link">${file}</a>`
+    listElement.appendChild(listItemElement);
+  }
+
+  fragment.appendChild(listElement);
+  videosElement.appendChild(fragment);
+}
+
+async function fetchMediaFiles(item: AnimeItem, videosElement: HTMLElement) {
+  if (item.media) {
+    return item.media;
+  }
+
+  const response = await fetch(`/media/files/${item.title}`, {
+    method: 'GET',
+    headers: {
+      "Content-Type": 'application/json',
+    }
+  });
+  if (!response.ok) {
+    console.log(`Failed to fetch media files for ${item.title}`);
+  }
+  let files: string[] = await response.json();
+  files = files.filter(file => file.endsWith('.mp4'));
+
+  item.media = files;
+  return item.media;
 }

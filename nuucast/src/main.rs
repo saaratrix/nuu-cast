@@ -5,13 +5,15 @@ mod file_fetcher;
 mod html;
 mod deleter;
 mod converters;
+mod api;
+mod renamer;
 
 use std::collections::HashMap;
 use axum::{Form, Router};
 use axum::extract::{DefaultBodyLimit, Path};
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
-use axum::routing::{get, delete, put, post};
+use axum::routing::{get, delete, put, post, patch};
 use tower_http::services::ServeDir;
 use crate::io::file_utility::create_required_folders;
 
@@ -28,8 +30,11 @@ async fn main() {
         .route("/{*path}", get(explorer::explore_path_wildcard))
         .route("/{*path}", put(uploader::handle_upload).layer(DefaultBodyLimit::max(upload_max_size)))
         .route("/{*path}", delete(deleter::delete_path))
+        .route("/{*path}", patch(renamer::rename_path))
         .route("/delete_path/{*path}", post(delete_form_method_override))
-        .route("/", get(explorer::explore_path_root));
+        .route("/", get(explorer::explore_path_root))
+        // Api routes:
+        .route("/api/files/{*path}", get(api::get_files));
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
     axum::serve(listener, app).await.unwrap();

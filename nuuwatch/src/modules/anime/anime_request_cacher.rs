@@ -123,8 +123,6 @@ pub async fn try_get_cached_mal_image(url: &str) -> Option<Response> {
         (header::CONTENT_LENGTH, &file_size.to_string())
     ];
 
-    println!("header: {:?}", header);
-
     let response = (header, body).into_response();
     Some(response)
 }

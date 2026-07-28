@@ -10,7 +10,7 @@ use crate::modules::anime::anime_routes::{get_anime_status, patch_anime_status, 
 use crate::modules::anime::other::anime_other_module::add_other_routes;
 
 /// Initialize the module by binding routes to an existing Axum Router
-pub fn get_routes() -> Router<AppState> {
+pub fn get_anime_routes() -> Router<AppState> {
     let mod_routes = Router::new()
     .route("/anime/view/{mal_id}", put(put_anime_status))
     .route("/anime/view/{mal_id}", patch(patch_anime_status))

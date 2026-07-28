@@ -1,4 +1,5 @@
 use std::env;
+use std::path::PathBuf;
 use axum::http::{HeaderMap, HeaderValue};
 
 #[derive(Clone)]
@@ -25,5 +26,9 @@ impl NuucastClient {
 
     pub fn get_upload_url(&self, file_path: &str) -> String {
         format!("{}/{}", self.base_url, file_path)
+    }
+
+    pub fn get_files_url(&self, directory_path: &PathBuf) -> String {
+        format!("{}/api/files/{}", self.base_url, directory_path.display())
     }
 }

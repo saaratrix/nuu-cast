@@ -1,2 +1,2 @@
 pub mod anime;
-pub mod modules_fetcher;
+pub mod modules_router;

@@ -4,6 +4,7 @@ mod modules;
 mod data_utility;
 mod database;
 mod nuucast_api;
+mod media;
 
 use tokio::fs::{create_dir_all};
 use std::path::{Path};
@@ -13,7 +14,6 @@ use tower_http::services::ServeDir;
 use sqlx::{SqlitePool};
 use crate::data_utility::data_utility::DATA_ROOT;
 use crate::database::db::init_db;
-use crate::modules::anime::anime_module;
 use crate::modules::anime::jikan::jikan::Jikan;
 use crate::nuucast_api::nuucast_client::NuucastClient;
 
@@ -36,8 +36,9 @@ async fn main() -> Result<(), sqlx::Error> {
     let app = Router::new()
         .nest_service("/static", ServeDir::new("static"))
         .route("/", get(browser::browse))
-        .merge(anime_module::get_routes())
-        .merge(modules::modules_fetcher::get_modules_routes())
+        .merge(modules::anime::anime_module_router::get_anime_routes())
+        .merge(modules::modules_router::get_modules_routes())
+        .merge(media::media_router::get_media_routes())
         .with_state(state);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3001").await.unwrap();

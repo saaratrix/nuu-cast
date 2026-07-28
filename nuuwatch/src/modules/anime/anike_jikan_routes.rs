@@ -63,8 +63,6 @@ pub async fn handle_search_anime(
 /// Fetch image from local server cache if it exists, else fetch it from MAL.
 pub async fn handle_mal_image(Path(url) : Path<String>
 ) -> Response {
-    println!("handle_mal_image: {}", url);
-
     if !StdPath::new(&url)
         .components()
         .all(|c| matches!(c, Component::Normal(_))) {

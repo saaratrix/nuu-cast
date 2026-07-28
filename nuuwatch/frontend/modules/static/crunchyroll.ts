@@ -1,5 +1,5 @@
 import { AnimeItem, appState } from '../../js/app-state.js';
-import { animeItemPageContentSelector } from '../../js/constants.js';
+import { animeItemPageModuleContentSelector } from '../../js/constants.js';
 import { AnimeModel, getAnimeModel, insertOrUpdateModel, ModelUpdatedEvent } from '../../js/anime-model.js';
 import { escapeHtml } from '../../js/utility.js';
 
@@ -29,7 +29,7 @@ interface CrunchyrollModel {
       return;
     }
 
-    currentItem.cardElement.removeEventListener('anime:modelUpdated', onModelUpdated);
+    currentItem.eventHandler.removeEventListener('anime:modelUpdated', 'crunchyroll');
   }
 
   function setCurrentItem(item: AnimeItem | undefined): void {
@@ -43,12 +43,11 @@ interface CrunchyrollModel {
       return;
     }
 
-    currentItem.cardElement.addEventListener('anime:modelUpdated', onModelUpdated);
+    currentItem.eventHandler.addEventListener('anime:modelUpdated', 'crunchyroll', onModelUpdated);
   }
 
-  function onModelUpdated(e: Event) {
-    const event = e as CustomEvent<ModelUpdatedEvent>;
-    addLinks(event.detail.id);
+  function onModelUpdated(event: ModelUpdatedEvent) {
+    addLinks(event.id);
   }
 
   function addLinks(malId: number) {
@@ -57,9 +56,9 @@ interface CrunchyrollModel {
       return;
     }
 
-    const pageContent = document.querySelector<HTMLElement>(animeItemPageContentSelector);
+    const pageContent = document.querySelector<HTMLElement>(animeItemPageModuleContentSelector);
     if (!pageContent) {
-      console.log(`Crunchyroll: Could not find element ${animeItemPageContentSelector}`);
+      console.log(`Crunchyroll: Could not find element ${animeItemPageModuleContentSelector}`);
       return;
     }
     setCurrentItem(item);

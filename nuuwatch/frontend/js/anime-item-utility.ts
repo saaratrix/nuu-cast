@@ -4,6 +4,7 @@ import { escapeHtml } from './utility.js';
 import { hidePopover, showPopover } from './popover.js';
 import { openEditor } from './item-editor.js';
 import { AnimeModel, getAnimeModel, insertOrUpdateModel, ModelUpdatedEvent, Rating } from './anime-model.js';
+import { EventHandler } from './event-handler.js';
 
 export function createAnimeItem(item: MALAnime): AnimeItem {
   // Background exists along with synopsis for a shorter description.
@@ -72,6 +73,7 @@ export function createAnimeItem(item: MALAnime): AnimeItem {
       imageUrl: image_url,
     },
     cardElement: itemCardElement,
+    eventHandler: new EventHandler(),
   };
 
   itemCardElement.addEventListener('pointerenter', () => showPopover(itemCardElement));
@@ -179,13 +181,12 @@ function initRatingEvents(item: AnimeItem, cardElement: HTMLElement): void {
     await insertOrUpdateModel(item, model);
   });
 
-  cardElement.addEventListener('anime:modelUpdated', (e) => {
-    const event = (e as CustomEvent<ModelUpdatedEvent>)
-    if (!event.detail.model) {
+  item.eventHandler.addEventListener('anime:modelUpdated', 'rating', (event: ModelUpdatedEvent) => {
+    if (!event) {
       return;
     }
 
-    setRatingColour(event.detail.model);
+    setRatingColour(event.model);
   });
 
   function setRatingColour(model: AnimeModel) {

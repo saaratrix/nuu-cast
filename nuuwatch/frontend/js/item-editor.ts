@@ -1,7 +1,6 @@
 import { AnimeItem } from './app-state.js';
 import { AnimeModel, getAnimeModel, insertOrUpdateModel, patchAnimeModel, putAnimeModel, Rating, Status, updateItemModel } from './anime-model.js';
 import { escapeHtml } from './utility.js';
-import { requestModulesData } from './module-handler.js';
 
 export async function openEditor(
   item: AnimeItem,
