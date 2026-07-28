@@ -12,6 +12,6 @@ pub async fn get_media_files(
 // ) -> Result<Json<Vec<String>>, (StatusCode, String)> {
 ) -> impl IntoResponse {
     let path = PathBuf::from(url);
-    let files = get_files_in_directory(&state.nuucast, &path).await.map_err(|e| e.to_string()).unwrap();
+    let files = get_files_in_directory(&state.nuucast, &path).await.map_err(|e| e.to_string()).unwrap_or(Vec::new());
     (StatusCode::OK, Json(files)).into_response()
 }

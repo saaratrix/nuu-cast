@@ -30,12 +30,15 @@ pub async fn handle_upload(
         vec![paths.url.clone()]
     };
 
+
+
     if added_files.is_empty() {
         return Err((StatusCode::INTERNAL_SERVER_ERROR, "No files uploaded".to_string()));
     }
+
     // This doesn't invalidate directories but a future problem.
     for path in &added_files {
-        invalidate_path_details(path);
+        invalidate_path_details(&MEDIA_ROOT.join(path));
     }
 
     Ok(Json(added_files))

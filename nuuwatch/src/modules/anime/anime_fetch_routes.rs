@@ -5,16 +5,17 @@ use axum::Json;
 use axum::response::{Sse};
 use axum::response::sse::{Event};
 use nuufetch::fetch_item::{fetch_resource, FetchItem};
+use nuufetch::folder_utility::{try_delete_old_downloads};
 use tokio::sync::mpsc;
 use tokio_stream::{Stream, StreamExt};
 use tokio_stream::wrappers::ReceiverStream;
 use crate::AppState;
 use crate::nuucast_api::nuucast_api::upload_file;
-
 pub async fn post_anime_fetch(
     State(state): State<AppState>,
     Json(item): Json<FetchItem>,
 ) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
+    try_delete_old_downloads();
 
     let (message_tx, message_rx) =
         mpsc::channel::<Result<Event, Infallible>>(32);

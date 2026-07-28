@@ -17,10 +17,15 @@ pub async fn extract_subtitle_files_from_mkv_with_track_ids(
 
     let mut found_tracks: HashMap<&str, u8> = HashMap::new();
 
+    let mut should_convert = 0;
+    let mut checked = tracks.len();
     for track in tracks {
+        checked -= 1;
         if !matches!(track.language, "en" | "fi" | "sv") {
             continue;
         }
+
+        should_convert += 1;
 
         *found_tracks.entry(&track.language).or_insert(0) += 1;
 
@@ -51,10 +56,15 @@ pub async fn extract_subtitle_files_from_mkv_with_track_ids(
         .output()
         .map_err(|e| format!("Could not run mkvextract: {}", e))?;
 
-    if output.status.success() {
-        Ok(paths)
-    } else {
-        Err(format!(
+    let status_code = output.status.code();
+    match output.status.code() {
+        Some(0) => Ok(paths),
+        // Mkvextract can be successful but return error code giving warnings.
+        Some(1) => {
+            println!("mkvextract succeeded but had warnings: {}", mkv_file);
+            Ok(paths)
+        }
+        _ => Err(format!(
             "mkvextract failed: {}",
             String::from_utf8_lossy(&output.stderr)
         ))

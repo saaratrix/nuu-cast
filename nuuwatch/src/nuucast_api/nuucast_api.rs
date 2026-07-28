@@ -1,4 +1,5 @@
 use std::path::PathBuf;
+use axum::http::StatusCode;
 use crate::nuucast_api::nuucast_client::NuucastClient;
 
 pub async fn upload_file(nuucast_client: &NuucastClient, file_path: &str, file_bytes: Vec<u8>) -> Result<Vec<PathBuf>, String> {
@@ -48,6 +49,11 @@ pub async fn get_files_in_directory(nuucast_client: &NuucastClient, directory_pa
     {
         Ok(response) => response,
         Err(e) => {
+            if e.is_connect() {
+                println!("Fetching resources: Nuucast not running, turn it on!");
+                return Err("Nuucast media server not currently running".to_string());
+            }
+
             eprintln!("reqwest error: {:#?}", e);
 
             let mut source = std::error::Error::source(&e);
@@ -60,7 +66,12 @@ pub async fn get_files_in_directory(nuucast_client: &NuucastClient, directory_pa
         }
     };
 
-    let files = response.json::<Vec<String>>().await.map_err(|e| e.to_string())?;
-
-    Ok(files)
+    let status = response.status();
+    match status {
+        StatusCode::OK => {
+            let files = response.json::<Vec<String>>().await.map_err(|e| e.to_string())?;
+            Ok(files)
+        }
+        _ => Ok(Vec::new())
+    }
 }
