@@ -23,7 +23,11 @@ export function createAnimeItem(item: MALAnime): AnimeItem {
   const episodesHtml = episodes ? `<div class="episodes">${Number(episodes)} Episodes</div>` : '';
   const synopsisText = (synopsis || background || '').replace(/\r?\n/g, '<br>');
 
-  const image_url = images.webp.image_url.replace("https://myanimelist.net/images/anime/", "/anime/malimage/");
+  let image_url = images.webp.image_url.replace('https://myanimelist.net/images/anime/', '/anime/malimage/');
+  image_url = image_url.replace('https://cdn.myanimelist.net/images/anime/', '/anime/malimage/');
+  if (!image_url.startsWith('/anime/malimage/')) {
+    console.log('Found image not proxied to cache.', image_url);
+  }
 
   const metalinebreakHtml = (!!ratingHtml || !!episodesHtml || !!airingHtml) ? '<hr>' : '';
 

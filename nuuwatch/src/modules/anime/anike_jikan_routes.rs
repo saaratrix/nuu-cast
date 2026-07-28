@@ -84,7 +84,7 @@ pub async fn handle_mal_image(Path(url) : Path<String>
     if !image_path.starts_with(&root) {
         return (StatusCode::NOT_FOUND, "Image not found").into_response();
     }
-    let image_url = format!("https://myanimelist.net/images/anime/{}", url);
+    let image_url = format!("https://cdn.myanimelist.net/images/anime/{}", url);
     let response = reqwest::get(image_url).await.unwrap();
     if !response.status().is_success() {
         return (StatusCode::INTERNAL_SERVER_ERROR, "Unexpected error fetching MAL image.").into_response();
