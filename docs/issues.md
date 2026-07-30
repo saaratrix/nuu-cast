@@ -24,6 +24,8 @@
 ## Features
 * Add name to /anime/fetch route so it looks nicer.
 * Change search item to have a link button and the name searches.
+* Improve airing to find out if something has aired etc.
+* Loading spinners and status updates so you know what happens lol.
 
 # Nuufetch
 

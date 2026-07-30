@@ -1,5 +1,6 @@
 use std::{env, fs};
-use std::path::{Component, Path, PathBuf};
+use std::collections::HashSet;
+use std::path::{Component,  PathBuf};
 use std::sync::LazyLock;
 use tokio::io;
 use crate::io::file_lookup_cache::PathCache;
@@ -95,8 +96,19 @@ pub fn get_path_details(path: &PathBuf) -> PathType {
     PATH_CACHE.get_path_details(path)
 }
 
-pub fn invalidate_path_details(path: &PathBuf) {
-    PATH_CACHE.invalidate(path)
+pub fn invalidate_path_details(paths: &Vec<PathBuf>)
+{
+    let mut paths_to_invalidate = HashSet::<PathBuf>::new();
+    for path in paths {
+        let mut current = MEDIA_ROOT.clone();
+
+        for component in path.components() {
+            current.push(component);
+            paths_to_invalidate.insert(current.clone());
+        }
+    }
+
+    PATH_CACHE.invalidate_paths(paths_to_invalidate)
 }
 
 #[derive(Debug, Clone)]

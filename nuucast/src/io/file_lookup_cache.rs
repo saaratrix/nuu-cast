@@ -1,8 +1,8 @@
 use std::sync::{Arc, RwLock};
 use std::collections::HashMap;
 use std::fs;
-use std::path::PathBuf;
-use crate::io::file_utility::{get_path_details, PathType};
+use std::path::{Path, PathBuf};
+use crate::io::file_utility::{PathType};
 
 pub struct PathCache {
     cache: Arc<RwLock<HashMap<PathBuf, PathType>>>,
@@ -30,9 +30,15 @@ impl PathCache {
         result
     }
 
-    pub fn invalidate(&self, path: &PathBuf) {
+    pub fn invalidate_paths<I>(&self, paths: I)
+    where
+        I: IntoIterator,
+        I::Item: AsRef<Path>,
+    {
         if let Ok(mut cache) = self.cache.write() {
-            cache.remove(path);
+            for path in paths {
+                cache.remove(path.as_ref());
+            }
         }
     }
 
