@@ -68,7 +68,6 @@ pub async fn handle_mal_image(Path(url) : Path<String>
         .all(|c| matches!(c, Component::Normal(_))) {
         return (StatusCode::NOT_FOUND, "Image not found").into_response()
     }
-
     if let Some(cached_response) = try_get_cached_mal_image(&url).await {
         return cached_response;
     }

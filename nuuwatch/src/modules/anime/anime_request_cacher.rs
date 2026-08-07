@@ -120,7 +120,8 @@ pub async fn try_get_cached_mal_image(url: &str) -> Option<Response> {
     let header = [
         (header::CONTENT_TYPE, mime_type),
         (header::ACCEPT_RANGES, "bytes"),
-        (header::CONTENT_LENGTH, &file_size.to_string())
+        (header::CONTENT_LENGTH, &file_size.to_string()),
+        (header::CACHE_CONTROL, "public, max-age=31536000, immutable"),
     ];
 
     let response = (header, body).into_response();
