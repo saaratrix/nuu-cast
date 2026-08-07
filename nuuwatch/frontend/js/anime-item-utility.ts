@@ -18,8 +18,9 @@ export function createAnimeItem(item: MALAnime): AnimeItem {
   const airing = getAiring(broadcast, 'Europe/Helsinki');
   const airingHtml = airing ? `<div class="airing">${airing}</div>` : '';
 
-  const visualTitle = escapeHtml(title_english || title || '');
-  const titleHtml = `<div class="meta-title">${visualTitle}</div>`
+  const visualTitle = title_english || title || '';
+  const escapedTitle = escapeHtml(visualTitle);
+  const titleHtml = `<div class="meta-title">${escapedTitle}</div>`
   const ratingHtml = score ? `<div class="rating">★ ${Number(score)} ${scored_by ? `(${Number(scored_by)})` : ''}</div>` : '';
   const episodesHtml = episodes ? `<div class="episodes">${Number(episodes)} Episodes</div>` : '';
   const synopsisText = (synopsis || background || '').replace(/\r?\n/g, '<br>');
@@ -65,6 +66,7 @@ export function createAnimeItem(item: MALAnime): AnimeItem {
     id,
     data: item,
     title: visualTitle,
+    titleEscaped: escapedTitle,
     type: 'anime',
     parts: {
       visualTitle,

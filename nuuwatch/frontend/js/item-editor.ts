@@ -14,7 +14,7 @@ export async function openEditor(
   dialog.className = 'edit-item-dialog';
   dialog.innerHTML = `
       <form method="dialog" class="anime-editor">
-        <h2>Edit Anime ${item.title}</h2>
+        <h2>Edit Anime ${item.titleEscaped}</h2>
         <label>
             Comment
             <textarea id="comment" rows="2">${escapeHtml(model.comment)}</textarea>

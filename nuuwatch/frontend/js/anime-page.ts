@@ -46,7 +46,7 @@ async function loadAnimeViewPage(malId: number) {
   container.innerHTML = `
     <div class="anime-item-page">
       <header>
-        <h1><a href="${animeItem.data.url}">${animeItem.title}</a></h1>
+        <h1><a href="${animeItem.data.url}">${animeItem.titleEscaped}</a></h1>
       </header>
       <section class="anime-info">
         <div>

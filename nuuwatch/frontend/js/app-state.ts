@@ -16,6 +16,7 @@ export interface AnimeItem {
   id: number,
   data: MALAnime;
   title: string;
+  titleEscaped: string;
   type: 'anime';
   parts: AnimeItemParts;
   cardElement: HTMLElement;
