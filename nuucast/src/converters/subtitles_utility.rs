@@ -21,7 +21,8 @@ pub async fn extract_subtitle_files_from_mkv_with_track_ids(
     let mut checked = tracks.len();
     for track in tracks {
         checked -= 1;
-        if !matches!(track.language, "en" | "fi" | "sv") {
+        // Check ietf and ISO 639-2/3 in case ietf is missing.
+        if !matches!(track.language, "en" | "fi" | "sv" | "eng" | "fin" | "swe") {
             continue;
         }
 
@@ -51,12 +52,16 @@ pub async fn extract_subtitle_files_from_mkv_with_track_ids(
         paths.push(srt_path);
     }
 
+    if should_convert == 0 {
+        println!("No subtitles (total tracks: {}) to convert was found for {}", tracks.len(), mkv_file);
+        return Ok(paths);
+    }
+
     let output = std::process::Command::new("mkvextract")
         .args(&args)
         .output()
         .map_err(|e| format!("Could not run mkvextract: {}", e))?;
 
-    let status_code = output.status.code();
     match output.status.code() {
         Some(0) => Ok(paths),
         // Mkvextract can be successful but return error code giving warnings.
@@ -90,6 +95,7 @@ pub struct Track {
 
 #[derive(Debug, Deserialize)]
 pub struct Properties {
+    pub language: Option<String>,
     pub language_ietf: Option<String>,
 }
 
@@ -109,7 +115,13 @@ pub async fn extract_subtitle_tracks_with_language(
         .iter()
         .filter(|track| track.kind == "subtitles")
         .filter_map(|track| {
-            track.properties.language_ietf.as_ref().map(|language| SubtitleTrack {
+            let language = track
+                .properties
+                .language_ietf
+                .as_deref()
+                .or(track.properties.language.as_deref())?;
+
+            Some(SubtitleTrack {
                 track_id: track.id,
                 language,
             })
