@@ -77,6 +77,10 @@ export function addItemModel(item: AnimeItem, model: AnimeModel): void {
   }
 
   item.model = model;
+  if (typeof model.modules_data === 'string') {
+    processModel(model);
+  }
+
   appState.animeModels.set(item.id, model);
   item.eventHandler.dispatchEvent('anime:modelUpdated', { id: item.id, model });
 }
@@ -103,15 +107,18 @@ export async function fetchAnimeModel(malId: number): Promise<AnimeModel | undef
   if (!model) {
     return undefined;
   }
+  processModel(model);
 
+  return model;
+}
+
+export function processModel(model: AnimeModel): void {
   try {
-    const modules_data = JSON.parse(model.modules_data);
+    let modules_data = JSON.parse(model.modules_data);
     model.modules_data = modules_data;
   } catch (e) {
     model.modules_data = {};
   }
-
-  return model;
 }
 
 export function createDefaultModel(malId: number): AnimeModel {

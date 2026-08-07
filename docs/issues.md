@@ -20,12 +20,13 @@
 
 ## Bugs
 * Search duplicated the search window.
+* Managed to add file with & in it so it broke parsing and uploading.
 
 ## Features
 * Add name to /anime/fetch route so it looks nicer.
-* Change search item to have a link button and the name searches.
 * Improve airing to find out if something has aired etc.
-* Loading spinners and status updates so you know what happens lol.
++ Loading spinners and status updates so you know what happens lol.
+* Add error logging to be able to reproduce issues.
 
 # Nuufetch
 
