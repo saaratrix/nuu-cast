@@ -23,6 +23,7 @@ pub fn get_html(title: &str, body_class: &str, scripts_url: Option<&str>, url: &
     </div>
     {scripts}
 
+    <script src="/static/js/nui/nui.js" type="module"></script>
 </body>
 </html>"#)
 }

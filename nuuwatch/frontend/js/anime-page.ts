@@ -6,6 +6,7 @@ import { openEditor } from './item-editor.js';
 import { createAnimeItem } from './anime-item-utility.js';
 import { tryInitializeAnimeModel } from './anime-model.js';
 import { nuucastBaseUrl } from './constants.js';
+import { ProgressStatus } from './nui/progress-status/progress-status.js';
 
 async function loadAnimeViewPage(malId: number) {
   const container = document.querySelector<HTMLElement>('.content-container');
@@ -61,6 +62,9 @@ async function loadAnimeViewPage(malId: number) {
       </section>
       <section class="media">
         <h1>Videos</h1>
+        <progress-status active size="1.5em">
+            <span slot="content">Loading videos...</span>
+        </progress-status>
         <div class="media-videos"></div>
       </section>
       <section class="modules">
@@ -107,8 +111,12 @@ async function loadMalItem(malId: number): Promise<AnimeItem> {
 async function updateMediaSection(item: AnimeItem, itemContainer: HTMLElement) {
   const section = itemContainer.querySelector<HTMLElement>('.media')!;
   const videosElement = section.querySelector<HTMLElement>('.media-videos')!;
+  const spinner = section.querySelector<ProgressStatus>('progress-status');
+  spinner?.setAttribute('active', '');
 
   const files = await fetchMediaFiles(item, videosElement).then();
+
+  spinner?.removeAttribute('active');
   // As the fetch can take a little while, maybe id changed.
   if (appState.activeMalId !== item.id) {
     return;
@@ -142,6 +150,7 @@ async function fetchMediaFiles(item: AnimeItem, videosElement: HTMLElement) {
   });
   if (!response.ok) {
     console.log(`Failed to fetch media files for ${item.title}`);
+    return [];
   }
   let files: string[] = await response.json();
   files = files.filter(file => file.endsWith('.mp4'));
