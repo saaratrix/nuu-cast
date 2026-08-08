@@ -47,7 +47,7 @@ pub fn get_navbar(url: &PathBuf) -> String {
 }
 
 pub fn get_browser_html() -> String {
-    let title = "Browser";
+    let title = "Nuuwatch";
     let html = get_html(&title, "browser", None, &PathBuf::from(""), "<div class='content-container'></div>");
     html
 }

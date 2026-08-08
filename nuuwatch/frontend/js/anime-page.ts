@@ -14,6 +14,8 @@ async function loadAnimeViewPage(malId: number) {
     return gotoMain();
   }
 
+  container.innerHTML = `<progress-status active><p slot="content">Loading ...</p></progress-status>`
+
   loadModules('anime').then(result => console.log(`${result ? 'succesfully loaded' : 'failed to load'} module anime `));
   loadModules('crunchyroll').then(result => console.log(`${result ? 'succesfully loaded' : 'failed to load'} module crunchyroll`));
 
@@ -26,6 +28,7 @@ async function loadAnimeViewPage(malId: number) {
     document.addEventListener('anime:itemChanged', onChanged, { once: true });
 
     animeItem = await getMalAnimeItem(malId);
+    document.title = animeItem.title;
     await tryInitializeAnimeModel(animeItem);
     document.removeEventListener('anime:itemChanged', onChanged);
     if (itemChanged) {

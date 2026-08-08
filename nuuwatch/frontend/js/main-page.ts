@@ -12,6 +12,7 @@ export function loadMainPage() {
   }
 
   changeItem(undefined);
+  document.title = 'Nuuwatch';
   container.innerHTML = `<div class="items-container"></div>`;
   fetchCurrentSeason(currentPage).then();
 }
