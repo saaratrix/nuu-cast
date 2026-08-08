@@ -87,7 +87,7 @@ async fn convert_mkv_to_mp4(mkv_file: &PathBuf, metadata: &MkvMergeMetadataJson,
         .ok_or("Could not extract filename stem")?;
 
     let mp4_path = temp_files_directory.path.join(format!("{}.mp4", stem.to_string_lossy()));
-    let audio_metadata = get_audio_tracks_metadata(metadata, &["en", "ja"])?;
+    let audio_metadata = get_audio_tracks_metadata(metadata, &["en", "ja", "eng", "jpn"])?;
 
     let mut args: Vec<String> = vec![
         "-i".to_string(),
@@ -181,6 +181,7 @@ pub fn get_audio_tracks_metadata(
             .properties
             .language_ietf
             .as_deref()
+            .or(track.properties.language.as_deref())
             .unwrap_or("");
 
         if wanted_languages.contains(&language) {

@@ -20,7 +20,6 @@
 
 ## Bugs
 * Search duplicated the search window.
-* Managed to add file with & in it so it broke parsing and uploading.
 
 ## Features
 * Add name to /anime/fetch route so it looks nicer.
