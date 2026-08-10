@@ -132,7 +132,7 @@ async function updateMediaSection(item: AnimeItem, itemContainer: HTMLElement) {
 
   for (const file of files) {
     const listItemElement = document.createElement('ul');
-    listItemElement.innerHTML = `<a href="${nuucastBaseUrl}/${file}" class="media-link">${file}</a>`
+    listItemElement.innerHTML = `<a href="${nuucastBaseUrl}/${encodeURI(file)}" class="media-link">${file}</a>`;
     listElement.appendChild(listItemElement);
   }
 

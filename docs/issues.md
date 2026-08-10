@@ -15,6 +15,8 @@
 * Change subtitle size
 * Change subtitle offset
 * File disk usage information.
+* Add date to files
+* Always keep at least 1 audio codec.
 
 # Nuuwatch
 
@@ -26,6 +28,10 @@
 * Improve airing to find out if something has aired etc.
 + Loading spinners and status updates so you know what happens lol.
 * Add error logging to be able to reproduce issues.
+* Add group by quality.
+* Add group by episode.
+* Turn each episode option in a card for easy click on TV, smallest first.
+* Add .env file for nuucast base.
 
 # Nuufetch
 

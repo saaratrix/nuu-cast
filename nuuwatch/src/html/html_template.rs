@@ -1,4 +1,5 @@
 use std::path::PathBuf;
+use crate::data_utility::data_utility::{NUUCAST_API_URL, NUUWATCH_API_URL};
 
 pub fn get_html(title: &str, body_class: &str, scripts_url: Option<&str>, url: &PathBuf, content: &str) -> String {
     let scripts = scripts_url.map_or(String::new(), |url| {
@@ -14,6 +15,10 @@ pub fn get_html(title: &str, body_class: &str, scripts_url: Option<&str>, url: &
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{title}</title>
     <link rel="stylesheet" href="/static/css/styles.css">
+    <script>
+      window.NUUCAST_API_BASE = "{nuucast_api_url}";
+      window.NUUWATCH_API_BASE = "{nuuwatch_api_url}";
+    </script>
     <script src="/static/js/app.js" type="module" ></script>
 </head>
 <body class="{body_class}">
@@ -25,7 +30,10 @@ pub fn get_html(title: &str, body_class: &str, scripts_url: Option<&str>, url: &
 
     <script src="/static/js/nui/nui.js" type="module"></script>
 </body>
-</html>"#)
+</html>"#,
+        nuuwatch_api_url = &*NUUWATCH_API_URL,
+        nuucast_api_url = &*NUUCAST_API_URL,
+    )
 }
 
 pub fn get_navbar(url: &PathBuf) -> String {

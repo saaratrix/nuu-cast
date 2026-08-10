@@ -20,3 +20,4 @@ scraper = "0.27.0"
 regex = "1.13.1"
 nuufetch = { path = "../nuufetch" }
 tokio-stream = "0.1.18"
+local-ip-address = "0.6.13"
