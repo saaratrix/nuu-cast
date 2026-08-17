@@ -1,9 +1,34 @@
 import { MediaType, viewingFailedToLoadEvent, viewingItemChangedEvent, defaultControlsPlacement, ControlsPlacements, controlsPlacementValues } from './media-viewer-models.js';
 import './media-viewer-controls-rotate.js';
+import { MediaViewerHotkeysHandler } from './media-viewer-hotkeys-handler.js';
+import { MediaViewerActions } from './media-viewer-actions.js';
+import { isVideoElement } from './media-viewer-shared.js';
 export class MediaViewerControls extends HTMLElement {
     constructor() {
         super();
         this.activeFeatures = new Set();
+        this.actions = new MediaViewerActions(this);
+        this.hotkeysHandler = new MediaViewerHotkeysHandler();
+        this.videoHotkeyActions = [
+            {
+                id: 'video:seekForward',
+                key: 'ArrowRight',
+                action: (_) => this.actions.seekForwards(),
+                preventDefault: true,
+            },
+            {
+                id: 'video:seekBackward',
+                key: 'ArrowLeft',
+                action: (_) => this.actions.seekBackwards(),
+                preventDefault: true,
+            },
+            {
+                id: 'video:togglePlayback',
+                key: ' ',
+                action: (_) => this.actions.togglePlayback(),
+            }
+        ];
+        this._isUIVisible = false;
         this._mediaViewer = null;
         this._viewerControls = null;
         this.onViewingItemChanged = (e) => {
@@ -12,6 +37,7 @@ export class MediaViewerControls extends HTMLElement {
                 return;
             }
             this.setFeatures();
+            this.tryOverrideDefaultEvents();
             this.updateView();
         };
         this.onViewingFailedToLoad = (e) => {
@@ -54,6 +80,10 @@ export class MediaViewerControls extends HTMLElement {
           opacity: 0.7
         }
         
+        .hidden {
+            display: none;
+        }
+        
         .features {
           display: flex;
         }
@@ -70,10 +100,22 @@ export class MediaViewerControls extends HTMLElement {
       </div>
     `;
     }
+    get isUIVisible() {
+        return this._isUIVisible;
+    }
+    set isUIVisible(value) {
+        this._isUIVisible = value;
+        this.viewerControls.classList.toggle('hidden', !this._isUIVisible);
+    }
     get placement() {
         return this.getAttribute('placement');
     }
     set placement(value) {
+        if (value == null) {
+            this.isUIVisible = false;
+            this.removeAttribute('placement');
+            return;
+        }
         value = value === null || value === void 0 ? void 0 : value.toLowerCase();
         if (!controlsPlacementValues.has(value)) {
             value = defaultControlsPlacement;
@@ -82,6 +124,7 @@ export class MediaViewerControls extends HTMLElement {
         if (oldValue === value) {
             return;
         }
+        this.isUIVisible = true;
         this.setAttribute('placement', value);
         const oldClass = this.getClassNameForPlacement(oldValue);
         const newClass = this.getClassNameForPlacement(value);
@@ -121,6 +164,7 @@ export class MediaViewerControls extends HTMLElement {
             this.activeFeatures.has('video:fullscreen') && `<media-viewer-controls-fullscreen ></media-viewer-controls-fullscreen>`,
             this.activeFeatures.has('rotate') && `<media-viewer-controls-rotate ></media-viewer-controls-rotate>`,
         ];
+        // typeof string as has && can return undefined.
         const activeFeatures = allFeatures.filter(f => typeof f === 'string');
         this.featuresElement.innerHTML = activeFeatures.join('\n');
     }
@@ -133,22 +177,22 @@ export class MediaViewerControls extends HTMLElement {
         window.addEventListener(viewingFailedToLoadEvent, this.onViewingFailedToLoad);
         this.setFeatures();
         this.updateView();
+        this.tryOverrideDefaultEvents();
+        this.hotkeysHandler.addEventListeners();
     }
     disconnectedCallback() {
         window.removeEventListener(viewingItemChangedEvent, this.onViewingItemChanged);
         window.removeEventListener(viewingFailedToLoadEvent, this.onViewingFailedToLoad);
-    }
-    attributeChangedCallback(name, oldValue, newValue) {
-        if (oldValue === newValue) {
-            return;
-        }
+        this.hotkeysHandler.removeEventListeners();
     }
     setFeatures() {
         const features = [];
+        const actions = [];
         switch (this.mediaViewer.activeMediaType) {
             case MediaType.Video:
                 features.push('video:audio', 'video:fullscreen', 'video:progress');
                 features.push('rotate');
+                actions.push(...this.videoHotkeyActions);
                 break;
             case MediaType.Image:
                 features.push('rotate');
@@ -156,7 +200,29 @@ export class MediaViewerControls extends HTMLElement {
             default:
                 break;
         }
+        this.hotkeysHandler.clearAndAddActions(actions);
         this.activeFeatures = new Set(features);
+    }
+    tryOverrideDefaultEvents() {
+        const contentElement = this.mediaViewer.getViewerContentElement();
+        if (!isVideoElement(contentElement)) {
+            return;
+        }
+        // Note: Clicking play, volume or fullscreen leaves the browser (chrome) in a focused state that ignores keydown events.
+        // Probably so you can press space to toggle play/pause or mute/unmute.
+        // So these methods are here to override such behaviour to allow for a smoother keyboard experience.
+        contentElement.addEventListener('play', function () {
+            this.blur();
+        });
+        contentElement.addEventListener('pause', function () {
+            this.blur();
+        });
+        contentElement.addEventListener('volumechange', function () {
+            this.blur();
+        });
+        document.addEventListener('fullscreenchange', () => {
+            contentElement.blur();
+        });
     }
 }
 MediaViewerControls.observedAttributes = ['placement'];

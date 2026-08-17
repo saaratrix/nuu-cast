@@ -35,7 +35,6 @@ export class MediaViewer extends HTMLElement {
     constructor() {
         super();
         this.activeMediaType = MediaType.Unknown;
-        this._showControls = false;
         this._controlsElement = null;
         this._parentContainer = null;
         this._viewerContainerElement = null;
@@ -73,7 +72,7 @@ export class MediaViewer extends HTMLElement {
       <div class="container">
         <div class="item-container">
           <div class="item"></div>
-          <!-- Controls will be inserted here. -->
+          <media-viewer-controls></media-viewer-controls>
         </div>
       </div>
     `;
@@ -88,8 +87,8 @@ export class MediaViewer extends HTMLElement {
     }
     set src(value) {
         value == null
-          ? this.removeAttribute("src")
-          : this.setAttribute("src", value);
+            ? this.removeAttribute("src")
+            : this.setAttribute("src", value);
     }
     get mimeType() {
         return this.getAttribute("mime-type");
@@ -122,8 +121,8 @@ export class MediaViewer extends HTMLElement {
     set automaticallyAdjustHeight(value) {
         var _a;
         value == null
-          ? this.removeAttribute('auto-height')
-          : this.setAttribute('auto-height', value ? 'true' : 'false');
+            ? this.removeAttribute('auto-height')
+            : this.setAttribute('auto-height', value ? 'true' : 'false');
         if (!value && ((_a = this.viewItemElement) === null || _a === void 0 ? void 0 : _a.firstElementChild)) {
             this.viewItemElement.firstElementChild.style.maxHeight = '';
         }
@@ -138,7 +137,7 @@ export class MediaViewer extends HTMLElement {
     }
     set controlsPlacement(value) {
         if (!value) {
-            this.hideControls();
+            this.hideControlsUI();
             return;
         }
         value = value.toLowerCase();
@@ -146,29 +145,13 @@ export class MediaViewer extends HTMLElement {
             value = defaultControlsPlacement;
         }
         this.setAttribute("controls-placement", value);
-        this.showControls(value);
+        this.controlsElement.placement = value;
     }
-    showControls(placement) {
-        if (this._showControls) {
-            this.controlsElement.placement = placement;
+    hideControlsUI() {
+        if (!this.controlsElement.isUIVisible) {
             return;
         }
-        this._showControls = true;
-        let controlsElement = this.controlsElement;
-        if (!controlsElement) {
-            controlsElement = document.createElement('media-viewer-controls');
-        }
-        const containerItem = this.shadow.querySelector('.item-container');
-        containerItem === null || containerItem === void 0 ? void 0 : containerItem.appendChild(controlsElement);
-        controlsElement.placement = placement;
-    }
-    hideControls() {
-        var _a;
-        if (!this._showControls) {
-            return;
-        }
-        this._showControls = false;
-        (_a = this.controlsElement) === null || _a === void 0 ? void 0 : _a.remove();
+        this.controlsElement.placement = null;
     }
     get viewerContainer() {
         if (!this._viewerContainerElement) {
@@ -181,6 +164,17 @@ export class MediaViewer extends HTMLElement {
             this._viewItemElement = this.shadow.querySelector('.item');
         }
         return this._viewItemElement;
+    }
+    getViewerContentElement() {
+        switch (this.activeMediaType) {
+            case MediaType.Video:
+                return this.viewItemElement.querySelector('video');
+            case MediaType.Audio:
+                return this.viewItemElement.querySelector('audio');
+            case MediaType.Image:
+                return this.viewItemElement.querySelector('img');
+        }
+        return null;
     }
     get subtitles() {
         if (this._subtitles) {
@@ -227,7 +221,7 @@ export class MediaViewer extends HTMLElement {
     connectedCallback() {
         const placement = this.controlsPlacement;
         if (placement) {
-            this.showControls(placement);
+            this.controlsElement.placement = placement;
         }
         this.renderViewItem(true);
     }
@@ -245,12 +239,13 @@ export class MediaViewer extends HTMLElement {
         this.renderViewItem(shouldRender);
     }
     renderViewItem(render) {
-        var _a, _b, _c;
+        var _a, _b;
+        var _c;
         if (!render) {
             return;
         }
         const src = this.src;
-        const [mediaType, mimeType] = (_a = this.getTypes(src)) !== null && _a !== void 0 ? _a : [];
+        const [mediaType, mimeType] = (_c = this.getTypes(src)) !== null && _c !== void 0 ? _c : [];
         if (!mediaType || !mimeType) {
             this.viewItemElement.textContent = '';
             this._lastRender = undefined;
@@ -258,7 +253,7 @@ export class MediaViewer extends HTMLElement {
             dispatchViewingItemChangedEvent(this.eventId, this, this.activeMediaType);
             return;
         }
-        if (((_b = this._lastRender) === null || _b === void 0 ? void 0 : _b.src) === src && ((_c = this._lastRender) === null || _c === void 0 ? void 0 : _c.mediaType) === mediaType) {
+        if (((_a = this._lastRender) === null || _a === void 0 ? void 0 : _a.src) === src && ((_b = this._lastRender) === null || _b === void 0 ? void 0 : _b.mediaType) === mediaType) {
             return;
         }
         this.activeMediaType = mediaType;

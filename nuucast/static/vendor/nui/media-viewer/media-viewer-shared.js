@@ -1,3 +1,4 @@
+// TODO: Change that these are using fixed external css variables.
 const sharedCSS = `
   .icon-action {
     padding: 5px;
@@ -27,25 +28,28 @@ const sharedCSS = `
   }
 `;
 function supportsAdoptedStyleSheets() {
-  return ("adoptedStyleSheets" in Document.prototype &&
-    "adoptedStyleSheets" in ShadowRoot.prototype &&
-    "replaceSync" in CSSStyleSheet.prototype);
+    return ("adoptedStyleSheets" in Document.prototype &&
+        "adoptedStyleSheets" in ShadowRoot.prototype &&
+        "replaceSync" in CSSStyleSheet.prototype);
 }
 export function applyMediaViewerSharedCSS(shadowRoot) {
-  let useFallback = !supportsAdoptedStyleSheets();
-  try {
-    if (!useFallback) {
-      const css = new CSSStyleSheet();
-      css.replaceSync(sharedCSS);
-      shadowRoot.adoptedStyleSheets = [css];
+    let useFallback = !supportsAdoptedStyleSheets();
+    try {
+        if (!useFallback) {
+            const css = new CSSStyleSheet();
+            css.replaceSync(sharedCSS);
+            shadowRoot.adoptedStyleSheets = [css];
+        }
     }
-  }
-  catch (e) {
-    useFallback = true;
-  }
-  if (useFallback) {
-    const style = document.createElement("style");
-    style.textContent = sharedCSS;
-    shadowRoot.appendChild(style);
-  }
+    catch (e) {
+        useFallback = true;
+    }
+    if (useFallback) {
+        const style = document.createElement("style");
+        style.textContent = sharedCSS;
+        shadowRoot.appendChild(style);
+    }
+}
+export function isVideoElement(element) {
+    return (element === null || element === void 0 ? void 0 : element.nodeName) === 'VIDEO';
 }

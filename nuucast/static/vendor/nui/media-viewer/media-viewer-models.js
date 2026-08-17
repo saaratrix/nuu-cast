@@ -9,8 +9,8 @@ export const defaultControlsPlacement = 'page:left';
 export const ControlsPlacements = {
     PageLeft: 'page:left',
     PageRight: 'page:right',
-    ItemLeft: 'item:up',
-    ItemRight: 'item:down',
+    ItemLeft: 'item:left',
+    ItemRight: 'item:right',
 };
 export const controlsPlacementValues = new Set([ControlsPlacements.PageLeft, ControlsPlacements.PageRight, ControlsPlacements.ItemLeft, ControlsPlacements.ItemRight]);
 export const viewingItemChangedEvent = 'viewer:itemChanged';
