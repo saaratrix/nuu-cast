@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   tryInitializeSubtitlesPicker();
+
+  tryInitializeKittyButton();
 });
 
 function tryInitializeSubtitlesPicker() {
@@ -49,4 +51,44 @@ function getSubtitleUrls(elements) {
   });
 
   return directMatching.length > 0 ? directMatching : subtitles;
+}
+
+function tryInitializeKittyButton() {
+  const mediaViewer = document.querySelector('media-viewer');
+  /** @type {HTMLVideoElement} */
+  const video = mediaViewer.getViewerContentElement();
+  if (video.nodeName !== 'VIDEO' || video.textTracks.length <= 0) {
+    return;
+  }
+
+  const button = document.createElement('button');
+  button.innerText = 'Meow!';
+  button.style.position = 'absolute';
+  button.style.bottom = '1rem';
+  button.style.right = '3rem';
+  button.style.height = '1.5rem';
+  button.style.width = '8ch';
+
+  let hasAdjusted = false;
+
+  button.addEventListener('click', () => {
+    const increment = !hasAdjusted ? -3 : 3;
+    hasAdjusted = !hasAdjusted;
+    for (const track of video.textTracks) {
+      // Only active track has cues.
+      if (!track.cues) {
+        continue;
+      }
+
+      for (const cue of track.cues) {
+        let line = parseInt(cue.line);
+        if (Number.isNaN(line)) {
+          line = 13;
+        }
+        cue.line = line + increment;
+      }
+    }
+  });
+
+  document.body.appendChild(button);
 }

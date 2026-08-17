@@ -94,7 +94,7 @@ export class MediaViewerControls extends HTMLElement {
         }
         
       </style>
-      <div class="controls">
+      <div class="controls hidden">
           <div class="features"></div>
           <div class="extra-space"></div>
       </div>
