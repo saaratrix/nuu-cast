@@ -32,12 +32,10 @@
 ## Features
 * Add name to /anime/fetch route so it looks nicer.
 * Improve airing to find out if something has aired etc.
-+ Loading spinners and status updates so you know what happens lol.
 * Add error logging to be able to reproduce issues.
 * Add group by quality.
 * Add group by episode.
 * Turn each episode option in a card for easy click on TV, smallest first.
-* Add .env file for nuucast base.
 * On click suggest season & episode.
 * Pressing enter should add search term
 * Add sources
