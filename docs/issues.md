@@ -17,11 +17,17 @@
 * File disk usage information.
 * Add date to files
 * Always keep at least 1 audio codec.
+* Cache mime type, file size in PathCache.
+* Add support for play & pause button
+    - Well this one seems impossible as the remote does not even send play/pause events.
+* Add debug mode in top right corner on main page to enable logging button presses etc.
+
 
 # Nuuwatch
 
 ## Bugs
 * Search duplicated the search window.
+* Top left hover issue
 
 ## Features
 * Add name to /anime/fetch route so it looks nicer.
@@ -32,6 +38,9 @@
 * Add group by episode.
 * Turn each episode option in a card for easy click on TV, smallest first.
 * Add .env file for nuucast base.
+* On click suggest season & episode.
+* Pressing enter should add search term
+* Add sources
 
 # Nuufetch
 
