@@ -1,4 +1,4 @@
-type PopoverPlacement = 'bottom' | 'right' | 'left';
+type PopoverPlacement = 'top' | 'bottom' | 'right' | 'left';
 
 const popover = document.createElement('div');
 popover.id = 'item-popover';
@@ -25,44 +25,45 @@ export function showPopover(anchor: HTMLElement) {
 
   popover.hidden = false;
 
-  const a = anchor.getBoundingClientRect();
-  const p = popover.getBoundingClientRect();
+  const aRects = anchor.getBoundingClientRect();
+  const pRects = popover.getBoundingClientRect();
 
   const margin = 12;
   const gap = 12;
 
+  const fitsBelow = aRects.bottom + gap + pRects.height <= window.innerHeight - margin;
+  const fitsAbove = aRects.top - gap - pRects.height >= gap;
+
+  let top: number;
+  let left: number = 0;
+
   let placement: PopoverPlacement = 'bottom';
-
-  let left = a.left + a.width / 2 - p.width / 2;
-  let top = a.bottom + gap;
-
-  const fitsBottom =
-    top + p.height <= window.innerHeight - margin &&
-    left >= margin &&
-    left + p.width <= window.innerWidth - margin;
-
-  if (!fitsBottom) {
-    placement = 'right';
-    left = a.right + gap;
-    top = a.top + a.height / 2 - p.height / 2;
-
-    const fitsRight =
-      left + p.width <= window.innerWidth - margin &&
-      top >= margin &&
-      top + p.height <= window.innerHeight - margin;
-
-    if (!fitsRight) {
-      placement = 'left';
-      left = a.left - p.width - gap;
-      top = a.top + a.height / 2 - p.height / 2;
+  if (fitsBelow || fitsAbove) {
+    if (fitsBelow) {
+      placement = 'bottom';
+      top = aRects.bottom + gap;
+    } else {
+      top = aRects.top - gap - pRects.height;
+      placement = 'top';
     }
+
+    left = Math.max((aRects.left + aRects.width / 2) - pRects.width / 2, 0);
+  } else {
+    const fitsRight = aRects.right + gap + pRects.width <= window.innerWidth - margin;
+    const fitsLeft = aRects.left - gap - pRects.width >= margin;
+
+    // If it fits right or doesn't fit left then default to right.
+    if (fitsRight || !fitsLeft) {
+      left = aRects.right + gap;
+      placement = 'right';
+    } else if (fitsLeft) {
+      left = aRects.left - gap - pRects.width;
+      placement = 'left';
+    }
+    top = Math.max((aRects.top + aRects.height / 2), 0);
   }
 
-  left = clamp(left, margin, window.innerWidth - p.width - margin);
-  top = clamp(top, margin, window.innerHeight - p.height - margin);
-
   popover.dataset['placement'] = placement;
-
   popover.style.left = `${left + window.scrollX}px`;
   popover.style.top = `${top + window.scrollY}px`;
 
@@ -71,10 +72,6 @@ export function showPopover(anchor: HTMLElement) {
 
 export function hidePopover() {
   popover.hidden = true;
-}
-
-function clamp(value: number, min: number, max: number) {
-  return Math.min(Math.max(value, min), max);
 }
 
 function positionArrow(
@@ -90,15 +87,17 @@ function positionArrow(
   arrow.style.right = '';
   arrow.style.bottom = '';
 
-  if (placement === 'bottom') {
+  if (placement === 'bottom' || placement === 'top') {
     const anchorCenterX = a.left + a.width / 2;
     const arrowLeft = anchorCenterX - popoverLeft;
 
     arrow.style.left = `${arrowLeft}px`;
+    if (placement === 'top') {
+      arrow.style.bottom = '-6px';
+    }
   } else {
     const anchorCenterY = a.top + a.height / 2;
-    const arrowTop = anchorCenterY - popoverTop;
-
+    const arrowTop = Math.max(anchorCenterY - popoverTop, 12);
     arrow.style.top = `${arrowTop}px`;
   }
 }
