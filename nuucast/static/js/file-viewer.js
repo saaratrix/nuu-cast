@@ -66,14 +66,18 @@ function tryInitializeKittyButton() {
   button.style.position = 'absolute';
   button.style.bottom = '1rem';
   button.style.right = '3rem';
-  button.style.height = '1.5rem';
-  button.style.width = '8ch';
+  button.style.height = '2.5rem';
+  button.style.width = '10ch';
 
-  let hasAdjusted = false;
+  let translateLine = false;
 
   button.addEventListener('click', () => {
-    const increment = !hasAdjusted ? -3 : 3;
-    hasAdjusted = !hasAdjusted;
+    const hasSubtitlesActive = Array.from(video.textTracks).some(t => !!t.cues);
+    if (!hasSubtitlesActive) {
+      return;
+    }
+
+    translateLine = !translateLine;
     for (const track of video.textTracks) {
       // Only active track has cues.
       if (!track.cues) {
@@ -81,13 +85,26 @@ function tryInitializeKittyButton() {
       }
 
       for (const cue of track.cues) {
-        let line = parseInt(cue.line);
-        if (Number.isNaN(line)) {
-          line = 13;
+        if (translateLine) {
+          if (!'__originalValue' in cue) {
+            cue.__originalValue = cue.line;
+          }
+
+          let line = parseInt(cue.line);
+          if (Number.isNaN(line)) {
+            line = 10;
+          } else {
+            line -= 3;
+          }
+          cue.line = line;
+
+        } else {
+          cue.line = cue.__originalValue || 'auto';
         }
-        cue.line = line + increment;
       }
     }
+
+    button.style.backgroundColor = translateLine ? '#badbad' : '';
   });
 
   document.body.appendChild(button);
