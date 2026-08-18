@@ -47,7 +47,12 @@ export function showPopover(anchor: HTMLElement) {
       placement = 'top';
     }
 
-    left = Math.max((aRects.left + aRects.width / 2) - pRects.width / 2, 0);
+    left = Math.max((aRects.left + aRects.width / 2) - pRects.width / 2, margin);
+    // 1000 - 990 = 10
+    const rightDelta = (innerWidth - margin) - (left + pRects.width);
+    if (rightDelta < 0 && left > margin) {
+      left += rightDelta;
+    }
   } else {
     const fitsRight = aRects.right + gap + pRects.width <= window.innerWidth - margin;
     const fitsLeft = aRects.left - gap - pRects.width >= margin;
@@ -60,7 +65,7 @@ export function showPopover(anchor: HTMLElement) {
       left = aRects.left - gap - pRects.width;
       placement = 'left';
     }
-    top = Math.max((aRects.top + aRects.height / 2), 0);
+    top = Math.max((aRects.top + aRects.height / 2 - pRects.height / 2), margin);
   }
 
   popover.dataset['placement'] = placement;
@@ -92,9 +97,6 @@ function positionArrow(
     const arrowLeft = anchorCenterX - popoverLeft;
 
     arrow.style.left = `${arrowLeft}px`;
-    if (placement === 'top') {
-      arrow.style.bottom = '-6px';
-    }
   } else {
     const anchorCenterY = a.top + a.height / 2;
     const arrowTop = Math.max(anchorCenterY - popoverTop, 12);

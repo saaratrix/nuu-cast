@@ -177,6 +177,10 @@ a:hover {
     top: -6px;
 }
 
+#item-popover[data-placement="top"] .item-popover-arrow {
+    bottom: -6px;
+}
+
 #item-popover[data-placement="right"] .item-popover-arrow {
     left: -6px;
 }
