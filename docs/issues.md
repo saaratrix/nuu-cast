@@ -27,7 +27,6 @@
 
 ## Bugs
 * Search duplicated the search window.
-* Top left hover issue
 
 ## Features
 * Add name to /anime/fetch route so it looks nicer.
