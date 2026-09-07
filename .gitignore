@@ -24,9 +24,15 @@ nuucast/media/*
 nuucast/temp_files/*
 nuuwatch/data/*
 nuuwatch/downloads/*
+
+nuuwatch/frontend/css/*.css
+nuuwatch/frontend/css/*.css.map
+
+
 nuuwatch/static/js/*
 nuuwatch/static/css/*
 nuuwatch/static/modules/*
+nuuwatch/static/img/*
 nuuwatch/static/index.html
 nuuwatch/frontend/node_modules
 nuuwatch/frontend/js/**/*.js

@@ -3,7 +3,6 @@ import path from 'path';
 
 const __dirname = path.join(process.cwd(), 'scripts');
 
-// --- Configuration ---
 const SOURCE_ROOT = path.join(__dirname, '..');
 const TARGET_ROOT = path.join(__dirname, '..', '..', 'static');
 
@@ -16,6 +15,8 @@ const folders = [
   'css',
   'modules',
 ];
+
+const ignoreExtensions = ['.ts'];
 
 /**
  * Creates directories recursively in the target path
@@ -41,11 +42,17 @@ async function copyToTarget(relativePath, parent) {
       await copyToTarget(item, source);
     }
   } else {
+    for (const ext of ignoreExtensions) {
+      if (source.endsWith(ext)) {
+        return;
+      }
+    }
+
     await fs.promises.copyFile(source, destBase);
   }
 }
 
-async function runBuild() {
+export async function runBuild() {
   // TODO: Remove folders from static too.
 
   console.log('copying files...')
@@ -62,4 +69,6 @@ async function runBuild() {
   console.log('Build completed successfully.');
 }
 
-runBuild().catch(console.error);
+if (import.meta.main) {
+  runBuild().catch(console.error);
+}

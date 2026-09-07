@@ -4,8 +4,11 @@
   "description": "nuuwatch package",
   "main": "index.js",
   "scripts": {
-    "build": "tsc && node scripts/build_and_copy.mjs",
-    "watch": "",
+    "build": "tsc && npm run sass:production && node scripts/build_and_copy.mjs",
+    "build:watch": "node scripts/watch.mjs",
+    "tsc:watch": "tsc -w",
+    "sass:production": "sass css/styles.scss:../static/css/styles.css",
+    "sass:watch": "sass --watch .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Luna",
@@ -13,6 +16,7 @@
   "private": true,
   "devDependencies": {
     "@mateoaranda/jikanjs": "1.3.1",
-    "typescript": "7.0.2"
+    "typescript": "7.0.2",
+    "sass": "1.104.0"
   }
 }
