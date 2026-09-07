@@ -1,61 +1,60 @@
-use std::path::PathBuf;
-use crate::data_utility::data_utility::{NUUCAST_API_URL, NUUWATCH_API_URL};
+use askama::Template;
+use std::path::{Component, Path, PathBuf};
 
-pub fn get_html(title: &str, body_class: &str, scripts_url: Option<&str>, url: &PathBuf, content: &str) -> String {
-    let scripts = scripts_url.map_or(String::new(), |url| {
-        format!(r#"<script src="/static/{url}" type="module"></script>"#)
-    });
+use crate::data_utility::data_utility::{
+    NUUCAST_API_URL,
+    NUUWATCH_API_URL,
+};
 
-    let navbar = get_navbar(url);
-
-    format!(r#"<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{title}</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
-    <script>
-      window.NUUCAST_API_BASE = "{nuucast_api_url}";
-      window.NUUWATCH_API_BASE = "{nuuwatch_api_url}";
-    </script>
-    <script src="/static/js/app.js" type="module" ></script>
-</head>
-<body class="{body_class}">
-    <div class="page-container">
-    {navbar}
-    {content}
-    </div>
-    {scripts}
-
-    <script src="/static/js/nui/nui.js" type="module"></script>
-</body>
-</html>"#,
-        nuuwatch_api_url = &*NUUWATCH_API_URL,
-        nuucast_api_url = &*NUUCAST_API_URL,
-    )
+pub struct Breadcrumb {
+    pub name: String,
+    pub url: String,
 }
 
-pub fn get_navbar(url: &PathBuf) -> String {
-    let mut breadcrumbs = String::new();
-    let mut accumulated_path = PathBuf::new();
+#[derive(Template)]
+#[template(path = "home.html")]
+pub struct HomeTemplate<'a> {
+    pub title: &'a str,
+    pub body_class: &'a str,
+    pub scripts_url: Option<&'a str>,
 
-    breadcrumbs.push_str(r#"<a class="breadcrumb-link" href="/#">Home</a>"#);
-    for component in url.components() {
-        if let std::path::Component::Normal(segment) = component {
-            accumulated_path.push(segment);
-            let segment_str = segment.to_string_lossy();
-            let path_str = accumulated_path.display();
+    pub nuucast_api_url: &'a str,
+    pub nuuwatch_api_url: &'a str,
 
-            breadcrumbs.push_str(&format!(r#" / <a class="breadcrumb-link" href="/{path_str}">{segment_str}</a>"#));
+    pub breadcrumbs: Vec<Breadcrumb>,
+}
+
+fn breadcrumbs(path: &PathBuf) -> Vec<Breadcrumb> {
+    let mut result = Vec::new();
+    let mut accumulated = String::new();
+
+    for component in path.components() {
+        if let Component::Normal(segment) = component {
+            let name = segment.to_string_lossy();
+
+            accumulated.push('/');
+            accumulated.push_str(&name);
+
+            result.push(Breadcrumb {
+                name: name.into_owned(),
+                url: accumulated.clone(),
+            });
         }
     }
 
-    format!(r#"<nav class="navbar">{breadcrumbs}</nav>"#)
+    result
 }
 
 pub fn get_browser_html() -> String {
-    let title = "Nuuwatch";
-    let html = get_html(&title, "browser", None, &PathBuf::from(""), "<div class='content-container'></div>");
-    html
+    HomeTemplate {
+        title: "Nuuwatch",
+        body_class: "browser",
+        scripts_url: None,
+
+        nuucast_api_url: &NUUCAST_API_URL,
+        nuuwatch_api_url: &NUUWATCH_API_URL,
+
+        breadcrumbs: breadcrumbs(&PathBuf::from("")),
+    }
+        .render().unwrap()
 }

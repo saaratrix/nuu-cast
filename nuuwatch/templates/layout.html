@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ title }}</title>
+
+    <link rel="stylesheet" href="/static/css/styles.css">
+
+    <script>
+      window.NUUCAST_API_BASE = "{{ nuucast_api_url }}";
+      window.NUUWATCH_API_BASE = "{{ nuuwatch_api_url }}";
+    </script>
+
+    <script src="/static/js/app.js" type="module"></script>
+</head>
+
+<body class="{{ body_class }}">
+<div class="page-container">
+    <nav class="navbar">
+        <a class="breadcrumb-link" href="/">Home</a>
+
+        {% for breadcrumb in breadcrumbs %}
+        /
+        <a class="breadcrumb-link" href="{{ breadcrumb.url }}">
+            {{ breadcrumb.name }}
+        </a>
+        {% endfor %}
+    </nav>
+
+    {% block content %}{% endblock %}
+</div>
+
+{% if let Some(scripts_url) = scripts_url %}
+<script src="/static/{{ scripts_url }}" type="module"></script>
+{% endif %}
+
+<script src="/static/js/nui/nui.js" type="module"></script>
+</body>
+</html>

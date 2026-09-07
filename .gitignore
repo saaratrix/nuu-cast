@@ -28,7 +28,6 @@ nuuwatch/downloads/*
 nuuwatch/frontend/css/*.css
 nuuwatch/frontend/css/*.css.map
 
-
 nuuwatch/static/js/*
 nuuwatch/static/css/*
 nuuwatch/static/modules/*
