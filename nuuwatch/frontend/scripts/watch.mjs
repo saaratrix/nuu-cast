@@ -50,6 +50,8 @@ function startCopyAction() {
     const values = [...pendingFiles.values()];
     pendingFiles.clear();
 
+    console.log(`copying ${values.length} files...`);
+
     clearTimeout(timer);
     timer = undefined;
 

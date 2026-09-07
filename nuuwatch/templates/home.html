@@ -1,5 +1,36 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="content-container"></div>
+<nav class="navbar-side">
+    <a href="#/">🏠 Home</a>
+    <a href="#/seasons">🗓️ Seasons</a>
+</nav>
+<div class="content">
+    <section class="episodes-feed">
+        <h2>New episodes for you ></h2>
+        <nui-carousel>Nui Carousel</nui-carousel>
+    </section>
+    <section class="animes">
+        <header class="season-info">
+            <h2>Summer 2026</h2>
+            <div class="season-timespan">📆 Jun 2026 - Sep 2026</div>
+        </header>
+        <div class="categories">
+            <button>All (64)</button>
+            <button>TV (42)</button>
+            <button>Movies (8)</button>
+        </div>
+        <ul class="animes-list">
+            <li>Anime Card 1...</li>
+            <li>Anime Card 2...</li>
+            <li>Anime Card 3...</li>
+        </ul>
+    </section>
+</div>
+<aside class="utility">
+    <section class="schedule">
+        <h2>Airing today</h2>
+        <p>Some schedule goes here!</p>
+    </section>
+</aside>
 {% endblock %}

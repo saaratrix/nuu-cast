@@ -6,15 +6,16 @@ import { addItemModel, AnimeModel, Rating } from './anime-model.js';
 export function loadMainPage() {
   let currentPage = 1;
 
-  const container = document.querySelector('.content-container');
-  if (!container) {
-    return;
-  }
+  // const container = document.querySelector('.content-container');
+  // if (!container) {
+  //   return;
+  // }
 
   changeItem(undefined);
   document.title = 'Nuuwatch';
-  container.innerHTML = `<div class="items-container"></div>`;
-  fetchCurrentSeason(currentPage).then();
+  document.body.className = 'home-page';
+  // container.innerHTML = `<div class="items-container"></div>`;
+  // fetchCurrentSeason(currentPage).then();
 }
 
 async function fetchCurrentSeason(currentPage: number) {

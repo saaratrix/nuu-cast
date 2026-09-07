@@ -15,7 +15,6 @@ pub struct Breadcrumb {
 #[template(path = "home.html")]
 pub struct HomeTemplate<'a> {
     pub title: &'a str,
-    pub body_class: &'a str,
     pub scripts_url: Option<&'a str>,
 
     pub nuucast_api_url: &'a str,
@@ -48,7 +47,6 @@ fn breadcrumbs(path: &PathBuf) -> Vec<Breadcrumb> {
 pub fn get_browser_html() -> String {
     HomeTemplate {
         title: "Nuuwatch",
-        body_class: "browser",
         scripts_url: None,
 
         nuucast_api_url: &NUUCAST_API_URL,

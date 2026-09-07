@@ -1,3 +1,7 @@
+@use 'utility';
+@use 'home';
+@use 'anime-page';
+
 :root {
     --color-bg: #2c2c38;
     --color-bg-contrast-low: #383847;
@@ -27,10 +31,6 @@ html, body {
 
 body {
     min-height: 100vh;
-}
-
-[hidden] {
-    display: none !important;
 }
 
 .page-container {

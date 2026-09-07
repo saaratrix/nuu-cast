@@ -14,6 +14,7 @@ async function loadAnimeViewPage(malId: number) {
     return gotoMain();
   }
 
+  document.body.className = 'anime-page';
   container.innerHTML = `<progress-status active><p slot="content">Loading ...</p></progress-status>`
 
   loadModules('anime').then(result => console.log(`${result ? 'succesfully loaded' : 'failed to load'} module anime `));

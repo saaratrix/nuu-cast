@@ -16,22 +16,25 @@
     <script src="/static/js/app.js" type="module"></script>
 </head>
 
-<body class="{{ body_class }}">
-<div class="page-container">
-    <nav class="navbar">
-        <a class="breadcrumb-link" href="/">Home</a>
-
-        {% for breadcrumb in breadcrumbs %}
-        /
-        <a class="breadcrumb-link" href="{{ breadcrumb.url }}">
-            {{ breadcrumb.name }}
-        </a>
-        {% endfor %}
+<body>
+<header class="site-header">
+    <nav class="navbar-top">
+        <div>
+            <div class="logo">
+                🐾
+                Nuuwatch
+            </div>
+            <a href="/#">Home</a>
+            <a href="/#seasons">Seasons</a>
+        </div>
+        <div>
+            <search-bar>A search bar.</search-bar>
+        </div>
     </nav>
-
+</header>
+<main class="page-container">
     {% block content %}{% endblock %}
-</div>
-
+</main>
 {% if let Some(scripts_url) = scripts_url %}
 <script src="/static/{{ scripts_url }}" type="module"></script>
 {% endif %}
