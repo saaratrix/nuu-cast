@@ -1,4 +1,93 @@
+@use "sass:color";
+@use "variables";
+@use "theme-colors";
+
+$opacity-bg-link: 0.2;
+$opacity-left: 0.6;
+$opacity-right: 0.4;
+
+$content-padding: 1rem;
+$sidebar-padding: 0.5rem;
+
 body.home-page {
   background: url('../img/home.60.webp');
   background-size: cover;
+
+  --opacity-bg-link: #{percentage($opacity-bg-link)};
+  --opacity-left: #{percentage($opacity-left)};
+  --opacity-right: #{percentage($opacity-right)};
+}
+
+.panel {
+  border-radius: 0.4rem;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--box-shadow-primary);
+}
+
+main {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.navbar-side {
+  display: flex;
+  flex-direction: column;
+  gap: 0.33rem;
+
+  padding: $sidebar-padding;
+
+  background: color.change(theme-colors.$bg-primary, $alpha: $opacity-left);
+  background: rgb(from var(--color-bg-primary) r g b / var(--opacity-left));
+
+  width: variables.$logo-width;
+}
+
+.sidebar-link {
+  color: var(--color-text-primary);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+
+  &.active {
+    color: var(--color-text-primary);
+    // Older browsers doesn't get dynamic theme for some things :(
+    background-color: color.change(theme-colors.$link-active, $alpha: $opacity-bg-link);
+    background-color: rgb(from var(--color-link-active) r g b / var(--opacity-bg-link));
+  }
+
+  &:hover:not(.active) {
+    color: var(--color-text-primary);
+    background-color: color.change(theme-colors.$link-hover, $alpha: $opacity-bg-link);
+    background-color: rgb(from var(--color-link-hover) r g b / var(--opacity-bg-link));
+  }
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 400px;
+}
+
+.episodes-feed, .animes {
+  display: flex;
+  flex-direction: column;
+  padding: $content-padding;
+  background: linear-gradient(90deg, color.change(theme-colors.$bg-primary, $alpha: $opacity-left), color.change(theme-colors.$bg-primary, $alpha: $opacity-right));
+  background: linear-gradient(90deg, rgb(from var(--color-bg-primary) r g b / var(--opacity-left)), rgb(from var(--color-bg-primary) r g b / var(--opacity-right)));
+}
+
+.animes {
+  margin-top: 0.75rem;
+  flex: 1;
+}
+
+.utility {
+  display: flex;
+  flex-direction: column;
+
+  width: 300px;
+  padding: $sidebar-padding;
+
+  background: rgb(from var(--color-bg-primary) r g b / var(--opacity-right));
 }

@@ -1,0 +1,63 @@
+@use "sass:color";
+
+$bg-primary: #0f1115;
+$bg-secondary: #161a21;
+$bg-tertiary: #1f242d;
+$bg-elevated: #262c36;
+
+$primary: #e53946;
+$primary-hover: color.adjust($primary, $lightness: -7%);
+$primary-active: color.adjust($primary, $lightness: -13%);
+$primary-subtle: color.mix($primary, $bg-primary, 20%);
+
+$text-primary: #f9fafb;
+$text-secondary: #cbd5e1;
+$text-muted: #94a3b8;
+$text-disabled: #64748b;
+
+$link: #f05a67;
+$link-hover: color.adjust($link, $lightness: 8%);
+$link-active: color.adjust($link, $lightness: -6%);
+$link-visited: $link;
+$link-disabled: color.mix($link, $text-disabled, 30%);
+
+$border: #2e3541;
+$border-hover: color.adjust($border, $lightness: 7%);
+$border-focus: $primary;
+
+$success: #22c55e;
+$warning: #f59e0b;
+$error: #ef4444;
+$info: #3b82f6;
+
+:root {
+  --color-primary: #{$primary};
+  --color-primary-hover: #{$primary-hover};
+  --color-primary-active: #{$primary-active};
+  --color-primary-subtle: #{$primary-subtle};
+
+  --color-link: #{$link};
+  --color-link-hover: #{$link-hover};
+  --color-link-active: #{$link-active};
+  --color-link-visited: #{$link-visited};
+  --color-link-disabled: #{$link-disabled};
+
+  --color-bg-primary: #{$bg-primary};
+  --color-bg-secondary: #{$bg-secondary};
+  --color-bg-tertiary: #{$bg-tertiary};
+  --color-bg-elevated: #{$bg-elevated};
+
+  --color-border: #{$border};
+  --color-border-hover: #{$border-hover};
+  --color-border-focus: #{$border-focus};
+
+  --color-text-primary: #{$text-primary};
+  --color-text-secondary: #{$text-secondary};
+  --color-text-muted: #{$text-muted};
+  --color-text-disabled: #{$text-disabled};
+
+  --color-success: #{$success};
+  --color-warning: #{$warning};
+  --color-error: #{$error};
+  --color-info: #{$info};
+}

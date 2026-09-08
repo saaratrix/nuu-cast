@@ -3,7 +3,7 @@ import { copyFile } from "node:fs/promises";
 import { resolve, join } from "node:path";
 import { runBuild } from './build_and_copy.mjs';
 
-const DEBOUNCE_MS = 5000;
+const DEBOUNCE_MS = 2500;
 
 let timer;
 const frontendRootDir = resolve(import.meta.dirname, "../");

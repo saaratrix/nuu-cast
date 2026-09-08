@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc && npm run sass:production && node scripts/build_and_copy.mjs",
+    "build:dev": "npm run build:watch & npm run tsc:watch & npm run sass:watch",
     "build:watch": "node scripts/watch.mjs",
     "tsc:watch": "tsc -w",
     "sass:production": "sass css/styles.scss:../static/css/styles.css",
