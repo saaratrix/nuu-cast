@@ -1,10 +1,16 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<nav class="navbar-side panel">
-    <a href="#/" class="sidebar-link active">🏠 Home</a>
-    <a href="#/seasons" class="sidebar-link">🗓️ Seasons</a>
-</nav>
+<div class="sidebar">
+    <nav class="navbar-side panel">
+        <a href="#/" class="sidebar-link active">🏠 Home</a>
+        <a href="#/seasons" class="sidebar-link">🗓️ Seasons</a>
+    </nav>
+    <div class="sidebar-quote">
+        <span>A little anime brightens the day 🩷</span>
+    </div>
+</div>
+
 <div class="content">
     <section class="episodes-feed panel">
         <h2>New episodes for you ></h2>
@@ -16,15 +22,30 @@
             <div class="season-timespan">📆 Jun 2026 - Sep 2026</div>
         </header>
         <div class="categories">
-            <button>All (64)</button>
-            <button>TV (42)</button>
-            <button>Movies (8)</button>
+            <button class="btn btn-primary active">All (64)</button>
+            <button class="btn btn-primary">TV (42)</button>
+            <button class="btn btn-primary" disabled>Movies (8)</button>
         </div>
-        <ul class="animes-list">
-            <li>Anime Card 1...</li>
-            <li>Anime Card 2...</li>
-            <li>Anime Card 3...</li>
-        </ul>
+        <div class="animes-list">
+            <div class="anime-card">Anime Card 1...</div>
+            <div class="anime-card">Anime Card 2...</div>
+            <div class="anime-card">Anime Card 3...</div>
+            <div class="anime-card">Anime Card 4...</div>
+            <div class="anime-card">Anime Card 5...</div>
+            <div class="anime-card">Anime Card 6...</div>
+            <div class="anime-card">Anime Card 7...</div>
+            <div class="anime-card">Anime Card 8...</div>
+            <div class="anime-card">Anime Card 9...</div>
+            <div class="anime-card">Anime Card 10...</div>
+            <div class="anime-card">Anime Card 11...</div>
+            <div class="anime-card">Anime Card 12...</div>
+            <div class="anime-card">Anime Card 13...</div>
+            <div class="anime-card">Anime Card 14...</div>
+            <div class="anime-card">Anime Card 15...</div>
+            <div class="anime-card">Anime Card 16...</div>
+            <div class="anime-card">Anime Card 17...</div>
+            <div class="anime-card">Anime Card 18...</div>
+        </div>
     </section>
 </div>
 <aside class="utility panel">

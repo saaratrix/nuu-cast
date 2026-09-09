@@ -1,10 +1,17 @@
 @use "sass:color";
+@use "sass:math";
 @use "variables";
 @use "theme-colors";
 
 $opacity-bg-link: 0.2;
 $opacity-left: 0.6;
 $opacity-right: 0.4;
+
+$panel-gap: 1rem;
+
+$sidebar-width: variables.$logo-width;
+$sidebar-quote-height: 200px;
+$utility-width: 300px;
 
 $content-padding: 1rem;
 $sidebar-padding: 0.5rem;
@@ -13,9 +20,9 @@ body.home-page {
   background: url('../img/home.60.webp');
   background-size: cover;
 
-  --opacity-bg-link: #{percentage($opacity-bg-link)};
-  --opacity-left: #{percentage($opacity-left)};
-  --opacity-right: #{percentage($opacity-right)};
+  --opacity-bg-link: #{math.percentage($opacity-bg-link)};
+  --opacity-left: #{math.percentage($opacity-left)};
+  --opacity-right: #{math.percentage($opacity-right)};
 }
 
 .panel {
@@ -30,17 +37,27 @@ main {
   gap: 1rem;
 }
 
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: $panel-gap;
+  width: $sidebar-width;
+}
+
 .navbar-side {
   display: flex;
   flex-direction: column;
   gap: 0.33rem;
-
+  flex: 1;
   padding: $sidebar-padding;
 
   background: color.change(theme-colors.$bg-primary, $alpha: $opacity-left);
   background: rgb(from var(--color-bg-primary) r g b / var(--opacity-left));
+}
 
-  width: variables.$logo-width;
+.sidebar-quote {
+  font-family: "badscript", variables.$font-family;
+  text-align: center;
 }
 
 .sidebar-link {
@@ -75,11 +92,52 @@ main {
   padding: $content-padding;
   background: linear-gradient(90deg, color.change(theme-colors.$bg-primary, $alpha: $opacity-left), color.change(theme-colors.$bg-primary, $alpha: $opacity-right));
   background: linear-gradient(90deg, rgb(from var(--color-bg-primary) r g b / var(--opacity-left)), rgb(from var(--color-bg-primary) r g b / var(--opacity-right)));
+
+  height: 175px;
+
+  h2 {
+    font-size: 1.25em;
+  }
 }
+
+.season-info {
+  display: flex;
+  gap: 1rem;
+
+  h2 {
+    font-size: 1.25em;
+  }
+}
+
+.season-timespan {
+  display: flex;
+  align-items: center;
+  color: var(--color-text-muted);
+  font-size: 0.85em;
+}
+
 
 .animes {
   margin-top: 0.75rem;
   flex: 1;
+}
+
+.categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+
+}
+
+.animes-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, max-content));
+
+  margin-top: 0.75rem;
+}
+
+.anime-card {
+  height: 200px;
 }
 
 .utility {

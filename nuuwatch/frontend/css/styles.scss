@@ -2,8 +2,16 @@
 @use "variables";
 @use "theme-colors";
 @use "utility";
+@use "buttons";
 @use "home";
 @use "anime-page";
+
+@font-face {
+    font-family: "badscript";
+    src: url("../assets/badscript.woff2") format("woff2");
+    font-weight: normal;
+    font-style: normal;
+}
 
 :root {
     --box-shadow-primary: 0 1px 2px rgba(0, 0, 0, 0.35), 0 3px 6px rgba(0, 0, 0, 0.15);
@@ -35,9 +43,8 @@
 html, body {
     background-color: var(--color-bg-primary);
     color: var(--color-text-primary);
-    font-family: Calibri, serif;
+    font-family: variables.$font-family;
     margin: 0;
-
 }
 
 body {
@@ -72,8 +79,9 @@ body {
 
 .logo {
     gap: 0.5rem;
+    width: variables.$logo-width;
     font-size: 1.5em;
-    margin-right: 1em;
+    margin-right: 1rem;
     color: var(--color-primary);
     user-select: none;
 }

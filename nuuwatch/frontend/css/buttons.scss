@@ -1,0 +1,80 @@
+.btn {
+  --btn-color-bg: transparent;
+  --btn-color-text: currentColor;
+  --btn-color-border: transparent;
+
+  --btn-color-hover-bg: var(--btn-color-bg);
+  --btn-color-hover-text: var(--btn-color-text);
+  --btn-color-hover-border: var(--btn-color-border);
+
+  --btn-color-disabled-text: var(--btn-color-text);
+  --btn-color-disabled-bg: var(--btn-color-bg);
+
+  --btn-color-active-bg: var(--btn-color-bg);
+  --btn-color-active-text: var(--btn-color-text);
+  --btn-color-active-border: var(--btn-color-border);
+
+  // Strip default button style
+  appearance: none;
+  border: 1px solid var(--btn-color-border);
+  margin: 0;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+
+  // Rest of the styling:
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+
+  border-radius: 0.375rem;
+  padding: 0.625em 1em;
+
+  background: var(--btn-color-bg);
+  color: var(--btn-color-text);
+
+  &:hover:not([disabled]) {
+    color: var(--btn-color-hover-text);
+    background: var(--btn-color-hover-bg);
+    border-color: var(--btn-color-hover-border);
+  }
+
+  &:active:not([disabled]) {
+    color: var(--btn-color-active-text);
+    background: var(--btn-color-active-bg);
+    border-color: var(--btn-color-active-border);
+  }
+
+  &:disabled,
+  &[aria-disabled="true"] {
+    background: var(--btn-color-disabled-bg);
+    color: var(--btn-color-disabled-text);
+    cursor: not-allowed;
+  }
+}
+
+.btn-primary {
+  --btn-color-bg: var(--color-bg-tertiary);
+  --btn-color-border: var(--color-border);
+  --btn-color-text: var(--color-text);
+
+  --btn-color-disabled-bg: var(--color-bg-elevated);
+  --btn-color-disabled-text: var(--color-text-disabled);
+
+  --btn-color-hover-bg: var(--color-primary-hover);
+  --btn-color-hover-border: var(--color-border-hover);
+  --btn-color-hover-text: var(--color-text);
+
+  --btn-color-active-bg: var(--color-primary-active);
+  --btn-color-active-border: var(--color-primary-active);
+  --btn-color-active-text: var(--color-text);
+
+  &.active {
+    --btn-color-bg: var(--color-primary);
+    --btn-color-border: var(--color-border);
+    --btn-color-text: var(--color-text);
+
+    --btn-color-disabled-bg: var(--color-primary-subtle);
+  }
+}

@@ -10,13 +10,14 @@ const files = [
   'index.html'
 ]
 const folders = [
+  'assets',
   'img',
   'js',
   'css',
   'modules',
 ];
 
-const ignoreExtensions = ['.ts'];
+const ignoreExtensions = ['.ts', '.scss'];
 
 /**
  * Creates directories recursively in the target path
