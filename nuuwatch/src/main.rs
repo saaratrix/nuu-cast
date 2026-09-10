@@ -39,6 +39,7 @@ async fn main() -> Result<(), sqlx::Error> {
         .merge(modules::anime::anime_module_router::get_anime_routes())
         .merge(modules::modules_router::get_modules_routes())
         .merge(media::media_router::get_media_routes())
+        .merge(html::html_page_layouts::get_html_routes())
         .with_state(state);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3001").await.unwrap();

@@ -1,12 +1,12 @@
-import { AnimeItem, appState, changeItem, jikan, updateMediaFiles } from './app-state.js';
-import { escapeHtml } from './utility.js';
-import { loadModules } from './module-handler.js';
-import { gotoRoute } from './router.js';
-import { openEditor } from './item-editor.js';
-import { createAnimeItem } from './anime-item-utility.js';
-import { tryInitializeAnimeModel } from './anime-model.js';
-import { nuucastBaseUrl } from './constants.js';
-import { ProgressStatus } from './nui/progress-status/progress-status.js';
+import { AnimeItem, appState, changeItem, jikan, updateMediaFiles } from '../app-state.js';
+import { escapeHtml } from '../utility.js';
+import { loadModules } from '../module-handler.js';
+import { gotoRoute } from '../routing/router.js';
+import { openEditor } from '../item-editor.js';
+import { createAnimeItem } from '../anime-item-utility.js';
+import { tryInitializeAnimeModel } from '../anime-model.js';
+import { nuucastBaseUrl } from '../constants.js';
+import { ProgressStatus } from '../nui/progress-status/progress-status.js';
 
 async function loadAnimeViewPage(malId: number) {
   const container = document.querySelector<HTMLElement>('.content-container');

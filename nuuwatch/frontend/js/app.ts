@@ -1,7 +1,7 @@
-import { loadMainPage } from './main-page.js';
-import loadAnimeViewPage from './anime-page.js';
+import { loadMainPage } from './pages/home-page.js';
+import loadAnimeViewPage from './pages/anime-page.js';
 import { hidePopover } from './popover.js';
-import { getCurrentRoute } from './router.js';
+import { getCurrentRoute } from './routing/router.js';
 
 function router() {
   const [route, routes] = getCurrentRoute();

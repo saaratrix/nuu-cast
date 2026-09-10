@@ -1,21 +1,30 @@
-import { addItem, AnimeItem, appState, changeItem, ItemsKey, jikan } from './app-state.js';
-import { MALAnime } from './jikan/types/jikan.js';
-import { createAnimeItem } from './anime-item-utility.js';
-import { addItemModel, AnimeModel, Rating } from './anime-model.js';
+import { addItem, AnimeItem, appState, changeItem, ItemsKey, jikan } from '../app-state.js';
+import { MALAnime } from '../jikan/types/jikan.js';
+import { createAnimeItem } from '../anime-item-utility.js';
+import { addItemModel, AnimeModel, Rating } from '../anime-model.js';
+import { loadHTML } from '../routing/layout-loader.js';
 
 export function loadMainPage() {
-  let currentPage = 1;
-
-  // const container = document.querySelector('.content-container');
-  // if (!container) {
-  //   return;
-  // }
-
-  changeItem(undefined);
+  return;
+  const animeListContainer = document.querySelector('.animes-list');
   document.title = 'Nuuwatch';
   document.body.className = 'home-page';
-  // container.innerHTML = `<div class="items-container"></div>`;
-  // fetchCurrentSeason(currentPage).then();
+
+  console.log('starting to load page!');
+  const promise = !animeListContainer ? loadHTML('home', '.page-container') : Promise.resolve();
+
+  console.log('promise', promise);
+
+  promise.then(() => onPageLoaded()).catch((err) => {
+    console.log('Failed to load home page', err);
+  });
+}
+
+function onPageLoaded() {
+  console.log('page loaded');
+  let currentPage = 1;
+  changeItem(undefined);
+  fetchCurrentSeason(currentPage).then();
 }
 
 async function fetchCurrentSeason(currentPage: number) {
@@ -114,7 +123,7 @@ function sortItems() {
 }
 
 function renderAllItems() {
-  const itemsContainer = document.querySelector('.items-container');
+  const itemsContainer = document.querySelector('.animes-list');
   if (!itemsContainer) {
     return;
   }
@@ -144,20 +153,21 @@ function tryRenderItems(items: AnimeItem[], type: string, addLinebreak: boolean)
 
   const fragment = new DocumentFragment();
 
-  const itemsElement = document.createElement('div');
-  itemsElement.className = 'items';
-  itemsElement.dataset['type'] = type;
+  // const itemsElement = document.createElement('div');
+  // itemsElement.className = 'items';
+  // itemsElement.dataset['type'] = type;
 
-  if (addLinebreak) {
-    const linebreak = document.createElement('hr');
-    fragment.appendChild(linebreak);
-  }
+  // if (addLinebreak) {
+  //   const linebreak = document.createElement('hr');
+  //   fragment.appendChild(linebreak);
+  // }
 
   for (const item of items) {
-    itemsElement.appendChild(item.cardElement);
+    // itemsElement.appendChild(item.cardElement);
+    fragment.appendChild(item.cardElement);
   }
 
-  fragment.appendChild(itemsElement);
+  // fragment.appendChild(itemsElement);
   return fragment;
 }
 

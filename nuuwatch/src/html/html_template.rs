@@ -6,53 +6,67 @@ use crate::data_utility::data_utility::{
     NUUWATCH_API_URL,
 };
 
-pub struct Breadcrumb {
-    pub name: String,
-    pub url: String,
-}
-
 #[derive(Template)]
-#[template(path = "home.html")]
-pub struct HomeTemplate<'a> {
+#[template(path = "home_page.html")]
+pub struct HomePageTemplate<'a> {
     pub title: &'a str,
     pub scripts_url: Option<&'a str>,
 
     pub nuucast_api_url: &'a str,
     pub nuuwatch_api_url: &'a str,
-
-    pub breadcrumbs: Vec<Breadcrumb>,
 }
 
-fn breadcrumbs(path: &PathBuf) -> Vec<Breadcrumb> {
-    let mut result = Vec::new();
-    let mut accumulated = String::new();
-
-    for component in path.components() {
-        if let Component::Normal(segment) = component {
-            let name = segment.to_string_lossy();
-
-            accumulated.push('/');
-            accumulated.push_str(&name);
-
-            result.push(Breadcrumb {
-                name: name.into_owned(),
-                url: accumulated.clone(),
-            });
-        }
-    }
-
-    result
+#[derive(Template)]
+#[template(path = "home.html")]
+pub struct HomeTemplate {
 }
 
-pub fn get_browser_html() -> String {
-    HomeTemplate {
+#[derive(Template)]
+#[template(path = "anime_page.html")]
+pub struct AnimePageTemplate<'a> {
+    pub title: &'a str,
+    pub scripts_url: Option<&'a str>,
+
+    pub nuucast_api_url: &'a str,
+    pub nuuwatch_api_url: &'a str,
+}
+
+#[derive(Template)]
+#[template(path = "anime.html")]
+pub struct AnimeTemplate {
+}
+
+
+pub fn get_home_page_html() -> String {
+    HomePageTemplate {
         title: "Nuuwatch",
         scripts_url: None,
 
         nuucast_api_url: &NUUCAST_API_URL,
         nuuwatch_api_url: &NUUWATCH_API_URL,
-
-        breadcrumbs: breadcrumbs(&PathBuf::from("")),
     }
         .render().unwrap()
+}
+
+pub fn get_home_html() -> String {
+    HomeTemplate {
+        // 🐾
+    }.render().unwrap()
+}
+
+pub fn get_anime_page_html() -> String {
+    AnimePageTemplate {
+        title: "An Anime",
+        scripts_url: None,
+
+        nuucast_api_url: &NUUCAST_API_URL,
+        nuuwatch_api_url: &NUUWATCH_API_URL,
+    }
+        .render().unwrap()
+}
+
+pub fn get_anime_html() -> String {
+    AnimeTemplate {
+        // 🐾
+    }.render().unwrap()
 }
