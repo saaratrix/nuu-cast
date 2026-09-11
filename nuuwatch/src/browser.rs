@@ -9,6 +9,6 @@ use axum::{
 };
 
 pub async fn browse() -> Response {
-    let html = get_anime_page_html();
+    let html = get_home_page_html();
     (StatusCode::OK, Html(html)).into_response()
 }

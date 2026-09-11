@@ -3,7 +3,7 @@
 @use "theme-colors";
 @use "utility";
 @use "buttons";
-@use "home";
+@use "home-page";
 @use "anime-page";
 
 @font-face {
@@ -52,6 +52,15 @@ body {
     grid-template-rows: auto 1fr;
     min-height: 100vh;
     //padding: 0 0.5rem 0.5rem 0.5rem;
+}
+
+.bg-full {
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
 }
 
 .site-header {

@@ -17,12 +17,16 @@ $content-padding: 1rem;
 $sidebar-padding: 0.5rem;
 
 body.home-page {
-  background: url('../img/home.60.webp');
-  background-size: cover;
+  background: transparent;
 
   --opacity-bg-link: #{math.percentage($opacity-bg-link)};
   --opacity-left: #{math.percentage($opacity-left)};
   --opacity-right: #{math.percentage($opacity-right)};
+}
+
+.home-bg {
+  background: url('../img/home.60.webp');
+  background-size: cover;
 }
 
 .panel {
@@ -116,9 +120,11 @@ main {
   font-size: 0.85em;
 }
 
+.episodes-feed {
+  margin-top: 0.75rem;
+}
 
 .animes {
-  margin-top: 0.75rem;
   flex: 1;
 }
 

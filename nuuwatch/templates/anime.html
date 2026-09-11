@@ -9,7 +9,10 @@
 </div>
 
 <div class="content">
-  <section class="anime-info">
+  <div class="loading-content">
+    <progress-status active><p slot="content">Loading anime item ...</p></progress-status>
+  </div>
+  <section class="anime-info" hidden>
     <div class="anime-details">
       <img alt="Anime poster" class="poster">
       <h1 class="title">The best anime</h1>
@@ -47,7 +50,7 @@
       <span>Studio</span><span>The barkers.</span>
     </div>
   </section>
-  <section class="animes-body">
+  <section class="animes-body" hidden>
     <header class="tabs">
       <div>Episodes</div>
       <div>Secret</div>
@@ -87,3 +90,4 @@
     </div>
   </section>
 </div>
+<div class="anime-bg bg-full"></div>

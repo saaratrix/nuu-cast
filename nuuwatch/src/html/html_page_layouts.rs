@@ -2,9 +2,9 @@ use axum::extract::{Path, State};
 use axum::response::IntoResponse;
 use axum::{Router};
 use axum::http::StatusCode;
-use axum::routing::{get, patch, post, put};
+use axum::routing::{get};
 use crate::AppState;
-use crate::html::html_template::get_home_html;
+use crate::html::html_template::{get_anime_html, get_home_html};
 
 pub fn get_html_routes() -> Router<AppState> {
     let html_routes = Router::new()
@@ -18,7 +18,7 @@ async fn get_html_layout(State(state): State<AppState>,
 ) -> impl IntoResponse {
     let html = match layout.as_str() {
         "home" => get_home_html(),
-        "anime" => String::new(),
+        "anime" => get_anime_html(),
         _ => String::new(),
     };
 
