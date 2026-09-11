@@ -1,14 +1,22 @@
 type Layout = 'home' | 'anime';
 const layouts = new Map<Layout, string>();
 
-export function loadHTML(layout: Layout, targetSelector?: string): Promise<string> {
+export function loadHTML(layout: Layout, abortSignal: AbortSignal | null, targetSelector?: string): Promise<string> {
   let promise: Promise<string>;
 
   if (layouts.has(layout)) {
     promise = Promise.resolve(layouts.get(layout)!);
   } else {
+    if (targetSelector) {
+      const targetContainer = document.querySelector(targetSelector);
+      if (targetContainer) {
+        `<progress-status active><p slot="content">Loading ${layout} ...</p></progress-status>`;
+      }
+    }
+
     promise = fetch(`/html/${layout}`, {
       method: 'GET',
+      signal: abortSignal,
     }).then((response) => {
       if (!response.ok) {
         console.log(`Failed response for ${layout}`, response);

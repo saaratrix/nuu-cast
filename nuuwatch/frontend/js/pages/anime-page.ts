@@ -7,15 +7,36 @@ import { createAnimeItem } from '../anime-item-utility.js';
 import { tryInitializeAnimeModel } from '../anime-model.js';
 import { nuucastBaseUrl } from '../constants.js';
 import { ProgressStatus } from '../nui/progress-status/progress-status.js';
+import { loadHTML } from '../routing/layout-loader.js';
 
 async function loadAnimeViewPage(malId: number) {
-  const container = document.querySelector<HTMLElement>('.content-container');
-  if (!container) {
-    return gotoMain();
-  }
+  const pageContainer = document.querySelector('.page-container') as HTMLElement;
+  let animesBody: HTMLElement | null = pageContainer.querySelector('.animes-body');
+  let animeInfo: HTMLElement | null = null;
+  let loadingContent: HTMLElement | null = null;
 
   document.body.className = 'anime-page';
-  container.innerHTML = `<progress-status active><p slot="content">Loading ...</p></progress-status>`
+
+  const abortController = new AbortController();
+  // This can be pending in the background while we continue to load more.
+  // If this finishes first the HTML will have a loading spinner that it's waiting for the rest.
+  let loadHTMLPromise: Promise<void> | Promise<string>;
+  if (!animesBody) {
+    loadHTMLPromise = loadHTML('anime', abortController.signal, '.page-container');
+  } else {
+    loadHTMLPromise = Promise.resolve();
+    animeInfo = pageContainer.querySelector('.anime-info') as HTMLElement;
+    loadingContent = pageContainer.querySelector('.loading-content') as HTMLElement;
+
+    loadingContent.removeAttribute('hidden');
+    animeInfo.setAttribute('hidden', '');
+    animesBody.setAttribute('hidden', '');
+  }
+
+  loadHTMLPromise.catch(() => {
+    abortController.abort("Failed to load html");
+    gotoMain();
+  });
 
   loadModules('anime').then(result => console.log(`${result ? 'succesfully loaded' : 'failed to load'} module anime `));
   loadModules('crunchyroll').then(result => console.log(`${result ? 'succesfully loaded' : 'failed to load'} module crunchyroll`));
@@ -36,7 +57,8 @@ async function loadAnimeViewPage(malId: number) {
       return;
     }
   } catch (e) {
-    container.innerHTML = `
+    abortController.abort('Failed to load mal item');
+    pageContainer.innerHTML = `
       <div class="error"><p>Failed to load anime from MAL: ${e}</p></div>
     `;
     changeItem(undefined);
@@ -47,40 +69,56 @@ async function loadAnimeViewPage(malId: number) {
     return gotoMain();
   }
 
-  container.innerHTML = `
-    <div class="anime-item-page">
-      <header>
-        <h1><a href="${animeItem.data.url}">${animeItem.titleEscaped}</a></h1>
-      </header>
-      <section class="anime-info">
-        <div>
-            ${animeItem.parts.rating} - ${animeItem.parts.airing}
-        </div>
-        <div>
-            <img src="${escapeHtml(animeItem.parts.imageUrl)}" width="128" height="128" >
-        </div>
-        <div>
-            <button class="edit-button">Edit anime</button>
-        </div>
-        <div class="content"></div>
-      </section>
-      <section class="media">
-        <h1>Videos</h1>
-        <progress-status active size="1.5em">
-            <span slot="content">Loading videos...</span>
-        </progress-status>
-        <div class="media-videos"></div>
-      </section>
-      <section class="modules">
-        <div class="module-content"></div>
-      </section>
-    </div>
-  `;
+  await loadHTMLPromise;
 
-  const editButton = container.querySelector('.edit-button');
-  editButton?.addEventListener('click', () => openEditor(animeItem));
+  loadingContent ||= pageContainer.querySelector('.loading-content');
+  animeInfo ||= pageContainer.querySelector('.anime-info');
+  animesBody ||= pageContainer.querySelector('.animes-body');
 
-  animeItem.eventHandler.addEventListener('media:updated', 'anime-media', () => updateMediaSection(animeItem, container), true);
+  if (!animeInfo || !animesBody || !loadingContent) {
+    console.log('missing animeInfo container', animeInfo, 'or body', animesBody, 'or loading content', loadingContent);
+    return gotoMain();
+  }
+
+  loadingContent.setAttribute('hidden', '');
+  animeInfo.removeAttribute('hidden');
+  animesBody.removeAttribute('hidden');
+
+
+  // container.innerHTML = `
+  //   <div class="anime-item-page">
+  //     <header>
+  //       <h1><a href="${animeItem.data.url}">${animeItem.titleEscaped}</a></h1>
+  //     </header>
+  //     <section class="anime-info">
+  //       <div>
+  //           ${animeItem.parts.rating} - ${animeItem.parts.airing}
+  //       </div>
+  //       <div>
+  //           <img src="${escapeHtml(animeItem.parts.imageUrl)}" width="128" height="128" >
+  //       </div>
+  //       <div>
+  //           <button class="edit-button">Edit anime</button>
+  //       </div>
+  //       <div class="content"></div>
+  //     </section>
+  //     <section class="media">
+  //       <h1>Videos</h1>
+  //       <progress-status active size="1.5em">
+  //           <span slot="content">Loading videos...</span>
+  //       </progress-status>
+  //       <div class="media-videos"></div>
+  //     </section>
+  //     <section class="modules">
+  //       <div class="module-content"></div>
+  //     </section>
+  //   </div>
+  // `;
+
+  // const editButton = container.querySelector('.edit-button');
+  // editButton?.addEventListener('click', () => openEditor(animeItem));
+
+  // animeItem.eventHandler.addEventListener('media:updated', 'anime-media', () => updateMediaSection(animeItem, animeBody), true);
 
   changeItem(malId);
   updateMediaFiles(animeItem);

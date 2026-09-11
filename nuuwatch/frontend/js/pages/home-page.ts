@@ -5,13 +5,12 @@ import { addItemModel, AnimeModel, Rating } from '../anime-model.js';
 import { loadHTML } from '../routing/layout-loader.js';
 
 export function loadMainPage() {
-  return;
   const animeListContainer = document.querySelector('.animes-list');
   document.title = 'Nuuwatch';
   document.body.className = 'home-page';
 
   console.log('starting to load page!');
-  const promise = !animeListContainer ? loadHTML('home', '.page-container') : Promise.resolve();
+  const promise = !animeListContainer ? loadHTML('home', null, '.page-container') : Promise.resolve();
 
   console.log('promise', promise);
 
