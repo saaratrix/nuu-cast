@@ -13,13 +13,16 @@
     <progress-status active><p slot="content">Loading anime item ...</p></progress-status>
   </div>
   <section class="anime-info" hidden>
-    <div class="anime-details">
+    <div class="anime-details panel">
       <img alt="Anime poster" class="poster">
-      <h1 class="title">The best anime</h1>
+      <h1 class="anime-title">The best anime</h1>
       <div class="basics">
         <span class="runtime">2020 - 2023</span>
         <span class="seasons">3 Seasons</span>
-        <span class="tags">Romance, Comedy</span>
+        <span class="airing">19:00 Mondays</span>
+      </div>
+      <div class="tags">
+        <span class="tag tag-ghost">Romance</span><span class="tag tag-ghost">Comedy</span><span class="tag tag-ghost">Barking</span><span class="tag tag-ghost">Mystery</span><span class="tag tag-ghost">Puzzles</span><span class="tag tag-ghost">Enlightment</span>
       </div>
       <div class="synopsis">
         This anime is simply the best. It has the best footage, the best jokes, the best romance.
@@ -32,9 +35,8 @@
         😭
       </div>
     </div>
-    <div>
-      <p>Some other information??</p>
-      <button class="btn btn-primary active">
+    <div class="continue-play-sidebar">
+      <button class="btn btn-primary active continue-play-btn">
         <div class="continue-play">▶</div>
         <div class="continue-details">
           <strong>Continue Watching</strong>
@@ -42,48 +44,165 @@
         </div>
       </button>
     </div>
-    <div class="series-details">
-      <span>Type</span><span>TV</span>
-      <span>Status</span><span>Finished Airing</span>
-      <span>Aired</span><span>Winter 2020 - Summer 2023</span>
-      <span>Seasons</span><span>3</span>
-      <span>Studio</span><span>The barkers.</span>
+    <div class="series-details panel">
+      <span class="attribute">Type</span><span>TV</span>
+      <span class="attribute">Status</span><span>Finished Airing</span>
+      <span class="attribute">Aired</span><span>Winter 2020 - Summer 2023</span>
+      <span class="attribute">Seasons</span><span>3</span>
+      <span class="attribute">Studio</span><span>The Barkers</span>
     </div>
   </section>
-  <section class="animes-body" hidden>
+  <section class="anime-body" hidden>
     <header class="tabs">
-      <div>Episodes</div>
-      <div>Secret</div>
+      <div class="tab active">Episodes</div>
+      <div class="tab">Secret</div>
     </header>
     <div class="episodes-content">
       <div class="seasons active">
-        <div class="season" data-season="1">
-          <h3>Season 1</h3>
-          <p>The beginning</p>
+        <div class="season active" data-season="1">
+          <h3 class="season-title">Season 1</h3>
+          <p class="season-episode-count">5 episodes</p>
         </div>
         <div class="season" data-season="2">
-          <h3>Season 2</h3>
-          <p>The journey</p>
+          <h3 class="season-title">Season 2</h3>
+          <p class="season-episode-count">3 episodes</p>
         </div>
         <div class="season" data-season="3">
-          <h3>Season 3</h3>
-          <p>The culmination, epic finale</p>
+          <h3 class="season-title">Season 3</h3>
+          <p class="season-episode-count">666 episodes</p>
         </div>
       </div>
       <div class="episode-list">
-        <header class="episode-row"></header>
-        <article class="episode-row">
-          <span>1</span>
-          <img alt="Image for episode 1">
-          <h3>The start to let it become epic</h3>
-          <time datetime="PT24M">24m</time>
+<!--        <header class="episode-row">-->
+<!--          <span>#</span>-->
+<!--          <span></span>-->
+<!--          <span>Title</span>-->
+<!--          <span>Duration</span>-->
+<!--          <span>Quality</span>-->
+<!--          <span>Status</span>-->
+<!--          <span>Actions</span>-->
+<!--        </header>-->
+        <article class="episode-row watched">
+          <span class="episode-number">1</span>
+          <img class="episode-preview" src="/anime/malimage/1371/154308.webp" alt="Image for episode 1">
+          <h3 class="episode-title">The start to let it become epic</h3>
+          <time class="duration" datetime="PT24M">24m</time>
           <div class="quality">
-            <span>1080p</span>
+            <span class="tag tag-ghost">1080p</span>
           </div>
-          <div>✅ Watched</div>
+          <div class="episode-status">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="9" fill="currentColor" opacity="0.16"/>
+              <path d="M8 12.2l2.6 2.6L16.5 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Watched
+          </div>
           <div>
-            <button>▶</button>
-            <button>...</button>
+            <button class="btn btn-primary episode-actions">…</button>
+          </div>
+        </article>
+        <article class="episode-row current">
+          <span class="episode-number">2</span>
+          <img class="episode-preview" src="/anime/malimage/1371/154308.webp" alt="Image for episode 2">
+          <h3 class="episode-title">It's getting epic in here</h3>
+          <time class="duration" datetime="PT25M">25m</time>
+          <div class="quality">
+            <span class="tag tag-ghost">1080p</span>
+          </div>
+          <div class="episode-status">
+            <?xml version="1.0"?>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40">
+              <circle cx="20" cy="20" r="18.5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M16.25 12.55 C15.58 12.14 14.75 12.62 14.75 13.41 V26.59 C14.75 27.38 15.58 27.86 16.25 27.45 L28.15 20.86 C28.82 20.49 28.82 19.51 28.15 19.14 Z" fill="currentColor"/>
+            </svg>
+            Current
+          </div>
+          <div>
+            <button class="btn btn-primary episode-actions">…</button>
+          </div>
+        </article>
+        <article class="episode-row unwatched">
+          <span class="episode-number">3</span>
+          <img class="episode-preview" src="/anime/malimage/1371/154308.webp" alt="Preview">
+          <h3 class="episode-title">The dogs are barking epicly</h3>
+          <time class="duration" datetime="PT23M">23m</time>
+          <div class="quality">
+            <span class="tag tag-ghost">720p</span>
+            <span class="tag tag-ghost">1080p</span>
+          </div>
+          <div class="episode-status">
+            <?xml version="1.0"?>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+              <path d="M8.2 5.85 C7.45 5.39 6.5 5.93 6.5 6.81 V17.19 C6.5 18.07 7.45 18.61 8.2 18.15 L16.95 12.88 C17.7 12.43 17.7 11.57 16.95 11.12 Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+            </svg>
+            Slörbgæbbel
+          </div>
+          <div>
+            <button class="btn btn-primary episode-actions">…</button>
+          </div>
+        </article>
+        <article class="episode-row unavailable">
+          <span class="episode-number">4</span>
+          <img class="episode-preview" src="/static/img/unavailable.webp" alt="Episode not available thumbnail.">
+          <h3 class="episode-title">Oooh it's gonna be epic alright!</h3>
+          <time class="duration" datetime="PT23M">23m</time>
+          <div class="quality"></div>
+          <div class="episode-status">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="24" viewBox="0 0 32 24" fill="none">
+              <path
+                d="M10.2 19H8.5
+                 C5.46 19 3 16.54 3 13.5
+                 C3 10.46 5.46 8 8.5 8
+                 C9.30 4.55 12.40 2 16 2
+                 C19.60 2 22.70 4.55 23.50 8
+                 C26.54 8 29 10.46 29 13.5
+                 C29 16.54 26.54 19 23.5 19
+                 H21.8"
+                stroke="currentColor"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M16 9V20 M11.8 15.8L16 20L20.2 15.8"
+                stroke="currentColor"
+                stroke-width="2.6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            Unavailable
+          </div>
+          <div>
+            <button class="btn btn-primary episode-actions">…</button>
+          </div>
+        </article>
+        <article class="episode-row not-released">
+          <span class="episode-number">5</span>
+          <img class="episode-preview" src="/static/img/not_released.webp" alt="Episode not released thumbnail.">
+          <h3 class="episode-title">It sure was epic, now climax time!</h3>
+          <time class="duration" datetime="PT23M"></time>
+          <div class="quality"></div>
+          <div class="episode-status">
+            <?xml version="1.0"?>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 114 128" width="114" height="128">
+              <title>Lock icon with keyhole</title>
+              <defs>
+                <mask id="keyholeCutout">
+                  <rect width="114" height="128" fill="white"/>
+                  <circle cx="58" cy="68" r="6.5" fill="black"/>
+                  <path d="M54.8 72.5h6.4l-1.2 13h-4z" fill="black"/>
+                </mask>
+              </defs>
+              <!-- Shackle -->
+              <path d="M36 48V34C36 21.85 45.85 12 58 12s22 9.85 22 22v14" fill="none" stroke="currentColor" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+              <!-- Body with true transparent keyhole cutout -->
+              <rect x="24" y="43" width="68" height="55" rx="8" fill="currentColor" mask="url(#keyholeCutout)"/>
+            </svg>
+            Not released
+          </div>
+          <div>
+            <button class="btn btn-primary episode-actions" disabled>…</button>
           </div>
         </article>
       </div>

@@ -11,7 +11,7 @@ import { loadHTML } from '../routing/layout-loader.js';
 
 async function loadAnimeViewPage(malId: number) {
   const pageContainer = document.querySelector('.page-container') as HTMLElement;
-  let animesBody: HTMLElement | null = pageContainer.querySelector('.animes-body');
+  let animeBody: HTMLElement | null = pageContainer.querySelector('.anime-body');
   let animeInfo: HTMLElement | null = null;
   let loadingContent: HTMLElement | null = null;
 
@@ -21,7 +21,7 @@ async function loadAnimeViewPage(malId: number) {
   // This can be pending in the background while we continue to load more.
   // If this finishes first the HTML will have a loading spinner that it's waiting for the rest.
   let loadHTMLPromise: Promise<void> | Promise<string>;
-  if (!animesBody) {
+  if (!animeBody) {
     loadHTMLPromise = loadHTML('anime', abortController.signal, '.page-container');
   } else {
     loadHTMLPromise = Promise.resolve();
@@ -30,7 +30,7 @@ async function loadAnimeViewPage(malId: number) {
 
     loadingContent.removeAttribute('hidden');
     animeInfo.setAttribute('hidden', '');
-    animesBody.setAttribute('hidden', '');
+    animeBody.setAttribute('hidden', '');
   }
 
   loadHTMLPromise.catch(() => {
@@ -73,16 +73,16 @@ async function loadAnimeViewPage(malId: number) {
 
   loadingContent ||= pageContainer.querySelector('.loading-content');
   animeInfo ||= pageContainer.querySelector('.anime-info');
-  animesBody ||= pageContainer.querySelector('.animes-body');
+  animeBody ||= pageContainer.querySelector('.anime-body');
 
-  if (!animeInfo || !animesBody || !loadingContent) {
-    console.log('missing animeInfo container', animeInfo, 'or body', animesBody, 'or loading content', loadingContent);
+  if (!animeInfo || !animeBody || !loadingContent) {
+    console.log('missing animeInfo container', animeInfo, 'or body', animeBody, 'or loading content', loadingContent);
     return gotoMain();
   }
 
   loadingContent.setAttribute('hidden', '');
   animeInfo.removeAttribute('hidden');
-  animesBody.removeAttribute('hidden');
+  animeBody.removeAttribute('hidden');
 
 
   // container.innerHTML = `
@@ -115,11 +115,15 @@ async function loadAnimeViewPage(malId: number) {
   //   </div>
   // `;
 
+
   // const editButton = container.querySelector('.edit-button');
   // editButton?.addEventListener('click', () => openEditor(animeItem));
 
-  // animeItem.eventHandler.addEventListener('media:updated', 'anime-media', () => updateMediaSection(animeItem, animeBody), true);
+  updateAnimeInfo(animeInfo, animeItem);
+  updateAnimeBody(animeBody, animeItem);
+  updateBackground();
 
+  // animeItem.eventHandler.addEventListener('media:updated', 'anime-media', () => updateMediaSection(animeItem, animeBody), true);
   changeItem(malId);
   updateMediaFiles(animeItem);
 }
@@ -138,6 +142,19 @@ async function getMalAnimeItem(malId: number): Promise<AnimeItem> {
   }
 
   return loadMalItem(malId);
+}
+
+function updateAnimeInfo(animeInfo: HTMLElement, animeItem: AnimeItem) {
+  const poster = animeInfo.querySelector('.poster') as HTMLImageElement;
+  poster.src = animeItem.parts.imageUrl;
+}
+
+function updateAnimeBody(animeBody: HTMLElement, animeItem: AnimeItem) {
+
+}
+
+function updateBackground() {
+
 }
 
 async function loadMalItem(malId: number): Promise<AnimeItem> {

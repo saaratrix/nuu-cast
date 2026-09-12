@@ -3,6 +3,7 @@
 @use "theme-colors";
 @use "utility";
 @use "buttons";
+@use "tag";
 @use "home-page";
 @use "anime-page";
 
@@ -167,9 +168,6 @@ body {
 a {
     color: var(--color-link);
     text-decoration: none;
-}
-a:visited {
-    color: var(--color-link-visited);
 }
 a:hover {
     color: var(--color-link-hover);

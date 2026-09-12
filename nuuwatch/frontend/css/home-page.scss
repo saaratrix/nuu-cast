@@ -19,6 +19,9 @@ $sidebar-padding: 0.5rem;
 body.home-page {
   background: transparent;
 
+  --fallback-bg-link-active: color.change(theme-colors.$link-active, $alpha: $opacity-bg-link);
+  --fallback-bg-link-hover: color.change(theme-colors.$link-hover, $alpha: $opacity-bg-link);
+
   --opacity-bg-link: #{math.percentage($opacity-bg-link)};
   --opacity-left: #{math.percentage($opacity-left)};
   --opacity-right: #{math.percentage($opacity-right)};
@@ -72,18 +75,18 @@ main {
   &.active {
     color: var(--color-text-primary);
     // Older browsers doesn't get dynamic theme for some things :(
-    background-color: color.change(theme-colors.$link-active, $alpha: $opacity-bg-link);
+    background-color: var(--fallback-bg-link-active);
     background-color: rgb(from var(--color-link-active) r g b / var(--opacity-bg-link));
   }
 
   &:hover:not(.active) {
     color: var(--color-text-primary);
-    background-color: color.change(theme-colors.$link-hover, $alpha: $opacity-bg-link);
+    background-color: var(--fallback-bg-link-active);
     background-color: rgb(from var(--color-link-hover) r g b / var(--opacity-bg-link));
   }
 }
 
-.content {
+.home-page .content {
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;
