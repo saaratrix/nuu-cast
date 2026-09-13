@@ -9,6 +9,8 @@ $basics-gap: 0.25rem;
 $panel-padding: 1rem;
 $left-accent-width: 4px;
 
+
+
 body.anime-page {
   // These are for the left sidebar
   --fallback-bg-link-active: color.change(theme-colors.$link-active, $alpha: $opacity-bg-link);
@@ -18,43 +20,14 @@ body.anime-page {
   --opacity-left: #{math.percentage($opacity-left)};
   --opacity-right: #{math.percentage($opacity-right)};
 
-  background:
-    /* bottom-center red glow */
-    radial-gradient(
-            ellipse 38% 35% at 58% 102%,
-            rgba(150, 14, 38, 0.32) 0%,
-            rgba(100, 10, 29, 0.18) 38%,
-            transparent 75%
-    ),
+  background: transparent;
 
-    /* left-bottom red glow */
-    radial-gradient(
-            ellipse 30% 42% at -2% 73%,
-            rgba(113, 16, 36, 0.26) 0%,
-            rgba(67, 12, 27, 0.14) 45%,
-            transparent 78%
-    ),
-
-    /* upper-right subtle red haze */
-    radial-gradient(
-            ellipse 34% 28% at 89% 7%,
-            rgba(94, 16, 31, 0.2) 0%,
-            rgba(55, 12, 24, 0.1) 45%,
-            transparent 75%
-    ),
-
-    /* slight cool center illumination */
-    radial-gradient(
-            ellipse 55% 60% at 48% 45%,
-            rgba(32, 34, 44, 0.22) 0%,
-            transparent 70%
-    ),
-
-    #0c0d12;
-
+  background: url('../img/anime.30.webp');
+  background-size: cover;
   //background: url('../img/home.60.webp');
   //background-size: cover;
 }
+
 
 .anime-page .content {
   display: flex;
@@ -134,6 +107,10 @@ body.anime-page {
 .anime-body {
   max-width: 850px;
   flex: 1 1 auto;
+  padding: $panel-padding;
+
+  background: color.change(theme-colors.$bg-primary, $alpha: $opacity-left);
+  background: rgb(from var(--color-bg-primary) r g b / var(--opacity-left));
 
   .tabs {
     display: flex;
@@ -212,12 +189,16 @@ body.anime-page {
   padding: 0.33rem 1rem;
   cursor: pointer;
 
+  &:nth-child(odd) {
+    background-color: rgb(from var(--color-bg-primary) r g b / 40%);
+  }
+
   &:nth-child(even) {
-    background-color: var(--color-bg-secondary);
+    background-color: rgb(from var(--color-bg-secondary) r g b / 40%);
   }
 
   &:hover:not(.not-released) {
-    background-color: var(--color-bg-tertiary);
+    background-color: rgb(from var(--color-bg-tertiary) r g b / 40%);
   }
 
   & > * {
@@ -257,6 +238,18 @@ body.anime-page {
 .watched {
   border-left: $left-accent-width solid var(--color-success);
 
+  &:nth-child(odd) {
+    background-color: rgb(from color-mix(in srgb, var(--color-bg-primary) 90%, var(--color-success) 10%) r g b / 40%);
+  }
+
+  &:nth-child(even) {
+    background-color: rgb(from color-mix(in srgb, var(--color-bg-secondary) 90%, var(--color-success) 10%) r g b / 40%);
+  }
+
+  &:hover:not(.not-released) {
+    background-color: rgb(from color-mix(in srgb, var(--color-bg-tertiary) 90%, var(--color-success) 10%) r g b / 40%);
+  }
+
   .episode-status {
     color: var(--color-success);
     svg {
@@ -268,6 +261,18 @@ body.anime-page {
 
 .current {
   border-left: $left-accent-width solid var(--color-primary);
+
+  &:nth-child(odd) {
+    background-color: rgb(from color-mix(in srgb, var(--color-bg-primary) 90%, var(--color-primary) 10%) r g b / 40%);
+  }
+
+  &:nth-child(even) {
+    background-color: rgb(from color-mix(in srgb, var(--color-bg-secondary) 90%, var(--color-primary) 10%) r g b / 40%);
+  }
+
+  &:hover:not(.not-released) {
+    background-color: rgb(from color-mix(in srgb, var(--color-bg-tertiary) 90%, var(--color-primary) 10%) r g b / 40%);
+  }
 
   .episode-status {
     color: var(--color-link);
@@ -289,6 +294,19 @@ body.anime-page {
 .unavailable {
   color: var(--color-text-muted);
   border-left: $left-accent-width solid var(--color-warning);
+
+  &:nth-child(odd) {
+    background-color: rgb(from color-mix(in srgb, var(--color-bg-primary) 90%, var(--color-warning) 10%) r g b / 40%);
+  }
+
+  &:nth-child(even) {
+    background-color: rgb(from color-mix(in srgb, var(--color-bg-secondary) 90%, var(--color-warning) 10%) r g b / 40%);
+  }
+
+  &:hover:not(.not-released) {
+    background-color: rgb(from color-mix(in srgb, var(--color-bg-tertiary) 90%, var(--color-warning) 10%) r g b / 40%);
+  }
+
   .episode-preview {
     filter: saturate(0.5) brightness(0.8) contrast(0.8) blur(2px);
   }

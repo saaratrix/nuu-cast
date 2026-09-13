@@ -1,0 +1,323 @@
+// A fair bit of this was just quick and dirty ai-prototype and some tweaks to see if it looks OK.
+// It has a nice vibe to it, so will come back to it later but takes time to properly setup sizes, paths etc.
+
+$metaball-light: rgba(150, 14, 38, 0.32);
+$metaball-dark: rgba(100, 10, 29, 0.18);
+
+#bg-full {
+  //display: none;
+  /* This creates the "gooey" metaball merge */
+  filter: blur(50px) contrast(1);
+  background:
+          /* bottom-center red glow */
+          radial-gradient(
+                  ellipse 38% 35% at 58% 102%,
+                  rgba(150, 14, 38, 0.32) 0%,
+                  rgba(100, 10, 29, 0.18) 38%,
+                  transparent 75%
+          ),
+
+            /* left-bottom red glow */
+          radial-gradient(
+                  ellipse 30% 42% at -2% 73%,
+                  rgba(113, 16, 36, 0.26) 0%,
+                  rgba(67, 12, 27, 0.14) 45%,
+                  transparent 78%
+          ),
+
+            /* upper-right subtle red haze */
+          radial-gradient(
+                  ellipse 34% 28% at 89% 7%,
+                  rgba(94, 16, 31, 0.2) 0%,
+                  rgba(55, 12, 24, 0.1) 45%,
+                  transparent 75%
+          ),
+
+            /* slight cool center illumination */
+          radial-gradient(
+                  ellipse 55% 60% at 48% 45%,
+                  rgba(32, 34, 44, 0.22) 0%,
+                  transparent 70%
+          ),
+
+          #0c0d12;
+}
+}
+
+.metaball {
+  position: absolute;
+
+  width: 260px;
+  height: 260px;
+
+  border-radius: 50%;
+  //background: var(--color-primary);
+
+  /* Important: don't set top/left globally anymore */
+  animation-duration: 60s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+/* --------------------------------------------------
+   TOP LEFT
+-------------------------------------------------- */
+
+.metaball:nth-child(1) {
+  width: 320px;
+  height: 320px;
+
+  top: -8%;
+  left: -5%;
+
+  background: $metaball-dark;
+
+  animation-name: metaball-1;
+  animation-duration: 62s;
+}
+
+/* --------------------------------------------------
+   TOP MIDDLE
+-------------------------------------------------- */
+
+.metaball:nth-child(2) {
+  width: 220px;
+  height: 220px;
+
+  top: -5%;
+  left: 42%;
+
+  background: $metaball-light;
+
+  animation-name: metaball-2;
+  animation-duration: 68s;
+  animation-delay: -17s;
+}
+
+/* --------------------------------------------------
+   TOP RIGHT
+-------------------------------------------------- */
+
+.metaball:nth-child(3) {
+  width: 280px;
+  height: 280px;
+
+  top: 2%;
+  right: -5%;
+
+  background: $metaball-dark;
+
+  animation-name: metaball-3;
+  animation-duration: 64s;
+  animation-delay: -31s;
+}
+
+/* --------------------------------------------------
+   BOTTOM LEFT
+-------------------------------------------------- */
+
+.metaball:nth-child(4) {
+  width: 240px;
+  height: 240px;
+
+  bottom: -5%;
+  left: 3%;
+
+  background: $metaball-light;
+
+  animation-name: metaball-4;
+  animation-duration: 71s;
+  animation-delay: -9s;
+}
+
+/* --------------------------------------------------
+   BOTTOM MIDDLE
+-------------------------------------------------- */
+
+.metaball:nth-child(5) {
+  width: 300px;
+  height: 300px;
+
+  bottom: -10%;
+  left: 43%;
+
+  background: $metaball-dark;
+
+  animation-name: metaball-5;
+  animation-duration: 66s;
+  animation-delay: -42s;
+}
+
+/* --------------------------------------------------
+   BOTTOM RIGHT
+-------------------------------------------------- */
+
+.metaball:nth-child(6) {
+  width: 340px;
+  height: 340px;
+
+  bottom: -8%;
+  right: -7%;
+
+  background: $metaball-light;
+
+  animation-name: metaball-6;
+  animation-duration: 74s;
+  animation-delay: -23s;
+}
+
+
+/* ==================================================
+   INDIVIDUAL MOVEMENT PATHS
+================================================== */
+
+
+/* top-left -> bottom-right */
+
+@keyframes metaball-1 {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  22% {
+    transform: translate(24vw, 20vh);
+  }
+
+  48% {
+    transform: translate(44vw, 42vh);
+  }
+
+  72% {
+    transform: translate(65vw, 58vh);
+  }
+
+  100% {
+    transform: translate(82vw, 80vh);
+  }
+}
+
+
+/* top-middle -> bottom-ish left */
+
+@keyframes metaball-2 {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  20% {
+    transform: translate(-18vw, 18vh);
+  }
+
+  45% {
+    transform: translate(12vw, 38vh);
+  }
+
+  70% {
+    transform: translate(-25vw, 62vh);
+  }
+
+  100% {
+    transform: translate(-38vw, 82vh);
+  }
+}
+
+
+/* top-right -> bottom-left */
+
+@keyframes metaball-3 {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  23% {
+    transform: translate(-24vw, 16vh);
+  }
+
+  50% {
+    transform: translate(-45vw, 42vh);
+  }
+
+  76% {
+    transform: translate(-62vw, 60vh);
+  }
+
+  100% {
+    transform: translate(-82vw, 78vh);
+  }
+}
+
+
+/* bottom-left -> top-right */
+
+@keyframes metaball-4 {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  24% {
+    transform: translate(22vw, -22vh);
+  }
+
+  46% {
+    transform: translate(42vw, -38vh);
+  }
+
+  73% {
+    transform: translate(62vw, -62vh);
+  }
+
+  100% {
+    transform: translate(82vw, -82vh);
+  }
+}
+
+
+/* bottom-middle -> top-ish right */
+
+@keyframes metaball-5 {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  19% {
+    transform: translate(18vw, -20vh);
+  }
+
+  43% {
+    transform: translate(-10vw, -40vh);
+  }
+
+  67% {
+    transform: translate(24vw, -58vh);
+  }
+
+  100% {
+    transform: translate(38vw, -82vh);
+  }
+}
+
+
+/* bottom-right -> top-left */
+
+@keyframes metaball-6 {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  21% {
+    transform: translate(-20vw, -18vh);
+  }
+
+  47% {
+    transform: translate(-42vw, -42vh);
+  }
+
+  74% {
+    transform: translate(-64vw, -58vh);
+  }
+
+  100% {
+    transform: translate(-82vw, -80vh);
+  }
+}

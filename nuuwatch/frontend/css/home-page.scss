@@ -17,14 +17,14 @@ $content-padding: 1rem;
 $sidebar-padding: 0.5rem;
 
 body.home-page {
-  background: transparent;
-
   --fallback-bg-link-active: color.change(theme-colors.$link-active, $alpha: $opacity-bg-link);
   --fallback-bg-link-hover: color.change(theme-colors.$link-hover, $alpha: $opacity-bg-link);
 
   --opacity-bg-link: #{math.percentage($opacity-bg-link)};
   --opacity-left: #{math.percentage($opacity-left)};
   --opacity-right: #{math.percentage($opacity-right)};
+
+  background: transparent;
 }
 
 .home-bg {

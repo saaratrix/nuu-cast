@@ -23,15 +23,16 @@ pub struct CacheOptions {
 pub fn get_cache_key(url: &Url) -> Option<String> {
     let segments = url.path_segments()?;
 
-    let segments_key = segments.map(|s| s.to_string())
+    let mut segments_key = segments.map(|s| s.to_string())
         .collect::<Vec<_>>()
         .join("");
 
-    let query = &url.query().unwrap_or_else(||"").to_owned();
-    let sanitized_query = query.replace(&['&', '[', '?', '<', '>', ':', '*', '/', '\\', '|', '"'][..], "");
+    let sanitized_query = url.query().unwrap_or_else(||"").replace(&['&', '[', '?', '<', '>', ':', '*', '/', '\\', '|', '"'][..], "");
+
+    segments_key.push_str(&sanitized_query);
 
     Some(
-        segments_key + &sanitized_query
+        segments_key
     )
 }
 

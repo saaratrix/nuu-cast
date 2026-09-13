@@ -1,4 +1,4 @@
-import { AnimeItem, appState, changeItem, jikan, updateMediaFiles } from '../app-state.js';
+import { AnimeItem, AnimeItemParts, appState, changeItem, jikan, updateMediaFiles } from '../app-state.js';
 import { escapeHtml } from '../utility.js';
 import { loadModules } from '../module-handler.js';
 import { gotoRoute } from '../routing/router.js';
@@ -9,7 +9,22 @@ import { nuucastBaseUrl } from '../constants.js';
 import { ProgressStatus } from '../nui/progress-status/progress-status.js';
 import { loadHTML } from '../routing/layout-loader.js';
 
-async function loadAnimeViewPage(malId: number) {
+const useNewLoading = false;
+
+export async function loadAnimeViewPage(malId: number) {
+  if (useNewLoading) {
+    doNewDesignLoading(malId);
+  } else {
+    doOldLoading(malId);
+  }
+}
+
+function gotoMain() {
+  changeItem(undefined);
+  gotoRoute('main');
+}
+
+async function doNewDesignLoading(malId: number) {
   const pageContainer = document.querySelector('.page-container') as HTMLElement;
   let animeBody: HTMLElement | null = pageContainer.querySelector('.anime-body');
   let animeInfo: HTMLElement | null = null;
@@ -68,7 +83,6 @@ async function loadAnimeViewPage(malId: number) {
   if (!animeItem) {
     return gotoMain();
   }
-
   await loadHTMLPromise;
 
   loadingContent ||= pageContainer.querySelector('.loading-content');
@@ -84,41 +98,6 @@ async function loadAnimeViewPage(malId: number) {
   animeInfo.removeAttribute('hidden');
   animeBody.removeAttribute('hidden');
 
-
-  // container.innerHTML = `
-  //   <div class="anime-item-page">
-  //     <header>
-  //       <h1><a href="${animeItem.data.url}">${animeItem.titleEscaped}</a></h1>
-  //     </header>
-  //     <section class="anime-info">
-  //       <div>
-  //           ${animeItem.parts.rating} - ${animeItem.parts.airing}
-  //       </div>
-  //       <div>
-  //           <img src="${escapeHtml(animeItem.parts.imageUrl)}" width="128" height="128" >
-  //       </div>
-  //       <div>
-  //           <button class="edit-button">Edit anime</button>
-  //       </div>
-  //       <div class="content"></div>
-  //     </section>
-  //     <section class="media">
-  //       <h1>Videos</h1>
-  //       <progress-status active size="1.5em">
-  //           <span slot="content">Loading videos...</span>
-  //       </progress-status>
-  //       <div class="media-videos"></div>
-  //     </section>
-  //     <section class="modules">
-  //       <div class="module-content"></div>
-  //     </section>
-  //   </div>
-  // `;
-
-
-  // const editButton = container.querySelector('.edit-button');
-  // editButton?.addEventListener('click', () => openEditor(animeItem));
-
   updateAnimeInfo(animeInfo, animeItem);
   updateAnimeBody(animeBody, animeItem);
   updateBackground();
@@ -128,11 +107,82 @@ async function loadAnimeViewPage(malId: number) {
   updateMediaFiles(animeItem);
 }
 
-export default loadAnimeViewPage
+async function doOldLoading(malId: number) {
+  const container = document.querySelector<HTMLElement>('.page-container');
+  if (!container) {
+    return gotoMain();
+  }
 
-function gotoMain() {
-  changeItem(undefined);
-  gotoRoute('main');
+  document.body.className = 'anime-page';
+  container.innerHTML = `<progress-status active><p slot="content">Loading ...</p></progress-status>`
+
+  loadModules('anime').then(result => console.log(`${result ? 'succesfully loaded' : 'failed to load'} module anime `));
+  loadModules('crunchyroll').then(result => console.log(`${result ? 'succesfully loaded' : 'failed to load'} module crunchyroll`));
+
+  let animeItem: AnimeItem | undefined;
+  let itemChanged = false;
+  try {
+    const onChanged = () => {
+      itemChanged = true;
+    };
+    document.addEventListener('anime:itemChanged', onChanged, { once: true });
+
+    animeItem = await getMalAnimeItem(malId);
+    document.title = animeItem.title;
+    await tryInitializeAnimeModel(animeItem);
+    document.removeEventListener('anime:itemChanged', onChanged);
+    if (itemChanged) {
+      return;
+    }
+  } catch (e) {
+    container.innerHTML = `
+      <div class="error"><p>Failed to load anime from MAL: ${e}</p></div>
+    `;
+    changeItem(undefined);
+    return;
+  }
+
+  if (!animeItem) {
+    return gotoMain();
+  }
+
+  container.innerHTML = `
+    <div class="anime-item-page">
+      <header>
+        <h1><a href="${animeItem.data.url}">${animeItem.titleEscaped}</a></h1>
+      </header>
+      <section class="anime-info">
+        <div>
+            ${animeItem.parts.rating} - ${animeItem.parts.airing}
+        </div>
+        <div>
+            <img src="${escapeHtml(animeItem.parts.imageUrl)}" width="128" height="128" >
+        </div>
+        <div>
+            <button class="edit-button">Edit anime</button>
+        </div>
+        <div class="content"></div>
+      </section>
+      <section class="media">
+        <h1>Videos</h1>
+        <progress-status active size="1.5em">
+            <span slot="content">Loading videos...</span>
+        </progress-status>
+        <div class="media-videos"></div>
+      </section>
+      <section class="modules">
+        <div class="module-content"></div>
+      </section>
+    </div>
+  `;
+
+  const editButton = container.querySelector('.edit-button');
+  editButton?.addEventListener('click', () => openEditor(animeItem));
+
+  animeItem.eventHandler.addEventListener('media:updated', 'anime-media', () => updateMediaSection(animeItem, container), true);
+
+  changeItem(malId);
+  updateMediaFiles(animeItem);
 }
 
 async function getMalAnimeItem(malId: number): Promise<AnimeItem> {
