@@ -42,13 +42,20 @@ main {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
+
+  height: calc(100vh - #{variables.$header-height});
+  overflow-y: auto;
 }
 
 .sidebar {
   display: flex;
   flex-direction: column;
   gap: $panel-gap;
+  position: sticky;
+  top: 0;
+
   width: $sidebar-width;
+  max-height: 100%;
 }
 
 .navbar-side {
@@ -124,7 +131,7 @@ main {
 }
 
 .episodes-feed {
-  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
 }
 
 .animes {
