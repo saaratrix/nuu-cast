@@ -12,11 +12,16 @@ RUN rm src/*.rs
 FROM debian:trixie-slim AS runtime
 
 RUN apt-get update && apt-get install -y \
-  ca-certificates
+  ca-certificates ffmpeg mkvtoolnix \
+  && ffmpeg -version \
+  && mkvmerge --version
+
 RUN rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY --from=builder /app/target/release/nuucast /app/nuucast
+COPY --from=builder /app/templates ./templates
+COPY --from=builder /app/static ./static
 RUN mkdir -p /app/temp_files && chmod 777 /app/temp_files
 
 ENV PROJECT_ROOT=/app/
