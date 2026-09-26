@@ -1,6 +1,6 @@
-use std::env;
 use std::path::PathBuf;
 use axum::http::{HeaderMap, HeaderValue};
+use crate::data_utility::data_utility::NUUCAST_API_URL;
 
 #[derive(Clone)]
 pub struct NuucastClient {
@@ -10,7 +10,7 @@ pub struct NuucastClient {
 
 impl NuucastClient {
     pub fn new(client: reqwest::Client) -> Self {
-        let base_url = env::var("NUUCAST_API_BASE").unwrap_or("http://localhost:3000".into());
+        let base_url = NUUCAST_API_URL.clone();
 
         Self {
             client,

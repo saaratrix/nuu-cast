@@ -24,6 +24,7 @@ nuucast/media/*
 nuucast/temp_files/*
 nuuwatch/data/*
 nuuwatch/downloads/*
+nuuwatch/.env
 
 nuuwatch/frontend/css/*.css
 nuuwatch/frontend/css/*.css.map
@@ -41,3 +42,5 @@ nuuwatch/frontend/modules/local
 nuuwatch/src/modules/anime/other
 
 nuufetch
+
+deploy/rsync/rsync-variables.sh

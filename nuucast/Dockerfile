@@ -6,7 +6,15 @@ COPY templates ./templates
 COPY static ./static
 COPY src ./src
 
-RUN cargo build --release
+RUN --mount=type=cache,target=/usr/local/cargo/registry \
+    --mount=type=cache,target=/usr/local/cargo/git \
+    --mount=type=cache,target=/app/target \
+    cargo build --release && \
+    cp /app/target/release/nuucast /tmp/nuucast
+
+RUN mkdir -p /app/target/release && \
+    mv /tmp/nuucast /app/target/release/nuucast
+
 RUN rm src/*.rs
 
 FROM debian:trixie-slim AS runtime

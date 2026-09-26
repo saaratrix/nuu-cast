@@ -12,4 +12,7 @@ services:
         - ./data:/app/data
     environment:
       - RUST_LOG=info
+      - NUUWATCH_PROJECT_ROOT=/app/
+      - NUUCAST_API_URL=${NUUCAST_API_URL:-http://localhost:80}
+      - NUUWATCH_API_URL=${NUUWATCH_API_URL:-http://localhost:8080}
     restart: unless-stopped

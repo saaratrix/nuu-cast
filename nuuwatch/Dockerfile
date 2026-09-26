@@ -12,7 +12,16 @@ COPY --from=nuufetch /Cargo.toml ./nuufetch/Cargo.toml
 COPY --from=nuufetch /src ./nuufetch/src
 
 WORKDIR /app/nuuwatch
-RUN cargo build --release
+
+RUN --mount=type=cache,target=/usr/local/cargo/registry \
+    --mount=type=cache,target=/usr/local/cargo/git \
+    --mount=type=cache,target=/app/nuuwatch/target \
+    cargo build --release && \
+    cp /app/nuuwatch/target/release/nuuwatch /tmp/nuuwatch
+
+RUN mkdir -p /app/nuuwatch/target/release && \
+    mv /tmp/nuuwatch /app/nuuwatch/target/release/nuuwatch
+
 RUN rm src/*.rs
 
 FROM debian:trixie-slim AS runtime
@@ -25,9 +34,6 @@ WORKDIR /app
 COPY --from=builder /app/nuuwatch/target/release/nuuwatch ./nuuwatch
 COPY --from=builder /app/nuuwatch/templates ./templates
 COPY --from=builder /app/nuuwatch/static ./static
-
-ENV NUUWATCH_PROJECT_ROOT=/app/
-ENV NUUCAST_URL=http://localhost:80
 
 EXPOSE 3001
 CMD ["/app/nuuwatch"]

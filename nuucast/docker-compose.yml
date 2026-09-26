@@ -8,6 +8,4 @@ services:
       - ./media:/media:ro
     environment:
       - RUST_LOG=info
-      - SERVER_HOST=0.0.0.0
-      - SERVER_PORT=3000
     restart: unless-stopped
