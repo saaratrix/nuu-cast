@@ -31,6 +31,11 @@ async function fetchCurrentSeason(currentPage: number) {
   const { pagination, data } = res;
 
   if (!Array.isArray(data)) {
+    // Eg Jikan cached a bad response and it lives there in their cache.
+    if (currentPage > 1) {
+      return finishedFetchingCurrentSeason();
+    }
+
     document.body.innerHTML += 'no current season found';
     return;
   }
@@ -44,10 +49,14 @@ async function fetchCurrentSeason(currentPage: number) {
       fetchCurrentSeason(++currentPage).then();
     }, 0.5);
   } else {
-    onCurrentSeasonLoaded();
-    sortItems();
-    renderAllItems();
+    finishedFetchingCurrentSeason();
   }
+}
+
+function finishedFetchingCurrentSeason() {
+  onCurrentSeasonLoaded();
+  sortItems();
+  renderAllItems();
 }
 
 function onCurrentSeasonLoaded() {
