@@ -1,16 +1,20 @@
 use std::path::{Component, Path as StdPath};
+use std::str::FromStr;
 use axum::extract::{Path, Query, State};
 use axum::http::StatusCode;
 use axum::Json;
 use axum::response::{IntoResponse, Response};
 use serde::Deserialize;
 use crate::AppState;
-use crate::modules::anime::anime_request_cacher::{try_get_cached_mal_image, DATA_ANIME_ROOT};
+use crate::modules::anime::anime_request_cacher::{try_get_cached_mal_image, DATA_ANIME_ROOT, try_get_cached_ani_list_image, get_ani_list_image_path_from_url};
+use crate::modules::anime::api_shared::anime_api::AnimeApi;
+use crate::modules::anime::api_shared::anime_api_models::Season;
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct AnimeParams {
     #[serde(default = "default_page")]
-    page: u16
+    year: u16,
+    season: String,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -33,23 +37,22 @@ pub async fn handle_get_current_season(
     State(state): State<AppState>,
 ) -> impl IntoResponse {
     // params.page will be 1 by default (via serde default) or from URL ?page=2
-    let jikan = state.jikan;
-    let response = jikan.load_current_season(params.page).await.unwrap();
+    let season = Season::from_str(&params.season).unwrap();
+    let response = state.anime_api.load_season(params.year, season).await.unwrap();
     (StatusCode::OK, Json(response)).into_response()
 }
 
 pub async fn handle_get_season(
-    Path(year): Path<u32>,
-    Path(season): Path<u32>,
-    Query(params): Query<AnimeParams>,
+    Path((year, season)): Path<(u16, String)>,
     State(state): State<AppState>,
 ) -> impl IntoResponse {
-    (StatusCode::INTERNAL_SERVER_ERROR, "Not Implemented.").into_response()
+    let season = Season::from_str(&season).unwrap();
+    let response = state.anime_api.load_season(year, season).await.unwrap();
+    (StatusCode::OK, Json(response)).into_response()
 }
 
-pub async fn handle_load_anime_full(Path(mal_id): Path<u32>, State(state): State<AppState>,) -> impl IntoResponse {
-    let jikan = state.jikan;
-    let response = jikan.load_anime(mal_id).await.unwrap();
+pub async fn handle_load_anime_full(Path(id): Path<u32>, State(state): State<AppState>,) -> impl IntoResponse {
+    let response = state.anime_api.load_anime(id).await.unwrap();
     (StatusCode::OK, Json(response)).into_response()
 }
 
@@ -93,6 +96,44 @@ pub async fn handle_mal_image(Path(url) : Path<String>
     std::fs::write(&image_path, &bytes).expect("Failed to write image");
 
     if let Some(cached_response) = try_get_cached_mal_image(&url).await {
+        return cached_response;
+    }
+
+    (StatusCode::INTERNAL_SERVER_ERROR, "Failed to properly get image").into_response()
+}
+
+pub async fn handle_ani_list_image(Path((id, url)) : Path<(u32, String)>
+) -> Response {
+    let url = match url::Url::parse(&url) {
+        Ok(url) => url,
+        Err(_) => {
+            return (StatusCode::NOT_FOUND, "Image not found").into_response();
+        }
+    };
+
+    if let Some(cached_response) = try_get_cached_ani_list_image(id, &url).await {
+        return cached_response;
+    }
+
+    let (image_path, extension) = match get_ani_list_image_path_from_url(id, &url) {
+        Some(val) => val,
+        None => {
+            return (StatusCode::NOT_FOUND, "Could not parse AniList url").into_response();
+        }
+    };
+
+    println!("image_path: {:?}", image_path.display());
+    let response = reqwest::get(url.clone()).await.unwrap();
+    if !response.status().is_success() {
+        return (StatusCode::INTERNAL_SERVER_ERROR, "Unexpected error fetching AniList image.").into_response();
+    }
+
+    std::fs::create_dir_all(image_path.parent().unwrap()).ok();
+
+    let bytes = response.bytes().await.unwrap();
+    std::fs::write(&image_path, &bytes).expect("Failed to write image.");
+
+    if let Some(cached_response) = try_get_cached_ani_list_image(id, &url).await {
         return cached_response;
     }
 

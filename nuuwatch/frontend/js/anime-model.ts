@@ -4,7 +4,7 @@ import { AnimeItem, appState } from './app-state.js';
  * Modeled after the backend SQLite model.
  */
 export interface AnimeModel {
-  mal_id: number;
+  id: number;
   rating: Rating;
   comment: string;
   search_terms: string;
@@ -38,7 +38,7 @@ export interface ModelUpdatedEvent {
 
 let activePromises = new Map<number, Promise<AnimeModel>>
 
-export async function tryInitializeAnimeModel(item: AnimeItem) {
+export async function tryInitializeAnimeModel(item: AnimeItem<unknown>) {
   if (item.model) {
     return;
   }
@@ -47,7 +47,7 @@ export async function tryInitializeAnimeModel(item: AnimeItem) {
   addItemModel(item, model);
 }
 
-export function getAnimeModel(item: AnimeItem): Promise<AnimeModel> {
+export function getAnimeModel(item: AnimeItem<unknown>): Promise<AnimeModel> {
   if (item.model) {
     return Promise.resolve(item.model);
   }
@@ -70,7 +70,7 @@ export function getAnimeModel(item: AnimeItem): Promise<AnimeModel> {
   return promise;
 }
 
-export function addItemModel(item: AnimeItem, model: AnimeModel): void {
+export function addItemModel(item: AnimeItem<unknown>, model: AnimeModel): void {
   // In case of multiple pending calls we don't spam events!
   if (item.model) {
     return;
@@ -85,15 +85,15 @@ export function addItemModel(item: AnimeItem, model: AnimeModel): void {
   item.eventHandler.dispatchEvent('anime:modelUpdated', { id: item.id, model });
 }
 
-export function updateItemModel(item: AnimeItem, model: AnimeModel): void {
+export function updateItemModel(item: AnimeItem<unknown>, model: AnimeModel): void {
   item.model = model;
   appState.animeModels.set(item.id, model);
   item.eventHandler.dispatchEvent('anime:modelUpdated', { id: item.id, model });
 }
 
 
-export async function fetchAnimeModel(malId: number): Promise<AnimeModel | undefined> {
-  const response = await fetch(`/anime/view/${malId}`);
+export async function fetchAnimeModel(id: number): Promise<AnimeModel | undefined> {
+  const response = await fetch(`/anime/view/${id}`);
 
   if (response.status === 404) {
     return undefined
@@ -121,9 +121,9 @@ export function processModel(model: AnimeModel): void {
   }
 }
 
-export function createDefaultModel(malId: number): AnimeModel {
+export function createDefaultModel(id: number): AnimeModel {
   return {
-    mal_id: malId,
+    id: id,
     rating: Rating.NoRating,
     comment: '',
     episodes_watched: 0,
@@ -135,7 +135,7 @@ export function createDefaultModel(malId: number): AnimeModel {
   }
 }
 
-export async function insertOrUpdateModel(item: AnimeItem, model: AnimeModel): Promise<void> {
+export async function insertOrUpdateModel(item: AnimeItem<unknown>, model: AnimeModel): Promise<void> {
   const modules_data_json = JSON.stringify(model.modules_data);
   const payload = { ...model, modules_data: modules_data_json };
 
@@ -150,7 +150,7 @@ export async function insertOrUpdateModel(item: AnimeItem, model: AnimeModel): P
 }
 
 export async function putAnimeModel(model: AnimeModel): Promise<boolean> {
-  const response = await fetch(`/anime/view/${model.mal_id}`, {
+  const response = await fetch(`/anime/view/${model.id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -167,7 +167,7 @@ export async function putAnimeModel(model: AnimeModel): Promise<boolean> {
 }
 
 export async function patchAnimeModel(model: AnimeModel): Promise<boolean> {
-  const response = await fetch(`/anime/view/${model.mal_id}`, {
+  const response = await fetch(`/anime/view/${model.id}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",

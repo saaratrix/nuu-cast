@@ -20,11 +20,11 @@ export function getCurrentRoute(): [Routes, unknown[] | undefined]  {
 export function getRouteTo(route: Routes, params?: unknown[]): string {
   switch (route) {
     case 'view':
-      const malId = params?.[1] as number | undefined;
-      if (malId === undefined) {
+      const id = params?.[1] as number | undefined;
+      if (id === undefined) {
         return '#';
       }
-      return `#/view/${malId}`;
+      return `#/view/${id}`;
     default:
       return `#`;
   }

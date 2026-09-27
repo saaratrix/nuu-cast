@@ -15,7 +15,6 @@ export class Request {
       mal ? { headers: { 'X-MAL-CLIENT-ID': '6114d00ca681b7701d1e15fe11a4987e' } } : {}
     );
     const data = await response.json();
-
     if (response.status !== 200) return Promise.reject(new Error(data.error));
 
     if (typeof data === 'string') {

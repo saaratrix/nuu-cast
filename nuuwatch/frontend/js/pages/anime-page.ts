@@ -1,21 +1,22 @@
-import { AnimeItem, AnimeItemParts, appState, changeItem, jikan, updateMediaFiles } from '../app-state.js';
+import { animeApi, AnimeItem, AnimeItemParts, appState, changeItem, updateMediaFiles } from '../app-state.js';
 import { escapeHtml } from '../utility.js';
 import { loadModules } from '../module-handler.js';
 import { gotoRoute } from '../routing/router.js';
 import { openEditor } from '../item-editor.js';
-import { createAnimeItem } from '../anime-item-utility.js';
 import { tryInitializeAnimeModel } from '../anime-model.js';
 import { nuucastBaseUrl } from '../constants.js';
 import { ProgressStatus } from '../nui/progress-status/progress-status.js';
 import { loadHTML } from '../routing/layout-loader.js';
+import { AniListAnime } from '../api/ani-list/ani-list-types.js';
+import { createAnimeItemFromAniList } from '../anime-ani-list-item-utility.js';
 
 const useNewLoading = false;
 
-export async function loadAnimeViewPage(malId: number) {
+export async function loadAnimeViewPage(id: number) {
   if (useNewLoading) {
-    doNewDesignLoading(malId);
+    doNewDesignLoading(id);
   } else {
-    doOldLoading(malId);
+    doOldLoading(id);
   }
 }
 
@@ -24,7 +25,7 @@ function gotoMain() {
   gotoRoute('main');
 }
 
-async function doNewDesignLoading(malId: number) {
+async function doNewDesignLoading(id: number) {
   const pageContainer = document.querySelector('.page-container') as HTMLElement;
   let animeBody: HTMLElement | null = pageContainer.querySelector('.anime-body');
   let animeInfo: HTMLElement | null = null;
@@ -56,7 +57,7 @@ async function doNewDesignLoading(malId: number) {
   loadModules('anime').then(result => console.log(`${result ? 'succesfully loaded' : 'failed to load'} module anime `));
   loadModules('crunchyroll').then(result => console.log(`${result ? 'succesfully loaded' : 'failed to load'} module crunchyroll`));
 
-  let animeItem: AnimeItem | undefined;
+  let animeItem: AnimeItem<unknown> | undefined;
   let itemChanged = false;
   try {
     const onChanged = () => {
@@ -64,7 +65,7 @@ async function doNewDesignLoading(malId: number) {
     };
     document.addEventListener('anime:itemChanged', onChanged, { once: true });
 
-    animeItem = await getMalAnimeItem(malId);
+    animeItem = await getApiAnimeItem(id);
     document.title = animeItem.title;
     await tryInitializeAnimeModel(animeItem);
     document.removeEventListener('anime:itemChanged', onChanged);
@@ -103,11 +104,11 @@ async function doNewDesignLoading(malId: number) {
   updateBackground();
 
   // animeItem.eventHandler.addEventListener('media:updated', 'anime-media', () => updateMediaSection(animeItem, animeBody), true);
-  changeItem(malId);
+  changeItem(id);
   updateMediaFiles(animeItem);
 }
 
-async function doOldLoading(malId: number) {
+async function doOldLoading(id: number) {
   const container = document.querySelector<HTMLElement>('.page-container');
   if (!container) {
     return gotoMain();
@@ -119,7 +120,7 @@ async function doOldLoading(malId: number) {
   loadModules('anime').then(result => console.log(`${result ? 'succesfully loaded' : 'failed to load'} module anime `));
   loadModules('crunchyroll').then(result => console.log(`${result ? 'succesfully loaded' : 'failed to load'} module crunchyroll`));
 
-  let animeItem: AnimeItem | undefined;
+  let animeItem: AnimeItem<unknown> | undefined;
   let itemChanged = false;
   try {
     const onChanged = () => {
@@ -127,7 +128,7 @@ async function doOldLoading(malId: number) {
     };
     document.addEventListener('anime:itemChanged', onChanged, { once: true });
 
-    animeItem = await getMalAnimeItem(malId);
+    animeItem = await getApiAnimeItem(id);
     document.title = animeItem.title;
     await tryInitializeAnimeModel(animeItem);
     document.removeEventListener('anime:itemChanged', onChanged);
@@ -149,7 +150,7 @@ async function doOldLoading(malId: number) {
   container.innerHTML = `
     <div class="anime-item-page">
       <header>
-        <h1><a href="${animeItem.data.url}">${animeItem.titleEscaped}</a></h1>
+        <h1><a href="${animeItem.parts.siteUrl}">${animeItem.titleEscaped}</a></h1>
       </header>
       <section class="anime-info">
         <div>
@@ -181,25 +182,25 @@ async function doOldLoading(malId: number) {
 
   animeItem.eventHandler.addEventListener('media:updated', 'anime-media', () => updateMediaSection(animeItem, container), true);
 
-  changeItem(malId);
+  changeItem(id);
   updateMediaFiles(animeItem);
 }
 
-async function getMalAnimeItem(malId: number): Promise<AnimeItem> {
-  let animeItem = appState.itemsByMalId.get(malId);
+async function getApiAnimeItem(id: number): Promise<AnimeItem<unknown>> {
+  let animeItem = appState.itemsById.get(id);
   if (animeItem) {
     return animeItem;
   }
 
-  return loadMalItem(malId);
+  return loadApiItem(id);
 }
 
-function updateAnimeInfo(animeInfo: HTMLElement, animeItem: AnimeItem) {
+function updateAnimeInfo(animeInfo: HTMLElement, animeItem: AnimeItem<unknown>) {
   const poster = animeInfo.querySelector('.poster') as HTMLImageElement;
   poster.src = animeItem.parts.imageUrl;
 }
 
-function updateAnimeBody(animeBody: HTMLElement, animeItem: AnimeItem) {
+function updateAnimeBody(animeBody: HTMLElement, animeItem: AnimeItem<unknown>) {
 
 }
 
@@ -207,17 +208,18 @@ function updateBackground() {
 
 }
 
-async function loadMalItem(malId: number): Promise<AnimeItem> {
-  const request = jikan.loadAnime(malId, 'full', {});
+async function loadApiItem(id: number): Promise<AnimeItem<AniListAnime>> {
+  // const request = jikan.loadAnime(malId, 'full', {});
+  const request = animeApi.loadAnime(id);
   const response = await request;
 
-  const malItem = response.data;
-  const animeItem = createAnimeItem(malItem);
-  appState.itemsByMalId.set(malId, animeItem);
+  const apiItem = response;
+  const animeItem = createAnimeItemFromAniList(apiItem);
+  appState.itemsById.set(id, animeItem);
   return animeItem;
 }
 
-async function updateMediaSection(item: AnimeItem, itemContainer: HTMLElement) {
+async function updateMediaSection(item: AnimeItem<unknown>, itemContainer: HTMLElement) {
   const section = itemContainer.querySelector<HTMLElement>('.media')!;
   const videosElement = section.querySelector<HTMLElement>('.media-videos')!;
   const spinner = section.querySelector<ProgressStatus>('progress-status');
@@ -227,7 +229,7 @@ async function updateMediaSection(item: AnimeItem, itemContainer: HTMLElement) {
 
   spinner?.removeAttribute('active');
   // As the fetch can take a little while, maybe id changed.
-  if (appState.activeMalId !== item.id) {
+  if (appState.activeAnimeId !== item.id) {
     return;
   }
 
@@ -246,7 +248,7 @@ async function updateMediaSection(item: AnimeItem, itemContainer: HTMLElement) {
   videosElement.appendChild(fragment);
 }
 
-async function fetchMediaFiles(item: AnimeItem, videosElement: HTMLElement) {
+async function fetchMediaFiles(item: AnimeItem<unknown>, videosElement: HTMLElement) {
   if (item.media) {
     return item.media;
   }

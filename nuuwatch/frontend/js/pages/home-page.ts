@@ -1,8 +1,10 @@
-import { addItem, AnimeItem, appState, changeItem, ItemsKey, jikan } from '../app-state.js';
-import { MALAnime } from '../jikan/types/jikan.js';
-import { createAnimeItem } from '../anime-item-utility.js';
+import { addItem, animeApi, AnimeItem, appState, changeItem, ItemsKey } from '../app-state.js';
 import { addItemModel, AnimeModel, Rating } from '../anime-model.js';
 import { loadHTML } from '../routing/layout-loader.js';
+import { AniListAnime } from '../api/ani-list/ani-list-types';
+import { createAnimeItemFromAniList } from '../anime-ani-list-item-utility.js';
+
+const loadedAnimes = new Map<number, AniListAnime>();
 
 export function loadMainPage() {
   const animeListContainer = document.querySelector('.animes-list');
@@ -27,33 +29,25 @@ function onPageLoaded() {
 }
 
 async function fetchCurrentSeason(currentPage: number) {
-  const res = await jikan.loadCurrentSeason(currentPage);
-  const { pagination, data } = res;
+  let animes = Array.from(loadedAnimes.values());
 
-  if (!Array.isArray(data)) {
-    // Eg Jikan cached a bad response and it lives there in their cache.
-    if (currentPage > 1) {
-      return finishedFetchingCurrentSeason();
+  if (animes.length == 0) {
+    const res = await animeApi.getCurrentSeason();
+    animes = res.animes;
+    if (res.hasError) {
+      console.log('there was an error fetching animes from anilist.');
     }
+  }
 
+  if (!Array.isArray(animes)) {
     document.body.innerHTML += 'no current season found';
     return;
   }
 
-  for (const d of data as MALAnime[]) {
-    appState.animes.set(d.mal_id, d);
+  for (const anime of animes) {
+    loadedAnimes.set(anime.id, anime);
   }
 
-  if (currentPage < pagination.last_visible_page) {
-    setTimeout(() => {
-      fetchCurrentSeason(++currentPage).then();
-    }, 0.5);
-  } else {
-    finishedFetchingCurrentSeason();
-  }
-}
-
-function finishedFetchingCurrentSeason() {
   onCurrentSeasonLoaded();
   sortItems();
   renderAllItems();
@@ -64,18 +58,19 @@ function onCurrentSeasonLoaded() {
   const shows = [];
   const movies = [];
 
-  const animes = appState.animes.values();
+  const animes = loadedAnimes.values();
 
-  const malIds = new Set<number>();
+  const ids = new Set<number>();
 
   for (const anime of animes) {
     // It could be anything if type is null but movies have less items, so it would stand out more there.
-    const type = anime.type || 'Movie';
+    const type = anime.format || 'Movie';
     switch (type.toLowerCase()) {
       case 'tv':
+      case 'tv_short':
+      case 'tv special':
       case 'ova':
       case 'ona':
-      case 'tv special':
         shows.push(anime);
         break;
       case 'movie':
@@ -87,18 +82,18 @@ function onCurrentSeasonLoaded() {
   }
 
   for (const anime of shows) {
-    const animeItem = createAnimeItem(anime);
-    malIds.add(anime.mal_id);
-    addItem('TV', animeItem);
+    const animeItem = createAnimeItemFromAniList(anime);
+    ids.add(anime.id);
+    addItem('tv', animeItem);
   }
 
   for (const anime of movies) {
-    const animeItem = createAnimeItem(anime);
-    malIds.add(anime.mal_id);
-    addItem('Movie', animeItem);
+    const animeItem = createAnimeItemFromAniList(anime);
+    ids.add(anime.id);
+    addItem('movie', animeItem);
   }
 
-  fetchAllModels(malIds).then().catch(e => console.error('Fetching all anime models failed', e));
+  fetchAllModels(ids).then().catch(e => console.error('Fetching all anime models failed', e));
 }
 
 const ratingSortValues = {
@@ -114,7 +109,7 @@ function sortItems() {
       continue;
     }
 
-    items.sort((a: AnimeItem, b: AnimeItem): number => {
+    items.sort((a: AnimeItem<AniListAnime>, b: AnimeItem<AniListAnime>): number => {
       const modelA = a.model;
       const modelB = b.model;
 
@@ -154,7 +149,7 @@ function renderAllItems() {
   itemsContainer.appendChild(fragment);
 }
 
-function tryRenderItems(items: AnimeItem[], type: string, addLinebreak: boolean): DocumentFragment | undefined {
+function tryRenderItems(items: AnimeItem<AniListAnime>[], type: string, addLinebreak: boolean): DocumentFragment | undefined {
   if (items.length === 0) {
     return undefined;
   }
@@ -179,10 +174,10 @@ function tryRenderItems(items: AnimeItem[], type: string, addLinebreak: boolean)
   return fragment;
 }
 
-async function fetchAllModels(malIds: Set<number>): Promise<void> {
+async function fetchAllModels(ids: Set<number>): Promise<void> {
   const existing = new Set<number>(appState.animeModels.keys());
   const toFetchIds = new Set<number>();
-  for (const id of malIds) {
+  for (const id of ids) {
     if (!existing.has(id)) {
       toFetchIds.add(id);
     }
@@ -192,7 +187,7 @@ async function fetchAllModels(malIds: Set<number>): Promise<void> {
     return;
   }
 
-  const payload = { mal_ids: Array.from(toFetchIds.values()) };
+  const payload = { ids: Array.from(toFetchIds.values()) };
   const request = await fetch('/anime/view/query', {
     method: 'post',
     headers: {
@@ -201,14 +196,14 @@ async function fetchAllModels(malIds: Set<number>): Promise<void> {
     body: JSON.stringify(payload),
   });
   if (!request.ok) {
-    console.error('Failed to fetch all models from malIds', request.statusText);
+    console.error('Failed to fetch all models from ids', request.statusText);
   }
 
   const models: AnimeModel[] = await request.json();
   for (const model of models) {
-    const animeItem = appState.itemsByMalId.get(model.mal_id);
+    const animeItem = appState.itemsById.get(model.id);
     if (!animeItem) {
-      console.log(`Did not find a MAL item for ${model.mal_id}`, model);
+      console.log(`Did not find an anime api item for ${model.id}`, model);
       continue;
     }
 

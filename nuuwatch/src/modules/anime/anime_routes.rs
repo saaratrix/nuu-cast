@@ -7,10 +7,10 @@ use crate::database::anime_queries::{get_status, get_status_all, insert_status, 
 
 pub async fn put_anime_status(
     State(state): State<AppState>,
-    Path(mal_id): Path<i32>,
+    Path(id): Path<i32>,
     Json(patch): Json<AnimeStatusPatch>,
 ) -> impl IntoResponse {
-    match insert_status(&state.db, mal_id, patch).await {
+    match insert_status(&state.db, id, patch).await {
         Ok(rows) if rows > 0 => StatusCode::OK,
         Ok(_) => StatusCode::NOT_FOUND,
         Err(_) => StatusCode::INTERNAL_SERVER_ERROR,
@@ -19,10 +19,10 @@ pub async fn put_anime_status(
 
 pub async fn patch_anime_status(
     State(state): State<AppState>,
-    Path(mal_id): Path<i32>,
+    Path(id): Path<i32>,
     Json(patch): Json<AnimeStatusPatch>,
 ) -> impl IntoResponse {
-    match update_status(&state.db, mal_id, patch).await {
+    match update_status(&state.db, id, patch).await {
         Ok(rows) if rows > 0 => StatusCode::OK,
         Ok(_) => StatusCode::NOT_FOUND,
         Err(_) => StatusCode::INTERNAL_SERVER_ERROR,
@@ -31,9 +31,9 @@ pub async fn patch_anime_status(
 
 pub async fn get_anime_status(
     State(state): State<AppState>,
-    Path(mal_id): Path<i32>,
+    Path(id): Path<i32>,
 ) -> impl IntoResponse {
-    match get_status(&state.db, mal_id).await {
+    match get_status(&state.db, id).await {
         Ok(Some(anime)) => (StatusCode::OK, Json(anime)).into_response(),
         Ok(None) => StatusCode::NOT_FOUND.into_response(),
         Err(err) => {
@@ -45,14 +45,14 @@ pub async fn get_anime_status(
 
 #[derive(Debug, Deserialize)]
 pub struct AnimeStatusQuery {
-    pub mal_ids: Vec<i32>,
+    pub ids: Vec<i32>,
 }
 
 pub async fn post_anime_status_query(
     State(state): State<AppState>,
     Json(query): Json<AnimeStatusQuery>,
 ) -> impl IntoResponse {
-    match get_status_all(&state.db, query.mal_ids).await {
+    match get_status_all(&state.db, query.ids).await {
         Ok(animes) => (StatusCode::OK, Json(animes)).into_response(),
         Err(err) => {
             eprintln!("Database error: {err}");

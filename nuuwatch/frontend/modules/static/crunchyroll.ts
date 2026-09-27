@@ -8,20 +8,20 @@ interface CrunchyrollModel {
 }
 
 (function() {
-  let currentItem: AnimeItem | undefined = undefined;
+  let currentItem: AnimeItem<unknown> | undefined = undefined;
 
   document.addEventListener('anime:itemChanged', (e) => {
     const event = e as CustomEvent<number | undefined>;
-    const malId = event.detail;
-    if (malId === undefined) {
+    const id = event.detail;
+    if (id === undefined) {
       setCurrentItem(undefined);
     } else {
-      addLinks(malId);
+      addLinks(id);
     }
   });
 
-  if (appState.activeMalId) {
-    addLinks(appState.activeMalId);
+  if (appState.activeAnimeId) {
+    addLinks(appState.activeAnimeId);
   }
 
   function removeListeners(): void {
@@ -32,7 +32,7 @@ interface CrunchyrollModel {
     currentItem.eventHandler.removeEventListener('anime:modelUpdated', 'crunchyroll');
   }
 
-  function setCurrentItem(item: AnimeItem | undefined): void {
+  function setCurrentItem(item: AnimeItem<unknown> | undefined): void {
     if (item === currentItem) {
       return;
     }
@@ -50,8 +50,8 @@ interface CrunchyrollModel {
     addLinks(event.id);
   }
 
-  function addLinks(malId: number) {
-    const item = appState.itemsByMalId.get(malId);
+  function addLinks(id: number) {
+    const item = appState.itemsById.get(id);
     if (!item) {
       return;
     }
@@ -68,11 +68,11 @@ interface CrunchyrollModel {
     }
 
     const crunchyrollModel = item.model?.modules_data.crunchyroll as CrunchyrollModel | undefined;
-    if (!item.data.title_english && !crunchyrollModel?.url) {
+    if (!item.parts.hasEnglishTitle && !crunchyrollModel?.url) {
       console.log('Not adding crunchyroll link, no english title.');
       return;
     }
-    addLinksDOM(item.data.title_english || '', crunchyrollModel?.url, pageContent, existingContainer);
+    addLinksDOM(item.title || '', crunchyrollModel?.url, pageContent, existingContainer);
   }
 
   function addLinksDOM(keyword: string, url: string | undefined, pageContent: HTMLElement, container: HTMLElement | null): void {

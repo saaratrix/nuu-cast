@@ -5,3 +5,5 @@ pub mod anime_routes;
 pub mod anike_jikan_routes;
 pub mod other;
 mod anime_fetch_routes;
+pub mod anilist;
+pub mod api_shared;

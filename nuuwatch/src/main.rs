@@ -8,19 +8,24 @@ mod media;
 
 use tokio::fs::{create_dir_all};
 use std::path::{Path};
+use std::sync::Arc;
 use axum::{Router};
 use axum::routing::{get};
 use tower_http::services::ServeDir;
 use sqlx::{SqlitePool};
 use crate::data_utility::data_utility::DATA_ROOT;
 use crate::database::db::init_db;
+use crate::modules::anime::anilist::anilist::AniList;
+use crate::modules::anime::api_shared::anime_api::{AnimeApiClient, AnimeApiKind};
 use crate::modules::anime::jikan::jikan::Jikan;
 use crate::nuucast_api::nuucast_client::NuucastClient;
+
+
 
 #[derive(Clone)]
 struct AppState {
     db: SqlitePool,
-    jikan: Jikan,
+    anime_api: AnimeApiClient,
     nuucast: NuucastClient,
 }
 
@@ -29,9 +34,16 @@ async fn main() -> Result<(), sqlx::Error> {
     ensure_data_folders_existing().await;
 
     let db = init_db().await?;
-    let jikan = Jikan::new(Jikan::create_shared_client(false));
+
+    let active_api = AnimeApiKind::AniList;
+
+    let anime_api = match active_api {
+        AnimeApiKind::AniList => AnimeApiClient::AniList(AniList::new(AniList::create_shared_client())),
+        AnimeApiKind::Jikan => AnimeApiClient::Jikan(Jikan::new(Jikan::create_shared_client(false))),
+    };
+
     let nuucast_client = NuucastClient::new(NuucastClient::create_client());
-    let state = AppState { db, jikan, nuucast: nuucast_client };
+    let state = AppState { db, anime_api, nuucast: nuucast_client };
 
     let app = Router::new()
         .nest_service("/static", ServeDir::new("static"))

@@ -24,12 +24,12 @@ function router() {
 }
 
 function loadViewAnime(routes: string[]): boolean {
-  const malId = Number(routes[1]);
-  if (!routes[1] || Number.isNaN(malId)) {
+  const id = Number(routes[1]);
+  if (!routes[1] || Number.isNaN(id)) {
     return false;
   }
 
-  loadAnimeViewPage(malId).then();
+  loadAnimeViewPage(id).then();
   return true;
 }
 

@@ -1,16 +1,16 @@
 use url::Url;
 use std::collections::HashMap;
 use crate::modules::anime::anime_request_cacher::{add_cached_request_json, try_get_cached_request_json, CacheOptions};
-use crate::modules::anime::jikan::jikan_settings::{Settings};
+use crate::modules::anime::jikan::jikan_settings::{JikanSettings};
 
 #[derive(Clone)]
-pub struct Request {
+pub struct JikanRequest {
     http_client: reqwest::Client,
 }
 
-impl Request {
+impl JikanRequest {
     pub fn new(http_client: reqwest::Client) -> Self {
-        Request {
+        JikanRequest {
             http_client,
         }
     }
@@ -37,7 +37,7 @@ impl Request {
     }
 
     fn build_url(&self, args: Vec<String>, params: Option<&HashMap<String, String>>) -> Url {
-        let mut url = Settings::default().get_base_url();
+        let mut url = JikanSettings::default().get_base_url();
 
         if !args.is_empty() {
             url.path_segments_mut().unwrap().extend(args);

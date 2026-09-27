@@ -4,7 +4,7 @@ use axum::{
 };
 use axum::routing::{patch, post, put};
 use crate::AppState;
-use crate::modules::anime::anike_jikan_routes::{handle_get_current_season, handle_get_season, handle_load_anime_full, handle_mal_image, handle_search_anime};
+use crate::modules::anime::anike_jikan_routes::{handle_ani_list_image, handle_get_current_season, handle_get_season, handle_load_anime_full, handle_mal_image, handle_search_anime};
 use crate::modules::anime::anime_fetch_routes::post_anime_fetch;
 use crate::modules::anime::anime_routes::{get_anime_status, patch_anime_status, post_anime_status_query, put_anime_status};
 use crate::modules::anime::other::anime_other_module::add_other_routes;
@@ -12,18 +12,20 @@ use crate::modules::anime::other::anime_other_module::add_other_routes;
 /// Initialize the module by binding routes to an existing Axum Router
 pub fn get_anime_routes() -> Router<AppState> {
     let mod_routes = Router::new()
-    .route("/anime/view/{mal_id}", put(put_anime_status))
-    .route("/anime/view/{mal_id}", patch(patch_anime_status))
-    .route("/anime/view/{mal_id}", get(get_anime_status))
+    .route("/anime/view/{id}", put(put_anime_status))
+    .route("/anime/view/{id}", patch(patch_anime_status))
+    .route("/anime/view/{id}", get(get_anime_status))
     .route("/anime/view/query", post(post_anime_status_query))
     .route("/anime/fetch", post(post_anime_fetch))
     // Jikan Proxy & cache routes
     .route("/anime/seasons/now",   get(handle_get_current_season))
     .route("/anime/seasons/{year}/{season}", get(handle_get_season))
     // api prefix = anime, jikan api = anime! so we get anime/anime :3
-    .route("/anime/anime/{mal_id}/full", get(handle_load_anime_full))
+    .route("/anime/anime/{id}/full", get(handle_load_anime_full))
+    .route("/anime/info/{id}", get(handle_load_anime_full))
     .route("/anime/search", get(handle_search_anime))
-    .route("/anime/malimage/{*image_url}", get(handle_mal_image));
+    .route("/anime/malimage/{*image_url}", get(handle_mal_image))
+    .route("/anime/anilist-image/{id}/{*image_url}", get(handle_ani_list_image));
 
     let other_routes = add_other_routes();
     Router::new().merge(mod_routes).merge(other_routes)

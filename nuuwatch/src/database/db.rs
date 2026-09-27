@@ -4,7 +4,7 @@ use sqlx::sqlite::SqlitePoolOptions;
 
 #[derive(Debug, Clone, Serialize, FromRow)]
 pub struct Anime {
-    pub mal_id: i64,
+    pub id: i64,
     pub rating: Option<i64>,
     pub comment: String,
     pub search_terms: String,
@@ -42,7 +42,7 @@ pub async fn init_db() -> Result<Pool<Sqlite>, sqlx::Error> {
     let success = sqlx::query(
         r#"
         CREATE TABLE IF NOT EXISTS anime (
-            mal_id INTEGER PRIMARY KEY,
+            id INTEGER PRIMARY KEY,
 
             rating INTEGER,
             comment TEXT NOT NULL,

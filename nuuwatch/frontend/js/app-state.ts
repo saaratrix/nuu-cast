@@ -1,23 +1,26 @@
-import { MALAnime } from './jikan/types/jikan.js';
-import { JikanAPI } from './jikan/jikan.js';
 import { AnimeModel } from './anime-model.js';
 import { EventHandler } from './event-handler.js';
+import { AnimeApi } from './api/anime-api.js';
+import { AniListAnime } from './api/ani-list/ani-list-types';
 
 export interface AnimeItemParts {
   visualTitle: string;
   rating: string;
   airing: string;
   imageUrl: string;
+  siteUrl: string;
+  hasEnglishTitle: boolean;
 }
 
 export type AnimeItemEvents = 'anime:modelUpdated' | 'media:updated';
 
-export interface AnimeItem {
+export interface AnimeItem<T> {
   id: number,
-  data: MALAnime;
+  data: T;
   title: string;
   titleEscaped: string;
   type: 'anime';
+  apiType: 'mal' | 'anilist',
   parts: AnimeItemParts;
   cardElement: HTMLElement;
   eventHandler: EventHandler<AnimeItemEvents>
@@ -25,38 +28,47 @@ export interface AnimeItem {
   media?: string[];
 }
 
-export type ItemsKey = MALAnime['type'];
+// export type ItemsKey = MALAnime['type'];
+// export interface AnimeAppState {
+//   animes: Map<number, MALAnime>;
+//   animeModels: Map<number, AnimeModel>;
+//   itemsByMalId: Map<number, AnimeItem>;
+//   items: Partial<Record<ItemsKey, AnimeItem[]>>;
+//   activeMalId: number | undefined;
+// }
+
+export type ItemsKey = Lowercase<AniListAnime['format']>;
 export interface AnimeAppState {
-  animes: Map<number, MALAnime>;
   animeModels: Map<number, AnimeModel>;
-  itemsByMalId: Map<number, AnimeItem>;
-  items: Partial<Record<ItemsKey, AnimeItem[]>>;
-  activeMalId: number | undefined;
+  itemsById: Map<number, AnimeItem<AniListAnime>>;
+  items: Partial<Record<ItemsKey, AnimeItem<AniListAnime>[]>>;
+  activeAnimeId: number | undefined;
 }
 
-export const jikan = new JikanAPI();
-jikan.settings.setBaseURLAbsolute('/anime/');
+// export const jikan = new JikanAPI();
+// jikan.settings.setBaseURLAbsolute('/anime/');
+
+export const animeApi = new AnimeApi();
 
 export const appState: AnimeAppState = {
-  animes: new Map(),
   animeModels: new Map(),
-  itemsByMalId: new Map(),
+  itemsById: new Map(),
   items: {},
-  activeMalId: undefined,
+  activeAnimeId: undefined,
 }
 
-export function changeItem(malId: AnimeAppState['activeMalId']): void {
-  const before = appState.activeMalId;
-  if (before === malId) {
+export function changeItem(id: AnimeAppState['activeAnimeId']): void {
+  const before = appState.activeAnimeId;
+  if (before === id) {
     return;
   }
 
-  appState.activeMalId = malId;
-  document.dispatchEvent(new CustomEvent('anime:itemChanged', { detail: malId }));
+  appState.activeAnimeId = id;
+  document.dispatchEvent(new CustomEvent('anime:itemChanged', { detail: id }));
 }
 
-export const addItem = (type: ItemsKey, item: AnimeItem) => {
-  appState.itemsByMalId.set(item.id, item);
+export const addItem = (type: ItemsKey, item: AnimeItem<AniListAnime>) => {
+  appState.itemsById.set(item.id, item);
 
   if (!appState.items[type]) {
     appState.items[type] = [];
@@ -65,6 +77,6 @@ export const addItem = (type: ItemsKey, item: AnimeItem) => {
   appState.items[type].push(item);
 }
 
-export const updateMediaFiles = (animeItem: AnimeItem): void  => {
+export const updateMediaFiles = (animeItem: AnimeItem<unknown>): void  => {
   animeItem.eventHandler.dispatchEvent('media:updated');
 }

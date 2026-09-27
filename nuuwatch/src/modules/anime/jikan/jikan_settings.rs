@@ -1,14 +1,14 @@
 use url::Url;
 
-pub struct Settings {
+pub struct JikanSettings {
     base_url: Url,
 }
 
-impl Settings {
+impl JikanSettings {
     pub fn new(url: &str) -> Self {
         let url = Url::parse(url).unwrap();
         // Default to v4 if not set in constructor, or pass version arg
-        Settings { base_url: url}
+        JikanSettings { base_url: url}
     }
 
     pub fn get_base_url(&self) -> Url {
@@ -16,8 +16,8 @@ impl Settings {
     }
 }
 
-impl Default for Settings {
+impl Default for JikanSettings {
     fn default() -> Self {
-        Settings::new("https://api.jikan.moe/v4")
+        JikanSettings::new("https://api.jikan.moe/v4")
     }
 }
