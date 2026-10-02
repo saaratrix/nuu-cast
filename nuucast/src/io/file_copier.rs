@@ -1,4 +1,5 @@
 use std::path::{Path, PathBuf};
+use std::time::Instant;
 use crate::io::file_utility::UrlAndFilePath;
 
 /// For example an mkv file is uploaded but since browsers can't play mkv files it's converted into mp4 and subtitle files.
@@ -23,4 +24,25 @@ pub async fn copy_converted_files(original_paths: &UrlAndFilePath, files_to_copy
     }
 
     Ok(true)
+}
+
+pub async fn copy_converted_files_get_output(original_paths: &UrlAndFilePath, files_to_copy: &Vec<PathBuf>, delta_time: Instant) -> Result<Vec<PathBuf>, String> {
+    copy_converted_files(&original_paths, &files_to_copy).await?;
+
+    let copy_converted_files_time = Instant::now();
+    println!("copy files from temp to media folder took {:?}", copy_converted_files_time.duration_since(delta_time));
+    let directory = original_paths.url.parent().unwrap_or_else(|| {
+        panic!("paths.url {} should have a parent", original_paths.url.display())
+    });
+
+    Ok(files_to_copy
+        .iter()
+        .map(|p| {
+            directory.join(
+                p.file_name().unwrap_or_else(|| {
+                    panic!("converted path {} should have a filename", p.display())
+                })
+            )
+        })
+        .collect())
 }

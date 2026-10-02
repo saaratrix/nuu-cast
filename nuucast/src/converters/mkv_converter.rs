@@ -2,7 +2,7 @@ use std::path::{Path, PathBuf};
 use std::time::Instant;
 use axum::body::Bytes;
 use crate::converters::subtitles_utility::{extract_subtitle_files_from_mkv_with_track_ids, extract_subtitle_tracks_with_language, MkvMergeMetadataJson};
-use crate::io::file_copier::copy_converted_files;
+use crate::io::file_copier::{copy_converted_files, copy_converted_files_get_output};
 use crate::io::file_utility::{UrlAndFilePath, MEDIA_ROOT};
 use crate::io::temp_files_directory::TempFilesDirectory;
 use tokio::process::Command;
@@ -44,27 +44,7 @@ pub async fn convert_mkv(paths: &UrlAndFilePath, body: &Bytes) -> Result<Vec<Pat
     let mut converted_paths = vec![mp4_file];
     converted_paths.extend(vtt_paths);
 
-    copy_converted_files(paths, &converted_paths).await?;
-
-    let copy_converted_files_time = Instant::now();
-    println!("copy files from temp to media folder took {:?}", copy_converted_files_time.duration_since(vtt_paths_time));
-    // Set some kind of relations? So they can find each others.
-
-    let directory = paths.url.parent().unwrap_or_else(|| {
-        panic!("paths.url {} should have a parent", paths.url.display())
-    });
-
-    let output_paths: Vec<PathBuf> = converted_paths
-        .iter()
-        .map(|p| {
-            directory.join(
-                p.file_name().unwrap_or_else(|| {
-                    panic!("converted path {} should have a filename", p.display())
-                })
-            )
-        })
-        .collect();
-
+    let output_paths: Vec<PathBuf> = copy_converted_files_get_output(&paths, &converted_paths, vtt_paths_time).await?;
     Ok(output_paths)
 }
 
