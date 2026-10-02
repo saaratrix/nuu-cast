@@ -12,8 +12,11 @@ pub static NUUCAST_PROJECT_ROOT: LazyLock<PathBuf> =
             .unwrap_or_else(|_| env::current_dir().unwrap()).canonicalize().unwrap()
     });
 
-pub static MEDIA_ROOT: LazyLock<PathBuf> =
-    LazyLock::new(|| PathBuf::from(&*NUUCAST_PROJECT_ROOT).join("media"));
+pub static MEDIA_ROOT: LazyLock<PathBuf> = LazyLock::new(|| {
+    std::env::var_os("MEDIA_ROOT")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| PathBuf::from(&*NUUCAST_PROJECT_ROOT).join("media"))
+});
 
 pub static STATIC_ROOT: LazyLock<PathBuf> =
     LazyLock::new(|| PathBuf::from(&*NUUCAST_PROJECT_ROOT).join("static"));

@@ -32,7 +32,5 @@ COPY --from=builder /app/templates ./templates
 COPY --from=builder /app/static ./static
 RUN mkdir -p /app/temp_files && chmod 777 /app/temp_files
 
-ENV PROJECT_ROOT=/app/
-
 EXPOSE 3000
 CMD ["/app/nuucast"]

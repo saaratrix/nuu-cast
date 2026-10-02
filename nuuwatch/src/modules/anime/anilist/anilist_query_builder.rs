@@ -18,7 +18,6 @@ query Season($page: Int!, $season: MediaSeason!, $year: Int!) {
                 native
             }
 
-            bannerImage
             coverImage {
                 large
             }
