@@ -377,7 +377,7 @@ export class AnimeCard<ItemType = unknown> extends HTMLElement {
 
   getEpisodesText(current: number | null, total: number): string {
     if (current) {
-      if (current > total) {
+      if (current >= total) {
         return `${current} Episodes`;
       } else {
         return `Ep ${current} / ${total}`
