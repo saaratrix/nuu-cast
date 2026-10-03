@@ -5,6 +5,8 @@ import { hidePopover, showPopover } from './popover.js';
 import { openEditor } from './item-editor.js';
 import { EventHandler } from './event-handler.js';
 import { initRatingEvents } from './anime-item-utility.js';
+import type { AnimeCard } from './components/anime-card';
+import './components/anime-card.js';
 
 export function createAnimeItemFromMal(item: MALAnime): AnimeItem<MALAnime> {
   // Background exists along with synopsis for a shorter description.
@@ -37,37 +39,40 @@ export function createAnimeItemFromMal(item: MALAnime): AnimeItem<MALAnime> {
   const viewAnimeUrl = `#/view/${id}`;
   const siteUrl = escapeHtml(url);
 
-  const itemCardElement = document.createElement('div');
-  itemCardElement.className = 'item-card';
-  itemCardElement.innerHTML = `
-  <a class="item-body" href="${viewAnimeUrl}">
-      <img src="${escapeHtml(image_url)}" width="128" height="128">            
-      <div class="item-footer">
-        <span class="item-title">${visualTitle}</span>
-        <p>Ep ${item}</p>
-      </div>
-      
-      
-  </a>
-  <div class="item-synopsis" hidden>
-        <div class="synopsis-metadata">
-          ${titleHtml}
-          ${metalinebreakHtml}
-          ${ratingHtml}
-          ${episodesHtml}            
-          ${airingHtml}
-        </div>
-        <hr>
-        <div class="synopsis-text">
-            ${escapeHtml(synopsisText)}
-        </div>
-      </div>
-  <div class="item-actions">
-    <span class="item-action rating">♥</span>
-    <span class="item-action mal-link" title="Goto MAL"><a href="${siteUrl}">🔗</a></span>
-    <span class="item-action edit-anime" title="Edit anime">✎⋮</span>
-  </div>
-`;
+  // const itemCardElement = document.createElement('div');
+  // itemCardElement.className = 'item-card';
+  // itemCardElement.innerHTML = `
+//   <a class="item-body" href="${viewAnimeUrl}">
+//       <img src="${escapeHtml(image_url)}" width="128" height="128">
+//       <div class="item-footer">
+//         <span class="item-title">${visualTitle}</span>
+//         <p>Ep ${item}</p>
+//       </div>
+//
+//
+//   </a>
+//   <div class="item-synopsis" hidden>
+//         <div class="synopsis-metadata">
+//           ${titleHtml}
+//           ${metalinebreakHtml}
+//           ${ratingHtml}
+//           ${episodesHtml}
+//           ${airingHtml}
+//         </div>
+//         <hr>
+//         <div class="synopsis-text">
+//             ${escapeHtml(synopsisText)}
+//         </div>
+//       </div>
+//   <div class="item-actions">
+//     <span class="item-action rating">♥</span>
+//     <span class="item-action mal-link" title="Goto MAL"><a href="${siteUrl}">🔗</a></span>
+//     <span class="item-action edit-anime" title="Edit anime">✎⋮</span>
+//   </div>
+// `;
+
+  const cardElement = document.createElement('anime-card') as AnimeCard<MALAnime>;
+
 
   const animeItem: AnimeItem<MALAnime> = {
     id,
@@ -84,17 +89,17 @@ export function createAnimeItemFromMal(item: MALAnime): AnimeItem<MALAnime> {
       siteUrl,
       hasEnglishTitle: !!title_english,
     },
-    cardElement: itemCardElement,
+    cardElement,
     eventHandler: new EventHandler(),
   };
 
-  itemCardElement.addEventListener('pointerenter', () => showPopover(itemCardElement));
-  itemCardElement.addEventListener('pointerleave', () => hidePopover());
+  // cardElement.addEventListener('pointerenter', () => showPopover(cardElement, '.item-synopsis'));
+  // cardElement.addEventListener('pointerleave', () => hidePopover());
 
-  initRatingEvents(animeItem, itemCardElement);
+  // initRatingEvents(animeItem, itemCardElement);
 
-  const editAnimeBtn = itemCardElement.querySelector<HTMLElement>('.edit-anime');
-  editAnimeBtn?.addEventListener('click', () => openEditor(animeItem));
+  // const editAnimeBtn = itemCardElement.querySelector<HTMLElement>('.edit-anime');
+  // editAnimeBtn?.addEventListener('click', () => openEditor(animeItem));
 
   return animeItem;
 }

@@ -57,23 +57,23 @@
 .btn-primary {
   --btn-color-bg: var(--color-bg-tertiary);
   --btn-color-border: var(--color-border);
-  --btn-color-text: var(--color-text);
+  --btn-color-text: var(--color-text-primary);
 
   --btn-color-disabled-bg: var(--color-bg-elevated);
   --btn-color-disabled-text: var(--color-text-disabled);
 
   --btn-color-hover-bg: var(--color-primary-hover);
   --btn-color-hover-border: var(--color-border-hover);
-  --btn-color-hover-text: var(--color-text);
+  --btn-color-hover-text: var(--color-text-primary);
 
   --btn-color-active-bg: var(--color-primary-active);
   --btn-color-active-border: var(--color-primary-active);
-  --btn-color-active-text: var(--color-text);
+  --btn-color-active-text: var(--color-text-primary);
 
   &.active {
     --btn-color-bg: var(--color-primary);
     --btn-color-border: var(--color-border);
-    --btn-color-text: var(--color-text);
+    --btn-color-text: var(--color-text-primary);
 
     --btn-color-disabled-bg: var(--color-primary-subtle);
   }

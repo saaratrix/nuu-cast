@@ -13,8 +13,8 @@ content.className = 'item-popover-content';
 popover.append(arrow, content);
 document.body.appendChild(popover);
 
-export function showPopover(anchor: HTMLElement) {
-  const source = anchor.querySelector('.item-synopsis');
+export function showPopover(anchor: HTMLElement, sourceSelector: string) {
+  const source = anchor.querySelector(sourceSelector);
   if (!source) return;
 
   content.innerHTML = '';

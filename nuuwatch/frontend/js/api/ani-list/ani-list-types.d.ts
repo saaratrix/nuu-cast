@@ -18,13 +18,13 @@ export interface AniListAnime {
   averageScore: number,
   countryOfOrigin: 'JP' | string,
   description: string,
-  episodes: number,
+  episodes: number | null,
   format: 'TV' | 'TV_SHORT' | 'MOVIE' | 'SPECIAL' | 'OVA' | 'ONA' | 'MUSIC' | 'MANGA' | 'NOVEL' | 'ONE_SHOT'
   isAdult: boolean,
   popularity: number,
   nextAiringEpisode: {
-    airingAt: string,
-    timeUntilAiring: string,
+    airingAt: number,
+    timeUntilAiring: number,
     episode: number,
   } | null,
 }
