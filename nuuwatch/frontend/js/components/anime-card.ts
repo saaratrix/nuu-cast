@@ -311,6 +311,9 @@ export class AnimeCard<ItemType = unknown> extends HTMLElement {
     }
 
     this.dirty.item = false;
+
+    this.getElement<HTMLAnchorElement>('.body').href = `#/view/${item.id}`;
+
     this.getElement<HTMLImageElement>('.poster').src = item.parts.imageUrl;
     this.getElement('.title').textContent = item.title;
 

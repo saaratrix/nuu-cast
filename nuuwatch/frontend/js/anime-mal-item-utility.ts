@@ -36,7 +36,6 @@ export function createAnimeItemFromMal(item: MALAnime): AnimeItem<MALAnime> {
 
   const metalinebreakHtml = (!!ratingHtml || !!episodesHtml || !!airingHtml) ? '<hr>' : '';
 
-  const viewAnimeUrl = `#/view/${id}`;
   const siteUrl = escapeHtml(url);
 
   // const itemCardElement = document.createElement('div');

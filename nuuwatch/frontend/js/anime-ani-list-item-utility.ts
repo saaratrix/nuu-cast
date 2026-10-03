@@ -28,7 +28,6 @@ export function createAnimeItemFromAniList(aniListItem: AniListAnime): AnimeItem
   const siteUrl = `https://anilist.co/anime/${id}`;
 
 
-  const viewAnimeUrl = `#/view/${id}`;
 //   const metalinebreakHtml = (!!ratingHtml || !!episodesHtml || !!airingHtml) ? '<hr>' : '';
 //
 //   const itemCardElement = document.createElement('div');
