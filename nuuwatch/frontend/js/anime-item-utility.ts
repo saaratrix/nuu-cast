@@ -1,7 +1,7 @@
 import { AnimeItem } from './app-state.js';
 import { AnimeModel, getAnimeModel, insertOrUpdateModel, ModelUpdatedEvent, Rating } from './anime-model.js';
 
-export function initRatingEvents(item: AnimeItem<unknown>, cardElement: HTMLElement): void {
+export function initRatingEvents(item: AnimeItem, cardElement: HTMLElement): void {
   const ratingAction = cardElement.querySelector('.item-action.rating') as HTMLElement;
   ratingAction.addEventListener('click', async () => {
     const model = await getAnimeModel(item);

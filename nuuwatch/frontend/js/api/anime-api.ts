@@ -1,15 +1,15 @@
 import { AnimeClient } from './anime-client.js';
-import { AniListAnime, Season } from './ani-list/ani-list-types';
-import { AnimeItem } from '../app-state';
+import { AniListAnime, AniListSeason } from './ani-list/ani-list-types';
+import { getSelectedSeason, Season } from '../seasons.js';
 
 export class AnimeApi {
   private client: AnimeClient = new AnimeClient();
 
-  public async getCurrentSeason(): Promise<Season> {
-    const year = 2026;
-    const season = 'summer';
+  public async getSeason(): Promise<AniListSeason> {
+    const season = getSelectedSeason();
+    const seasonValue = Season[season.season].toLowerCase();
 
-    const url = `/anime/seasons/${year}/${season}`;
+    const url = `/anime/seasons/${season.year}/${seasonValue}`;
 
     const data = await this.client.get(url);
     return data;

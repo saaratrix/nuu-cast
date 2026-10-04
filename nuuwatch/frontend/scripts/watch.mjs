@@ -1,7 +1,6 @@
 import { watch } from "node:fs";
-import { copyFile } from "node:fs/promises";
-import { resolve, join } from "node:path";
-import { runBuild } from './build_and_copy.mjs';
+import { copyFile, mkdir } from "node:fs/promises";
+import { resolve, join, dirname } from "node:path";
 
 const DEBOUNCE_MS = 2500;
 
@@ -36,6 +35,11 @@ function watchDirectory(directory) {
   });
 }
 
+async function copyFileEnsureDirectory(src, target) {
+  await mkdir(dirname(target), { recursive: true });
+  await copyFile(src, target);
+}
+
 let isCopying = false;
 function startCopyAction() {
   clearTimeout(timer);
@@ -56,7 +60,7 @@ function startCopyAction() {
     timer = undefined;
 
     for (const [src, target] of values) {
-      copyPromises.push(copyFile(src, target));
+      copyPromises.push(copyFileEnsureDirectory(src, target));
     }
 
     Promise.allSettled(copyPromises).then((results) => {

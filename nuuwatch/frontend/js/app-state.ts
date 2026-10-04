@@ -1,7 +1,9 @@
 import { AnimeModel } from './anime-model.js';
 import { EventHandler } from './event-handler.js';
 import { AnimeApi } from './api/anime-api.js';
-import { AniListAnime } from './api/ani-list/ani-list-types';
+import type { AniListAnime } from './api/ani-list/ani-list-types';
+import type { AnimeCard } from './components/anime-card';
+import './components/anime-card.js';
 
 export interface AnimeItemParts {
   visualTitle: string;
@@ -10,11 +12,13 @@ export interface AnimeItemParts {
   imageUrl: string;
   siteUrl: string;
   hasEnglishTitle: boolean;
+  /** Generated from getSynopsisHTML(), might not exist so load on demand. */
+  synopsisHTML?: string
 }
 
 export type AnimeItemEvents = 'anime:modelUpdated' | 'media:updated';
 
-export interface AnimeItem<T> {
+export interface AnimeItem<T = unknown> {
   id: number,
   data: T;
   title: string;
@@ -22,7 +26,7 @@ export interface AnimeItem<T> {
   type: 'anime';
   apiType: 'mal' | 'anilist',
   parts: AnimeItemParts;
-  cardElement: HTMLElement;
+  cardElement: AnimeCard<T>;
   eventHandler: EventHandler<AnimeItemEvents>
   model?: AnimeModel;
   media?: string[];
@@ -77,6 +81,6 @@ export const addItem = (type: ItemsKey, item: AnimeItem<AniListAnime>) => {
   appState.items[type].push(item);
 }
 
-export const updateMediaFiles = (animeItem: AnimeItem<unknown>): void  => {
+export const updateMediaFiles = (animeItem: AnimeItem): void  => {
   animeItem.eventHandler.dispatchEvent('media:updated');
 }
