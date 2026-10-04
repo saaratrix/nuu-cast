@@ -25,14 +25,14 @@ function onPageLoaded() {
   console.log('page loaded');
   let currentPage = 1;
   changeItem(undefined);
-  fetchCurrentSeason(currentPage).then();
+  fetchSeason(currentPage).then();
 }
 
-async function fetchCurrentSeason(currentPage: number) {
+async function fetchSeason(currentPage: number) {
   let animes = Array.from(loadedAnimes.values());
 
   if (animes.length == 0) {
-    const res = await animeApi.getCurrentSeason();
+    const res = await animeApi.getSeason();
     animes = res.animes;
     if (res.hasError) {
       console.log('there was an error fetching animes from anilist.');

@@ -13,8 +13,8 @@ $left-accent-width: 4px;
 
 body.anime-page {
   // These are for the left sidebar
-  --fallback-bg-link-active: color.change(theme-colors.$link-active, $alpha: $opacity-bg-link);
-  --fallback-bg-link-hover: color.change(theme-colors.$link-hover, $alpha: $opacity-bg-link);
+  --fallback-bg-link-active: #{color.change(theme-colors.$link-active, $alpha: $opacity-bg-link)};
+  --fallback-bg-link-hover: #{color.change(theme-colors.$link-hover, $alpha: $opacity-bg-link)};
   --opacity-bg-link: #{math.percentage($opacity-bg-link)};
 
   --opacity-left: #{math.percentage($opacity-left)};

@@ -1,0 +1,47 @@
+.seasons-dialog {
+    background: var(--color-bg);
+    color: var(--color-text-primary);
+
+    border: 1px solid var(--color-bg-highlight);
+    border-radius: 14px;
+
+
+
+    box-shadow:
+            0 0 0 1px rgba(200, 172, 255, 0.08) inset,
+            0 12px 36px rgba(0, 0, 0, 0.5),
+            0 0 24px rgba(160, 135, 210, 0.18);
+
+    opacity: 0;
+    transform: translateY(-10px) scale(0.97);
+    transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.seasons-container {
+    padding: 2.5rem;
+    font-size: 1.5em;
+
+    h3 {
+        margin-bottom: 1.5rem;
+    }
+
+    input {
+        height: 2.5rem;
+        width: 10ch;
+        font-size: 1em;
+    }
+}
+
+.seasons-year-container {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.seasons-seasons {
+    margin-top: 2rem;
+}
+
+.seasons-select {
+    margin-top: 2rem;
+}

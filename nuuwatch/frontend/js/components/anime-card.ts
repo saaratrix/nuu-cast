@@ -1,10 +1,10 @@
-import { escapeHtml, getParsedSynopsisHTML } from '../utility.js';
 import { AnimeItem, appState } from '../app-state.js';
 import { AnimeModel, getAnimeModel, insertOrUpdateModel, Rating } from '../anime-model.js';
 import { openEditor } from '../item-editor.js';
 import { hidePopover, showPopover } from '../popover.js';
 import type { Rating as NuiRating } from '../nui/rating/rating'
-import { getCurrentEpisode, getTotalEpisodes, getScore, getSynopsisHTML, isAniListItem, isMalItem, getAiringAt } from '../utility-api.js';
+import { getCurrentEpisode, getTotalEpisodes, getScore, getSynopsisHTML, getAiringAt } from '../utility-api.js';
+import { animeCardStyle } from './anime-card.style.js';
 
 type AnimeCardElementQueries =
   | '.body'
@@ -29,7 +29,7 @@ type AnimeCardElementQueries =
   | '.mal-link a'
   | '.edit-anime';
 
-const defaultCardWidth = '128px';
+
 
 export class AnimeCard<ItemType = unknown> extends HTMLElement {
   observedAttributes = ['mal-id', 'ani-list-id'];
@@ -55,57 +55,7 @@ export class AnimeCard<ItemType = unknown> extends HTMLElement {
     // .title ellipsis clamp reference: https://stackoverflow.com/questions/5269713/css-ellipsis-on-second-line
     this.shadow.innerHTML = `
       <style>
-        :root {
-            
-        }
-        
-        .title, p {
-            margin: 0;
-        }
-        
-        .card {
-            width: var(--card-size, ${defaultCardWidth});
-        }
-        
-        .poster {
-            width: var(--card-size, ${defaultCardWidth});
-            height: calc(var(--card-size, ${defaultCardWidth}) * 1.15);
-            object-fit: cover;
-        }
-        
-        .body {
-            display: inline-flex;
-            flex-direction: column;
-            
-            color: var(--color-text-primary);
-            text-decoration: none;
-        }      
-        
-        .title {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            
-            font-size: 1em;
-        }           
-        
-        .airing-at {
-            color: var(--color-text-secondary);
-        }
-        
-        .rating {
-            color: var(--color-warning);
-            font-size: 1.15em;
-        }
-        .rating-text {
-            color: var(--color-text-primary);
-            font-size: 0.85em;
-        }
-        
-        .synopsis-rating-value {
-            margin: 1rem;
-        }
+        ${animeCardStyle}
       </style>
       <div class="card">
         <a class="body" href="">

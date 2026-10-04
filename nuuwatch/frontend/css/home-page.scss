@@ -19,8 +19,8 @@ $content-padding: 1rem;
 $sidebar-padding: 0.5rem;
 
 body.home-page {
-  --fallback-bg-link-active: color.change(theme-colors.$link-active, $alpha: $opacity-bg-link);
-  --fallback-bg-link-hover: color.change(theme-colors.$link-hover, $alpha: $opacity-bg-link);
+  --fallback-bg-link-active: #{color.change(theme-colors.$link-active, $alpha: $opacity-bg-link)};
+  --fallback-bg-link-hover: #{color.change(theme-colors.$link-hover, $alpha: $opacity-bg-link)};
 
   --opacity-bg-link: #{math.percentage($opacity-bg-link)};
   --opacity-left: #{math.percentage($opacity-left)};
@@ -150,13 +150,15 @@ main {
 .animes-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, max-content));
-
+  --card-size: 180px;
   margin-top: 0.75rem;
 }
 
-.anime-card {
-  height: 200px;
+anime-card {
+  display: flex;
+  justify-content: center;
 }
+
 
 .utility {
   display: flex;

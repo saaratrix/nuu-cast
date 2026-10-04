@@ -1,4 +1,4 @@
-export interface Season {
+export interface AniListSeason {
   animes: AniListAnime[];
   hasError: boolean;
 }

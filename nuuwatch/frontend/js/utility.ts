@@ -47,3 +47,11 @@ export function getParsedSynopsisHTML(synopsis: string) {
 
   return container.innerHTML;
 }
+
+/**
+ * Method to dynamically add a <style> tag to the header so we don't load all the CSS at once. It's a lot of CSS now!
+ * @param id
+ */
+export function addCSS(id: 'home' | 'anime' | 'home-anime-card'): boolean {
+  return false;
+}
