@@ -26,8 +26,8 @@ nuuwatch/data/*
 nuuwatch/downloads/*
 nuuwatch/.env
 
-nuuwatch/frontend/css/*.css
-nuuwatch/frontend/css/*.css.map
+nuuwatch/frontend/**/*.css
+nuuwatch/frontend/**/*.css.map
 
 nuuwatch/static/js/*
 nuuwatch/static/css/*

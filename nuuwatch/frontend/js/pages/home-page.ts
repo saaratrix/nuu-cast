@@ -3,6 +3,7 @@ import { addItemModel, AnimeModel, Rating } from '../anime-model.js';
 import { loadHTML } from '../routing/layout-loader.js';
 import { AniListAnime } from '../api/ani-list/ani-list-types';
 import { createAnimeItemFromAniList } from '../anime-ani-list-item-utility.js';
+import { getSelectedSeason, Season } from '../seasons.js';
 
 const loadedAnimes = new Map<number, AniListAnime>();
 
@@ -26,6 +27,33 @@ function onPageLoaded() {
   let currentPage = 1;
   changeItem(undefined);
   fetchSeason(currentPage).then();
+
+  setSeasonInfoHeader();
+}
+
+function setSeasonInfoHeader() {
+  const season = getSelectedSeason();
+  const seasonInfo = document.querySelector('.season-info') as HTMLElement;
+  const title = seasonInfo.querySelector('h2') as HTMLElement;
+  const timespan = seasonInfo?.querySelector('.season-timespan') as HTMLElement;
+
+  title.textContent = `${Season[season.season]} ${season.year}`;
+  let timespanText: string;
+  switch (season.season) {
+    case Season.Winter:
+      timespanText = `01 Jan - 31 Mar`;
+      break;
+    case Season.Spring:
+      timespanText = `01 Apr - 30 Jun`;
+      break;
+    case Season.Summer:
+      timespanText = `01 Jul - 30 Sep`;
+      break;
+    case Season.Fall:
+      timespanText = `1 Oct - 31 Dec`;
+      break;
+  }
+  timespan.textContent = timespanText;
 }
 
 async function fetchSeason(currentPage: number) {
