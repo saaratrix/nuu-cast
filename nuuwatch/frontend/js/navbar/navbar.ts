@@ -30,8 +30,8 @@ function openSeasonDialog() {
       <button class="btn btn-primary fall">Fall</button>
     </div>
     <div class="seasons-select">
-        <button class="btn btn-primary select active">Select</button>
-        <button class="btn btn-primary default">Set Default</button>
+        <button class="btn btn-primary select">Ok</button>
+        <button class="btn btn-primary default">Set as default</button>
         <button class="btn btn-primary clear-default" hidden>Clear default</button>
     </div>
    
