@@ -34,7 +34,6 @@ function openSeasonDialog() {
         <button class="btn btn-primary default">Set as default</button>
         <button class="btn btn-primary clear-default" hidden>Clear default</button>
     </div>
-   
 </div>`;
   document.body.appendChild(dialog);
 

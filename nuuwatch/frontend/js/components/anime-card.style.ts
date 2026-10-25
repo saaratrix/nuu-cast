@@ -1,10 +1,6 @@
 const defaultCardWidth = '128px';
 /* language=css */
-export const animeCardStyle = ` 
-:root {
-
-}
-
+export const animeCardStyle = `
 .title, p {
   margin: 0;
 }

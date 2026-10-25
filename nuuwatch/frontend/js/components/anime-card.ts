@@ -133,8 +133,6 @@ export class AnimeCard<ItemType = unknown> extends HTMLElement {
 
   connectedCallback() {
     this.addEventListeners();
-    // this.dirty.item = !!this.animeItem;
-    // this.dirty.model = !!this.animeItem?.model;
     this.render();
   }
 
@@ -298,7 +296,6 @@ export class AnimeCard<ItemType = unknown> extends HTMLElement {
       return;
     }
 
-    // const synopsisMetadata = this.getElement<HTMLElement>('.synopsis-metadata');
     const synopsisTitle = this.getElement('.meta-title');
     const synopsisRatingValue = this.getElement<NuiRating>('.synopsis-rating-value');
     const synopsisEpisodes = this.getElement('.syn-episodes');
