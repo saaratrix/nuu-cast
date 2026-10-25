@@ -36,15 +36,15 @@ pub async fn convert_mkv(paths: &UrlAndFilePath, body: &Bytes) -> Result<Vec<Pat
     let subtitle_paths_time = Instant::now();
     println!("extract subtitles ({}) to srt files took {:?}", subtitle_paths.len() , subtitle_paths_time.duration_since(video_fileconvert_time));
 
-    let vtt_paths = convert_subtitles_to_vtt(&subtitle_paths).await?;
-    let vtt_paths_time = Instant::now();
-    println!("convert srt to vtt took {:?}", vtt_paths_time.duration_since(subtitle_paths_time));
+    let converted_subtitle_paths = convert_subtitles_to_ass(&subtitle_paths).await?;
+    let converted_subtitle_paths_time = Instant::now();
+    println!("convert subtitles took {:?}", converted_subtitle_paths_time.duration_since(subtitle_paths_time));
 
     // Copy mp4_file and vtt_paths to the real folder.
     let mut converted_paths = vec![mp4_file];
-    converted_paths.extend(vtt_paths);
+    converted_paths.extend(converted_subtitle_paths);
 
-    let output_paths: Vec<PathBuf> = copy_converted_files_get_output(&paths, &converted_paths, vtt_paths_time).await?;
+    let output_paths: Vec<PathBuf> = copy_converted_files_get_output(&paths, &converted_paths, converted_subtitle_paths_time).await?;
     Ok(output_paths)
 }
 
@@ -234,6 +234,15 @@ pub async fn convert_subtitles_to_vtt(
     let mut vtt_files = Vec::new();
 
     for input_file in subtitle_files {
+        // If file already is a vtt file then just clone path.
+        if input_file
+            .extension()
+            .is_some_and(|ext| ext.eq_ignore_ascii_case("vtt"))
+        {
+            vtt_files.push(input_file.clone());
+            continue;
+        }
+
         let output_file = input_file.with_extension("vtt");
 
         let output = Command::new("ffmpeg")
@@ -263,4 +272,54 @@ pub async fn convert_subtitles_to_vtt(
     }
 
     Ok(vtt_files)
+}
+
+pub async fn convert_subtitles_to_ass(
+    subtitle_files: &[PathBuf],
+) -> Result<Vec<PathBuf>, String> {
+    let mut ass_files = Vec::with_capacity(subtitle_files.len());
+
+    for input_file in subtitle_files {
+        let extension = input_file
+            .extension()
+            .and_then(|ext| ext.to_str())
+            .unwrap_or_default();
+
+        // ASS and SSA can be used as-is
+        if extension.eq_ignore_ascii_case("ass")
+            || extension.eq_ignore_ascii_case("ssa")
+        {
+            ass_files.push(input_file.clone());
+            continue;
+        }
+
+        let output_file = input_file.with_extension("ass");
+
+        let output = Command::new("ffmpeg")
+            .arg("-y")
+            .arg("-i")
+            .arg(input_file)
+            .arg(&output_file)
+            .output()
+            .await
+            .map_err(|e| {
+                format!(
+                    "Failed to start ffmpeg for {}: {}",
+                    input_file.display(),
+                    e
+                )
+            })?;
+
+        if !output.status.success() {
+            return Err(format!(
+                "ffmpeg failed converting {}\nstderr:\n{}",
+                input_file.display(),
+                String::from_utf8_lossy(&output.stderr)
+            ));
+        }
+
+        ass_files.push(output_file);
+    }
+
+    Ok(ass_files)
 }

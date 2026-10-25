@@ -141,7 +141,7 @@ function initItemTags(item) {
 
   const itemTags = [];
 
-  const isSubtitle = url.endsWith('.vtt');
+  const isSubtitle = url.endsWith('.vtt') || url.endsWith('.ass') || url.endsWith('.ssa');
   if (isSubtitle) {
     itemTags.push(filters.subtitle.tag);
     filters.subtitle.items.push(item);
