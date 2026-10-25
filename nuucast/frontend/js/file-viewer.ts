@@ -8,7 +8,7 @@ function tryInitializeSubtitlesPicker() {
   const subtitlesPicker = document.getElementById('subtitle-picker');
 
   /** @type {NodeListOf<HTMLOptionElement> | undefined} */
-  const subtitleOptions = subtitlesPicker && subtitlesPicker.querySelectorAll('option');
+  const subtitleOptions = subtitlesPicker && subtitlesPicker.querySelectorAll<HTMLOptionElement>('option');
   // No subtitles if the element doesn't exist
   if (!subtitleOptions || !subtitleOptions.length) {
     return;
@@ -35,13 +35,13 @@ function tryInitializeSubtitlesPicker() {
   videoElement.appendChild(fragment);
 }
 
-function getSubtitleUrls(elements) {
-  const filename = document.title.split('/').pop();
+function getSubtitleUrls(elements: NodeListOf<HTMLOptionElement>): string[] {
+  const filename = document.title.split('/').pop() ?? '';
   const extensionIndex = filename.lastIndexOf('.');
   const basename = extensionIndex !== -1 ? filename.substring(0, extensionIndex) : filename;
 
-  let subtitles = [];
-  const directMatching = [];
+  let subtitles: string[] = [];
+  const directMatching: string[] = [];
   elements.forEach(s => {
     const subtitle = s.value;
     if (subtitle.includes(basename)) {

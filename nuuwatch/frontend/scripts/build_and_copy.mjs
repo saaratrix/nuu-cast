@@ -6,9 +6,7 @@ const __dirname = path.join(process.cwd(), 'scripts');
 const SOURCE_ROOT = path.join(__dirname, '..');
 const TARGET_ROOT = path.join(__dirname, '..', '..', 'static');
 
-const files = [
-  'index.html'
-]
+const files = [];
 const folders = [
   'assets',
   'img',
