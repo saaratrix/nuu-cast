@@ -68,6 +68,8 @@ export function setStoredAnimeSeason(season: AnimeSeason | null) {
     } else {
       localStorage.removeItem(animeSeasonStorageKey);
     }
+  } catch (e) {
+
   }
 }
 

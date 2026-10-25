@@ -1,0 +1,1 @@
+All icons gathered here so it's easy to generate an icon font.

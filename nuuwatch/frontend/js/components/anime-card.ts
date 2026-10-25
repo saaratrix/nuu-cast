@@ -29,10 +29,8 @@ type AnimeCardElementQueries =
   | '.mal-link a'
   | '.edit-anime';
 
-
-
 export class AnimeCard<ItemType = unknown> extends HTMLElement {
-  observedAttributes = ['mal-id', 'ani-list-id'];
+  static observedAttributes = ['mal-id', 'ani-list-id'];
 
   shadow: ShadowRoot;
 

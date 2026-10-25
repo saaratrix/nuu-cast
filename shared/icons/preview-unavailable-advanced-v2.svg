@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="24" viewBox="0 0 32 24" fill="none">
+  <!-- Filmstrip outline -->
+  <rect x="2.5" y="3" width="27" height="18" rx="2.5"
+        stroke="currentColor" stroke-width="2.2"/>
+
+  <!-- Film sprocket dividers -->
+  <path d="M7.5 3V21M24.5 3V21"
+        stroke="currentColor" stroke-width="2"/>
+
+  <!-- Left sprocket holes -->
+  <rect x="3.8" y="5" width="2.4" height="3.2" rx="0.5" fill="currentColor"/>
+  <rect x="3.8" y="10.4" width="2.4" height="3.2" rx="0.5" fill="currentColor"/>
+  <rect x="3.8" y="15.8" width="2.4" height="3.2" rx="0.5" fill="currentColor"/>
+
+  <!-- Right sprocket holes -->
+  <rect x="25.8" y="5" width="2.4" height="3.2" rx="0.5" fill="currentColor"/>
+  <rect x="25.8" y="10.4" width="2.4" height="3.2" rx="0.5" fill="currentColor"/>
+  <rect x="25.8" y="15.8" width="2.4" height="3.2" rx="0.5" fill="currentColor"/>
+
+  <!-- Centered unavailable X -->
+  <path d="M11 8L21 18M21 8L11 18"
+        stroke="currentColor" stroke-width="2.6"
+        stroke-linecap="round"/>
+</svg>

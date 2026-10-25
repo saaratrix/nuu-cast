@@ -36,13 +36,6 @@
   background-color: var(--color-bg-contrast-low);
 }
 
-.item-card:hover {
-  /*.item-synopsis {*/
-  /*    opacity: 1;*/
-  /*    pointer-events: auto;*/
-  /*}*/
-}
-
 a {
   color: var(--color-link);
   text-decoration: none;
@@ -92,14 +85,8 @@ a:hover {
 }
 
 .item-synopsis {
-  /*position: absolute;*/
-  /*top: 100%;*/
-  /*max-width: 100%;*/
   transition: opacity 100ms ease-in;
-  /*opacity: 0;*/
   pointer-events: none;
-
-  /*z-index: 10;*/
   padding: 0.5rem;
 }
 

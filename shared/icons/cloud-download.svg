@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="24" viewBox="0 0 32 24" fill="none">
+  <!-- Symmetric cloud, centered on x=16 -->
+  <path
+    d="M10.2 19H8.5
+       C5.46 19 3 16.54 3 13.5
+       C3 10.46 5.46 8 8.5 8
+       C9.30 4.55 12.40 2 16 2
+       C19.60 2 22.70 4.55 23.50 8
+       C26.54 8 29 10.46 29 13.5
+       C29 16.54 26.54 19 23.5 19
+       H21.8"
+    stroke="currentColor"
+    stroke-width="2.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Centered download arrow -->
+  <path
+    d="M16 9V20
+       M11.8 15.8L16 20L20.2 15.8"
+    stroke="currentColor"
+    stroke-width="2.6"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>
