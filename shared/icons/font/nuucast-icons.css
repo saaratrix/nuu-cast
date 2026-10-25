@@ -1,0 +1,27 @@
+@font-face {
+  font-family: "nuucast-icons";
+  src: url('nuucast-icons.eot?t=1792252685739'); /* IE9*/
+  src: url('nuucast-icons.eot?t=1792252685739#iefix') format('embedded-opentype') /* IE6-IE8 */,
+  url('nuucast-icons.woff2?t=1792252685739') format('woff2'),
+  url('nuucast-icons.woff?t=1792252685739') format('woff'),
+  url('nuucast-icons.ttf?t=1792252685739') format('truetype'),
+  url('nuucast-icons.svg?t=1792252685739') format('svg');
+}
+
+[class^="nuucast-icons-"], [class*=" nuucast-icons-"] {
+  font-family: 'nuucast-icons' !important;
+  font-style:normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+
+
+.nuucast-icons-arrow::before { content: "\ea01"; }
+.nuucast-icons-fullscreen::before { content: "\ea02"; }
+.nuucast-icons-play::before { content: "\ea03"; }
+.nuucast-icons-settings::before { content: "\ea04"; }
+.nuucast-icons-subtitles::before { content: "\ea05"; }
+
+

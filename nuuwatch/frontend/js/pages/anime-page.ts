@@ -57,7 +57,7 @@ async function doNewDesignLoading(id: number) {
   loadModules('anime').then(result => console.log(`${result ? 'succesfully loaded' : 'failed to load'} module anime `));
   loadModules('crunchyroll').then(result => console.log(`${result ? 'succesfully loaded' : 'failed to load'} module crunchyroll`));
 
-  let animeItem: AnimeItem<unknown> | undefined;
+  let animeItem: AnimeItem | undefined;
   let itemChanged = false;
   try {
     const onChanged = () => {
@@ -120,7 +120,7 @@ async function doOldLoading(id: number) {
   loadModules('anime').then(result => console.log(`${result ? 'succesfully loaded' : 'failed to load'} module anime `));
   loadModules('crunchyroll').then(result => console.log(`${result ? 'succesfully loaded' : 'failed to load'} module crunchyroll`));
 
-  let animeItem: AnimeItem<unknown> | undefined;
+  let animeItem: AnimeItem | undefined;
   let itemChanged = false;
   try {
     const onChanged = () => {
@@ -186,7 +186,7 @@ async function doOldLoading(id: number) {
   updateMediaFiles(animeItem);
 }
 
-async function getApiAnimeItem(id: number): Promise<AnimeItem<unknown>> {
+async function getApiAnimeItem(id: number): Promise<AnimeItem> {
   let animeItem = appState.itemsById.get(id);
   if (animeItem) {
     return animeItem;
@@ -195,12 +195,12 @@ async function getApiAnimeItem(id: number): Promise<AnimeItem<unknown>> {
   return loadApiItem(id);
 }
 
-function updateAnimeInfo(animeInfo: HTMLElement, animeItem: AnimeItem<unknown>) {
+function updateAnimeInfo(animeInfo: HTMLElement, animeItem: AnimeItem) {
   const poster = animeInfo.querySelector('.poster') as HTMLImageElement;
   poster.src = animeItem.parts.imageUrl;
 }
 
-function updateAnimeBody(animeBody: HTMLElement, animeItem: AnimeItem<unknown>) {
+function updateAnimeBody(animeBody: HTMLElement, animeItem: AnimeItem) {
 
 }
 
@@ -219,7 +219,7 @@ async function loadApiItem(id: number): Promise<AnimeItem<AniListAnime>> {
   return animeItem;
 }
 
-async function updateMediaSection(item: AnimeItem<unknown>, itemContainer: HTMLElement) {
+async function updateMediaSection(item: AnimeItem, itemContainer: HTMLElement) {
   const section = itemContainer.querySelector<HTMLElement>('.media')!;
   const videosElement = section.querySelector<HTMLElement>('.media-videos')!;
   const spinner = section.querySelector<ProgressStatus>('progress-status');
@@ -248,7 +248,7 @@ async function updateMediaSection(item: AnimeItem<unknown>, itemContainer: HTMLE
   videosElement.appendChild(fragment);
 }
 
-async function fetchMediaFiles(item: AnimeItem<unknown>, videosElement: HTMLElement) {
+async function fetchMediaFiles(item: AnimeItem, videosElement: HTMLElement) {
   if (item.media) {
     return item.media;
   }

@@ -2,9 +2,13 @@ use std::str::FromStr;
 
 #[derive(Debug, Clone, Copy)]
 pub enum Season {
+    // January 1 – March 31
     Winter,
+    // April 1 – June 30
     Spring,
+    // July 1 – September 30
     Summer,
+    // October 1 – December 31
     Fall,
 }
 

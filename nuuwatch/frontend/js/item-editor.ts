@@ -3,7 +3,7 @@ import { AnimeModel, getAnimeModel, insertOrUpdateModel, patchAnimeModel, putAni
 import { escapeHtml } from './utility.js';
 
 export async function openEditor(
-  item: AnimeItem<unknown>,
+  item: AnimeItem,
 ) {
   const model = await getAnimeModel(item);
   if (!model) {

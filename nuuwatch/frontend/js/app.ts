@@ -2,6 +2,7 @@ import { loadMainPage } from './pages/home-page.js';
 import { loadAnimeViewPage } from './pages/anime-page.js';
 import { hidePopover } from './popover.js';
 import { getCurrentRoute } from './routing/router.js';
+import { initNavbar } from './navbar/navbar.js';
 
 function router() {
   const [route, routes] = getCurrentRoute();
@@ -33,7 +34,12 @@ function loadViewAnime(routes: string[]): boolean {
   return true;
 }
 
+
+
 window.addEventListener('hashchange', router);
-window.addEventListener('DOMContentLoaded', router);
+window.addEventListener('DOMContentLoaded', () => {
+  initNavbar();
+  router();
+});
 
 

@@ -8,7 +8,7 @@ interface CrunchyrollModel {
 }
 
 (function() {
-  let currentItem: AnimeItem<unknown> | undefined = undefined;
+  let currentItem: AnimeItem | undefined = undefined;
 
   document.addEventListener('anime:itemChanged', (e) => {
     const event = e as CustomEvent<number | undefined>;
@@ -32,7 +32,7 @@ interface CrunchyrollModel {
     currentItem.eventHandler.removeEventListener('anime:modelUpdated', 'crunchyroll');
   }
 
-  function setCurrentItem(item: AnimeItem<unknown> | undefined): void {
+  function setCurrentItem(item: AnimeItem | undefined): void {
     if (item === currentItem) {
       return;
     }

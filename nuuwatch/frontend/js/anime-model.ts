@@ -38,7 +38,7 @@ export interface ModelUpdatedEvent {
 
 let activePromises = new Map<number, Promise<AnimeModel>>
 
-export async function tryInitializeAnimeModel(item: AnimeItem<unknown>) {
+export async function tryInitializeAnimeModel(item: AnimeItem) {
   if (item.model) {
     return;
   }
@@ -47,7 +47,7 @@ export async function tryInitializeAnimeModel(item: AnimeItem<unknown>) {
   addItemModel(item, model);
 }
 
-export function getAnimeModel(item: AnimeItem<unknown>): Promise<AnimeModel> {
+export function getAnimeModel(item: AnimeItem): Promise<AnimeModel> {
   if (item.model) {
     return Promise.resolve(item.model);
   }
@@ -70,7 +70,7 @@ export function getAnimeModel(item: AnimeItem<unknown>): Promise<AnimeModel> {
   return promise;
 }
 
-export function addItemModel(item: AnimeItem<unknown>, model: AnimeModel): void {
+export function addItemModel(item: AnimeItem, model: AnimeModel): void {
   // In case of multiple pending calls we don't spam events!
   if (item.model) {
     return;
@@ -85,7 +85,7 @@ export function addItemModel(item: AnimeItem<unknown>, model: AnimeModel): void 
   item.eventHandler.dispatchEvent('anime:modelUpdated', { id: item.id, model });
 }
 
-export function updateItemModel(item: AnimeItem<unknown>, model: AnimeModel): void {
+export function updateItemModel(item: AnimeItem, model: AnimeModel): void {
   item.model = model;
   appState.animeModels.set(item.id, model);
   item.eventHandler.dispatchEvent('anime:modelUpdated', { id: item.id, model });
@@ -135,7 +135,7 @@ export function createDefaultModel(id: number): AnimeModel {
   }
 }
 
-export async function insertOrUpdateModel(item: AnimeItem<unknown>, model: AnimeModel): Promise<void> {
+export async function insertOrUpdateModel(item: AnimeItem, model: AnimeModel): Promise<void> {
   const modules_data_json = JSON.stringify(model.modules_data);
   const payload = { ...model, modules_data: modules_data_json };
 
