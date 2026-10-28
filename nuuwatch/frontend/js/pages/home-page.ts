@@ -3,9 +3,10 @@ import { addItemModel, AnimeModel, Rating } from '../anime-model.js';
 import { loadHTML } from '../routing/layout-loader.js';
 import { AniListAnime } from '../api/ani-list/ani-list-types';
 import { createAnimeItemFromAniList } from '../anime-ani-list-item-utility.js';
-import { getSelectedSeason, Season } from '../seasons.js';
+import { AnimeSeason, changeSeasonWithoutRefresh, dispatchSeasonChangeEvent, getSelectedSeason, Season } from '../seasons.js';
+import type { PaginationIndicator } from '../nui/pagination-indicator/pagination-indicator';
 
-const loadedAnimes = new Map<number, AniListAnime>();
+const loadedAnimesBySeason = new Map<string, Map<number, AniListAnime>>();
 
 export function loadMainPage() {
   const animeListContainer = document.querySelector('.animes-list');
@@ -24,18 +25,60 @@ export function loadMainPage() {
 
 function onPageLoaded() {
   console.log('page loaded');
-  let currentPage = 1;
   changeItem(undefined);
-  fetchSeason(currentPage).then();
 
-  setSeasonInfoHeader();
+  document.addEventListener('seasonChange', onSeasonChange);
+
+  const season = getSelectedSeason();
+
+  dispatchSeasonChangeEvent(season.year, season.season);
+  initSeasonInfoHeader();
 }
 
-function setSeasonInfoHeader() {
-  const season = getSelectedSeason();
-  const seasonInfo = document.querySelector('.season-info') as HTMLElement;
-  const title = seasonInfo.querySelector('h2') as HTMLElement;
-  const timespan = seasonInfo?.querySelector('.season-timespan') as HTMLElement;
+function onSeasonChange(e: Event) {
+  const event = e as CustomEvent<AnimeSeason>;
+
+  setSeasonInfoHeader(event.detail);
+  fetchSeason(event.detail).then();
+}
+
+function initSeasonInfoHeader() {
+  // Has the season info and the categories buttons
+  const seasonInfoCategoriesHeader = document.querySelector('.season-info-categories-header') as HTMLElement;
+  const previousButton = seasonInfoCategoriesHeader.querySelector('.season-previous') as HTMLButtonElement;
+  const nextButton = seasonInfoCategoriesHeader.querySelector('.season-next') as HTMLButtonElement;
+
+  previousButton.addEventListener('click', () => {
+    let { year, season } = getSelectedSeason();
+    season -= 1;
+    if (season < 0) {
+      season = Season.Fall;
+      year--;
+    }
+    const seasonIndicator = document.querySelector('.season-info-categories-header pagination-indicator') as PaginationIndicator;
+    seasonIndicator.setAttribute('progress', season.toString());
+    changeSeasonWithoutRefresh(year, season);
+  });
+
+  nextButton?.addEventListener('click', () => {
+    let { year, season } = getSelectedSeason();
+    season += 1;
+    if (season > Season.Fall) {
+      season = Season.Winter;
+      year++;
+    }
+    const seasonIndicator = document.querySelector('.season-info-categories-header pagination-indicator') as PaginationIndicator;
+    seasonIndicator.setAttribute('progress', season.toString());
+    changeSeasonWithoutRefresh(year, season);
+  });
+}
+
+function setSeasonInfoHeader(season: AnimeSeason): void {
+  // Has the season info and the categories buttons
+  const seasonInfoCategoriesHeader = document.querySelector('.season-info-categories-header') as HTMLElement;
+  const title = seasonInfoCategoriesHeader.querySelector('h2') as HTMLElement;
+  const timespan = seasonInfoCategoriesHeader.querySelector('.season-timespan') as HTMLElement;
+  const seasonIndicator = seasonInfoCategoriesHeader.querySelector('pagination-indicator') as PaginationIndicator;
 
   title.textContent = `${Season[season.season]} ${season.year}`;
   let timespanText: string;
@@ -54,11 +97,22 @@ function setSeasonInfoHeader() {
       break;
   }
   timespan.textContent = timespanText;
+
+  seasonIndicator.setAnimationEnabled(false);
+  // Season is already nicely sorted 0 --> 3
+  seasonIndicator.setAttribute('progress', season.season.toString());
+  seasonIndicator.setAnimationEnabled(true);
 }
 
-async function fetchSeason(currentPage: number) {
-  let animes = Array.from(loadedAnimes.values());
+async function fetchSeason(season: AnimeSeason) {
+  const seasonKey = `${season.year}_${season.season}`;
+  let loadedAnimes = loadedAnimesBySeason.get(seasonKey);
+  if (!loadedAnimes) {
+    loadedAnimes = new Map<number, AniListAnime>();
+    loadedAnimesBySeason.set(seasonKey, loadedAnimes);
+  }
 
+  let animes = Array.from(loadedAnimes.values());
   if (animes.length == 0) {
     const res = await animeApi.getSeason();
     animes = res.animes;
@@ -73,20 +127,25 @@ async function fetchSeason(currentPage: number) {
   }
 
   for (const anime of animes) {
+    if (anime.isAdult) {
+      continue;
+    }
     loadedAnimes.set(anime.id, anime);
   }
 
-  onCurrentSeasonLoaded();
+  // Clear current items... needs more work!
+  appState.items = {};
+  onCurrentSeasonLoaded(loadedAnimes);
   sortItems();
-  renderAllItems();
+  renderAllItems(loadedAnimes);
 }
 
-function onCurrentSeasonLoaded() {
+function onCurrentSeasonLoaded(animesById: Map<number, AniListAnime>) {
 
   const shows = [];
   const movies = [];
 
-  const animes = loadedAnimes.values();
+  const animes = animesById.values();
 
   const ids = new Set<number>();
 
@@ -153,7 +212,7 @@ function sortItems() {
   }
 }
 
-function renderAllItems() {
+function renderAllItems(animes: Map<number, AniListAnime>) {
   const itemsContainer = document.querySelector('.animes-list');
   if (!itemsContainer) {
     return;
@@ -183,22 +242,10 @@ function tryRenderItems(items: AnimeItem<AniListAnime>[], type: string, addLineb
   }
 
   const fragment = new DocumentFragment();
-
-  // const itemsElement = document.createElement('div');
-  // itemsElement.className = 'items';
-  // itemsElement.dataset['type'] = type;
-
-  // if (addLinebreak) {
-  //   const linebreak = document.createElement('hr');
-  //   fragment.appendChild(linebreak);
-  // }
-
   for (const item of items) {
-    // itemsElement.appendChild(item.cardElement);
     fragment.appendChild(item.cardElement);
   }
 
-  // fragment.appendChild(itemsElement);
   return fragment;
 }
 

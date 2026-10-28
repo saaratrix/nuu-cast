@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const __dirname = path.join(process.cwd(), 'scripts');
+const __dirname = path.resolve(import.meta.dirname);
 
 const SOURCE_ROOT = path.join(__dirname, '..');
 const TARGET_ROOT = path.join(__dirname, '..', '..', 'static');

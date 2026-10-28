@@ -4,8 +4,8 @@
   "description": "nuucast package",
   "main": "index.js",
   "scripts": {
-    "build:nuucast": "tsc && node scripts/build_and_copy_nuucast.mjs",
-    "build:nuucast:dev": "npm run tsc:watch",
+    "build": "tsc && node scripts/build_and_copy_nuucast.mjs",
+    "build:dev": "npm run tsc:watch",
     "clean-ts-output": "find ./js -type f \\( -name '*.js' -o -name '*.js.map' \\) -delete",
     "tsc:watch": "tsc -w",
     "test": "echo \"Error: no test specified\" && exit 1"

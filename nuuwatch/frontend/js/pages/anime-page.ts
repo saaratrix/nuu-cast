@@ -13,7 +13,7 @@ import { createAnimeItemFromAniList } from '../anime-ani-list-item-utility.js';
 const useNewLoading = false;
 
 export async function loadAnimeViewPage(id: number) {
-  if (useNewLoading) {
+  if (useNewLoading || location.search.includes('new')) {
     doNewDesignLoading(id);
   } else {
     doOldLoading(id);
