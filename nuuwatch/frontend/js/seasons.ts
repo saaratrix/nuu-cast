@@ -50,7 +50,7 @@ export function getSelectedSeason(): AnimeSeason {
   const query = new URLSearchParams(location.search);
   const queryYear = parseInt(query.get('year') ?? '', 10);
   const querySeason = seasonStringToSeason(query.get('season'));
-  if (!Number.isNaN(queryYear) && querySeason) {
+  if (!Number.isNaN(queryYear) && querySeason != null) {
     return {
       year: queryYear,
       season: querySeason
@@ -86,4 +86,22 @@ export function getStoredAnimeSeason(): AnimeSeason | null {
   } catch { }
 
   return null;
+}
+
+export function changeSeasonRefresh(year: number, season: Season): void {
+  // Use the text name instead of keys.
+  const seasonText = Season[season];
+  location.href = `/?year=${year}&season=${seasonText}#`;
+}
+
+export function changeSeasonWithoutRefresh(year: number, season: Season): void {
+  const seasonText = Season[season];
+  history.pushState(null, '', `/?year=${year}&season=${seasonText}#`);
+  dispatchSeasonChangeEvent(year, season);
+}
+
+export function dispatchSeasonChangeEvent(year: number, season: Season): void {
+  document.dispatchEvent(new CustomEvent('seasonChange', {
+    detail: { year, season },
+  }));
 }

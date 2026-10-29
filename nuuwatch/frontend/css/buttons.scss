@@ -78,3 +78,10 @@
     --btn-color-disabled-bg: var(--color-primary-subtle);
   }
 }
+
+.btn-ghost {
+  --btn-color-bg: transparent;
+  --btn-color-text: var(--color-text-secondary);
+  --btn-color-hover-text: var(--color-text-primary);
+  --btn-color-active-text: var(--color-text-muted);
+}

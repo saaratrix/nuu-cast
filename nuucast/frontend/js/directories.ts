@@ -11,13 +11,13 @@ const filters = {
   subtitle: {
     tag: 'subtitle',
     active: false,
-    items: []
+    items: new Array<HTMLElement>()
   },
 }
 
 function initFilters() {
-  const filtersElement = document.getElementById('filters');
-  const filterSubtitlesButton = filtersElement.querySelector('.filter-subtitles');
+  const filtersElement = document.getElementById('filters') as HTMLElement;
+  const filterSubtitlesButton = filtersElement.querySelector('.filter-subtitles') as HTMLElement;
 
   filters.subtitle.active = (localStorage.getItem('filter-subtitles') ?? '1') !== '0';
   filters.subtitle.active && filterSubtitlesButton.classList.add('active');
@@ -33,11 +33,12 @@ function initFilters() {
 }
 
 function filterItems() {
-  const filterList = Object.values(filters);
+
+  const filterList = [filters.subtitle];
   /** @type {Set<HTMLButtonElement>} */
-  const visibleItems = new Set();
+  const visibleItems = new Set<HTMLElement>();
   /** @type {Set<HTMLButtonElement>} */
-  const hiddenItems = new Set();
+  const hiddenItems = new Set<HTMLElement>();
 
   for (const filter of filterList) {
     const target = filter.active ? hiddenItems : visibleItems;
@@ -58,13 +59,13 @@ function filterItems() {
 }
 
 function initItems() {
-  const items = document.querySelectorAll('.item-card');
+  const items = document.querySelectorAll<HTMLElement>('.item-card');
   items.forEach(item => {
     initItem(item);
   });
 }
 
-function initItem(item) {
+function initItem(item: HTMLElement) {
   /** @type {HTMLElement} */
   const actions = item.querySelector('.item-actions');
   if (!actions) {
@@ -79,18 +80,18 @@ function initItem(item) {
 /**
  * @param {HTMLElement} item
  */
-function initItemContextMenu(item) {
+function initItemContextMenu(item: HTMLElement) {
   const contextMenuOpenEvent = 'nuucast:contextmenu:open';
 
-  item.addEventListener('contextmenu', (e) => {
+  item.addEventListener('contextmenu', (e: PointerEvent) => {
     // Note: If you right click inside contextmenu you open the native contextmenu, should allow clickthrough or something instead for better UX.
 
     e.preventDefault();
     document.dispatchEvent(new CustomEvent(contextMenuOpenEvent));
 
-    const link = item.querySelector('.item-body');
+    const link = item.querySelector('.item-body') as HTMLAnchorElement;
     const url = link?.href;
-    const filepath = link?.dataset.filePath;
+    const filepath = link?.dataset['filePath'];
 
     const menu = document.createElement('div');
     menu.className = 'context-menu';
@@ -105,7 +106,8 @@ function initItemContextMenu(item) {
     document.body.appendChild(menu);
 
     menu.addEventListener('click', (e) => {
-      const action = e.target.dataset.action;
+
+      const action = (e.target as HTMLElement).dataset['action'];
       if (action === 'open-tab') {
         window.open(url, '_blank');
       } else if (action === 'rename') {
@@ -114,7 +116,7 @@ function initItemContextMenu(item) {
       menu.remove();
     });
 
-    function removeMenu(event) {
+    function removeMenu() {
       menu.remove();
       document.removeEventListener('click', removeMenu);
       document.removeEventListener(contextMenuOpenEvent, removeMenu);
@@ -128,7 +130,7 @@ function initItemContextMenu(item) {
 /**
  * @param {HTMLElement} item
  */
-function initItemTags(item) {
+function initItemTags(item: HTMLElement) {
   const isDirectory = item.classList.contains('item-directory');
   const isFile = !isDirectory;
 
@@ -136,18 +138,18 @@ function initItemTags(item) {
     return;
   }
 
-  const link = item.querySelector('.item-body');
+  const link = item.querySelector('.item-body') as HTMLAnchorElement;
   const url = link?.href;
 
   const itemTags = [];
 
-  const isSubtitle = url.endsWith('.vtt');
+  const isSubtitle = url.endsWith('.vtt') || url.endsWith('.ass') || url.endsWith('.ssa');
   if (isSubtitle) {
     itemTags.push(filters.subtitle.tag);
     filters.subtitle.items.push(item);
   }
 
   if (itemTags.length > 0) {
-    item.dataset.tags = itemTags.join(' ');
+    item.dataset['tags'] = itemTags.join(' ');
   }
 }

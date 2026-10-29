@@ -4,9 +4,16 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/nuucast/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/nuuwatch/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/nuufetch/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/nuucast/target" />
       <excludeFolder url="file://$MODULE_DIR$/nuuwatch/target" />
       <excludeFolder url="file://$MODULE_DIR$/nuuwatch/static" />
+      <excludeFolder url="file://$MODULE_DIR$/nuufetch/target" />
+      <excludeFolder url="file://$MODULE_DIR$/nuuwatch/data" />
+      <excludeFolder url="file://$MODULE_DIR$/nuuwatch/downloads" />
+      <excludeFolder url="file://$MODULE_DIR$/nuucast/frontend/js/nui" />
+      <excludeFolder url="file://$MODULE_DIR$/nuuwatch/frontend/js/nui" />
+      <excludeFolder url="file://$MODULE_DIR$/nuucast/static" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

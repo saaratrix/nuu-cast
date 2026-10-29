@@ -116,20 +116,48 @@ main {
   }
 }
 
-.season-info {
+.season-info-categories-header {
   display: flex;
   gap: 1rem;
+  align-items: center;
 
   h2 {
     font-size: 1.25em;
+    text-align: center;
   }
+}
+
+.season-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  // 'Summer 2000' is 11 characters, in font-size 16px it was about 115px wide,  15ch is 121px wide
+  min-width: 15ch;
+}
+
+.season-previous, .season-next {
+  align-self: stretch;
+}
+
+.season-next {
+  transform: rotate(180deg);
+}
+
+pagination-indicator {
+  --size: 0.5em;
+  color: var(--color-text-secondary);
+  --color-active: var(--color-primary);
+  margin: 0;
+  height: 0.5rem;
 }
 
 .season-timespan {
   display: flex;
   align-items: center;
+  justify-content: center;
   color: var(--color-text-muted);
-  font-size: 0.85em;
+  font-size: 0.9em;
+  margin-bottom: 0.5rem;
 }
 
 .episodes-feed {

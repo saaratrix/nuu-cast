@@ -76,7 +76,10 @@ fn language_label(code: &str) -> String {
 fn parse_subtitle_lang(path: &Path) -> Option<(String, String)> {
     let filename = path.file_name()?.to_str()?;
 
-    if !filename.ends_with(".vtt") {
+    if ![".vtt", ".srt", ".ssa", ".ass"]
+        .iter()
+        .any(|ext| filename.ends_with(ext))
+    {
         return None;
     }
 
@@ -105,7 +108,7 @@ pub fn try_get_subtitles(
         return Vec::new();
     };
 
-    let files = get_files_of_types(&dir.to_path_buf(), &["vtt"]);
+    let files = get_files_of_types(&dir.to_path_buf(), &["vtt", "srt", "ssa", "ass"]);
     let video_stem = paths.filepath.file_stem().and_then(|s| s.to_str());
 
     let matching = |path: &UrlAndFilePath| {

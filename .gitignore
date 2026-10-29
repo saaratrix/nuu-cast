@@ -20,8 +20,22 @@ target
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
+# ----------
+# nuucast
+
 nuucast/media/*
 nuucast/temp_files/*
+
+nuucast/frontend/js/**/*.js
+
+nuucast/frontend/node_modules
+
+nuucast/static/js/*
+nuucast/static/css/*
+nuucast/static/img/*
+
+# ----------
+# nuuwatch
 nuuwatch/data/*
 nuuwatch/downloads/*
 nuuwatch/.env
@@ -33,7 +47,6 @@ nuuwatch/static/js/*
 nuuwatch/static/css/*
 nuuwatch/static/modules/*
 nuuwatch/static/img/*
-nuuwatch/static/index.html
 nuuwatch/frontend/node_modules
 nuuwatch/frontend/js/**/*.js
 nuuwatch/frontend/modules/**/*.js
@@ -41,6 +54,12 @@ nuuwatch/frontend/modules/local
 
 nuuwatch/src/modules/anime/other
 
+# -----------
+# nuufetch
+
 nuufetch
+
+# ------------
+# deploy scripts
 
 deploy/rsync/rsync-variables.sh
