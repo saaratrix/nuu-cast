@@ -10,6 +10,7 @@ source "./rsync-variables.sh"
 
 # cd to root of the projects.
 # nuufluff
+# - nui-web-components
 # - nuufetch
 # - nuu-cast
 #   - nuucast
@@ -29,6 +30,7 @@ EXCLUDES=(
     "--exclude=nuu-cast/nuucast/media/"
     "--exclude=nuu-cast/nuucast/temp_files/"
     "--exclude=nuu-cast/nuucast/target/"
+    "--exclude=nuu-cast/nuucast/frontend/"
 
     # nuuwatch folders
     "--exclude=nuu-cast/nuuwatch/data/"

@@ -1,4 +1,4 @@
-import { getCurrentAnimeSeason, getSelectedSeason, getStoredAnimeSeason, Season, setStoredAnimeSeason } from '../seasons.js';
+import { changeSeasonRefresh, getCurrentAnimeSeason, getSelectedSeason, getStoredAnimeSeason, Season, setStoredAnimeSeason } from '../seasons.js';
 
 export function initNavbar() {
   const seasons = document.querySelector<HTMLAnchorElement>('.navbar-top .link-seasons') as HTMLAnchorElement;
@@ -114,9 +114,7 @@ function openSeasonDialog() {
   }
 
   function navigateToSeason(): void {
-    // Use the text name instead of keys.
-    const season = Season[state.season];
-    location.href = `/?year=${state.year}&season=${season}#`;
+    changeSeasonRefresh(state.year, state.season);
   }
 
   function setClearDefaultVisibility(): void {

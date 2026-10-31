@@ -1,20 +1,19 @@
-import fs from 'fs';
-import path from 'path';
+import { mkdir, stat, readdir, copyFile } from 'node:fs/promises';
+import { copyFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 
-const __dirname = path.join(process.cwd(), 'scripts');
 
-const SOURCE_ROOT = path.join(__dirname, '..');
-const TARGET_ROOT = path.join(__dirname, '..', '..', 'static');
+const __dirname = resolve(import.meta.dirname);
 
-const files = [
-  'index.html'
-]
+const SOURCE_ROOT = join(__dirname, '..');
+const TARGET_ROOT = join(__dirname, '..', '..', 'static');
+
+const files = []
 const folders = [
-  'assets',
+  // 'assets',
   'img',
   'js',
   'css',
-  'modules',
 ];
 
 const ignoreExtensions = ['.ts', '.scss'];
@@ -23,22 +22,22 @@ const ignoreExtensions = ['.ts', '.scss'];
  * Creates directories recursively in the target path
  */
 async function ensureDir(dir) {
-  await fs.promises.mkdir(dir, { recursive: true });
+  await mkdir(dir, { recursive: true });
 }
 
 /**
  * Copies a single file or directory recursively
  */
 async function copyToTarget(relativePath, parent) {
-  const source = path.join(parent, relativePath);
-  let destBase = path.join(TARGET_ROOT, source);
-  const stats = await fs.promises.stat(source);
+  const source = join(parent, relativePath);
+  let destBase = join(TARGET_ROOT, source);
+  const stats = await stat(source);
 
   if (stats.isDirectory()) {
     console.log(`copying all files and folders in ${source} ...`);
     await ensureDir(destBase);
     // Recursively copy directory contents
-    const items = await fs.promises.readdir(source);
+    const items = await readdir(source);
     for await (const item of items) {
       await copyToTarget(item, source);
     }
@@ -49,7 +48,7 @@ async function copyToTarget(relativePath, parent) {
       }
     }
 
-    await fs.promises.copyFile(source, destBase);
+    copyFile(source, destBase);
   }
 }
 
@@ -59,7 +58,7 @@ export async function runBuild() {
   console.log('copying files...')
   for (const file of files) {
     console.log(`copying ${file}`);
-    fs.copyFileSync(path.join(SOURCE_ROOT, file), path.join(TARGET_ROOT, file));
+    copyFileSync(join(SOURCE_ROOT, file), join(TARGET_ROOT, file));
   }
 
   console.log('copying folders...');

@@ -1,15 +1,3 @@
 {
-  "compilerOptions": {
-    "target": "ES2015",
-    "module": "ES2015",
-    "moduleResolution": "bundler",
-    "esModuleInterop": true,
-    "exactOptionalPropertyTypes": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "noUnusedLocals": false,
-    "noUncheckedIndexedAccess": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "skipLibCheck": true,
-  }
+  "extends": ["../../shared/tsconfig.json"],
 }

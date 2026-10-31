@@ -14,15 +14,37 @@
         <nui-carousel>Nui Carousel</nui-carousel>
     </section>
     <section class="animes panel">
-        <header class="season-info">
-            <h2>Summer 2026</h2>
-            <div class="season-timespan">📆 Jun 2026 - Sep 2026</div>
+        <header class="season-info-categories-header">
+            <button class="season-previous btn btn-ghost">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 width="24" height="24"
+                 viewBox="0 0 24 24"
+                 fill="currentColor">
+                <path d="M10.9 5.9 C11.4 6.4 11.4 7.1 10.9 7.6 L6.5 12 L10.9 16.4 C11.4 16.9 11.4 17.6 10.9 18.1 C10.4 18.6 9.7 18.6 9.2 18.1 L4 12.9 C3.5 12.4 3.5 11.6 4 11.1 L9.2 5.9 C9.7 5.4 10.4 5.4 10.9 5.9 Z"/>
+                <path d="M18.9 5.9 C19.4 6.4 19.4 7.1 18.9 7.6 L14.5 12 L18.9 16.4 C19.4 16.9 19.4 17.6 18.9 18.1 C18.4 18.6 17.7 18.6 17.2 18.1 L12 12.9 C11.5 12.4 11.5 11.6 12 11.1 L17.2 5.9 C17.7 5.4 18.4 5.4 18.9 5.9 Z"/>
+            </svg>
+            </button>
+            <div class="season-info">
+                <h2></h2>
+                <div class="season-timespan"></div>
+                <pagination-indicator indicators="4"></pagination-indicator>
+            </div>
+            <button class="season-next btn btn-ghost">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     width="24" height="24"
+                     viewBox="0 0 24 24"
+                     fill="currentColor">
+                    <path d="M10.9 5.9 C11.4 6.4 11.4 7.1 10.9 7.6 L6.5 12 L10.9 16.4 C11.4 16.9 11.4 17.6 10.9 18.1 C10.4 18.6 9.7 18.6 9.2 18.1 L4 12.9 C3.5 12.4 3.5 11.6 4 11.1 L9.2 5.9 C9.7 5.4 10.4 5.4 10.9 5.9 Z"/>
+                    <path d="M18.9 5.9 C19.4 6.4 19.4 7.1 18.9 7.6 L14.5 12 L18.9 16.4 C19.4 16.9 19.4 17.6 18.9 18.1 C18.4 18.6 17.7 18.6 17.2 18.1 L12 12.9 C11.5 12.4 11.5 11.6 12 11.1 L17.2 5.9 C17.7 5.4 18.4 5.4 18.9 5.9 Z"/>
+                </svg>
+            </button>
+            <div class="categories">
+                <button class="btn btn-primary active">All (64)</button>
+                <button class="btn btn-primary">TV (42)</button>
+                <button class="btn btn-primary" disabled>Movies (8)</button>
+            </div>
         </header>
-        <div class="categories">
-            <button class="btn btn-primary active">All (64)</button>
-            <button class="btn btn-primary">TV (42)</button>
-            <button class="btn btn-primary" disabled>Movies (8)</button>
-        </div>
+
         <div class="animes-list"></div>
     </section>
 </div>

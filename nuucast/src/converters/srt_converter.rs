@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 use std::time::Instant;
 use axum::body::Bytes;
-use crate::converters::mkv_converter::convert_subtitles_to_vtt;
+use crate::converters::mkv_converter::{convert_subtitles_to_ass, convert_subtitles_to_vtt};
 use crate::io::file_copier::{copy_converted_files, copy_converted_files_get_output};
 use crate::io::file_utility::UrlAndFilePath;
 use crate::io::temp_files_directory::TempFilesDirectory;
@@ -12,7 +12,7 @@ pub async fn convert_srt(paths: &UrlAndFilePath, body: &Bytes) -> Result<Vec<Pat
     let srt_file = save_srt_file(paths, &temp_directory, body).await?;
 
     let srt_files = vec![srt_file];
-    let vtt_paths = convert_subtitles_to_vtt(&srt_files).await?;
+    let vtt_paths = convert_subtitles_to_ass(&srt_files).await?;
     let vtt_paths_time = Instant::now();
     println!("convert srt to vtt took {:?}", vtt_paths_time.duration_since(start));
 
