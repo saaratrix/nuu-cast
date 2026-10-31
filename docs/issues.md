@@ -29,7 +29,6 @@
 * Search duplicated the search window.
 
 ## Features
-* Add name to /anime/fetch route so it looks nicer.
 * Improve airing to find out if something has aired etc.
 * Add error logging to be able to reproduce issues.
 * Add group by quality.
@@ -38,7 +37,22 @@
 * On click suggest season & episode.
 * Pressing enter should add search term
 * Add sources
-
+    - .env file or so.
+* Season picker - fix metaballs animations
+* Anime card:
+    * Have rating etc be clickable again, favourite card!
+* Find cards from previous season, only works if you saw last season tho.
+        * Continuing API?
+* Improve items handling now that there are multiple seasons and seasons loading without page refresh.
+    
+* Api improvements: 
+    * Add name to /anime/fetch route so it looks nicer.
+    * Dynamically calculate episodes based on the airing data
+        * Since the result from API is cached we need to dynamically calculate it.
+    * Once a week allow fetching new rating, if it's for the current season.
+        * Maybe episodes available?
+    * RSS Feed visit once a day?
+    
 # Nuufetch
 
 ## Bugs

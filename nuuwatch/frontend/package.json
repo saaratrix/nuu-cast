@@ -9,6 +9,7 @@
     "build:watch": "node scripts/watch.mjs",
     "clean-ts-output": "find ./js -type f \\( -name '*.js' -o -name '*.js.map' \\) -delete",
     "tsc:watch": "tsc -w",
+    "tsc": "tsc",
     "sass:production": "sass css/styles.scss:../static/css/styles.css",
     "sass:watch": "sass --watch .",
     "test": "echo \"Error: no test specified\" && exit 1"

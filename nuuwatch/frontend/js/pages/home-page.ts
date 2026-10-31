@@ -1,10 +1,11 @@
 import { addItem, animeApi, AnimeItem, appState, changeItem, ItemsKey } from '../app-state.js';
 import { addItemModel, AnimeModel, Rating } from '../anime-model.js';
 import { loadHTML } from '../routing/layout-loader.js';
-import { AniListAnime } from '../api/ani-list/ani-list-types';
+import type { AniListAnime } from '../api/ani-list/ani-list-types';
 import { createAnimeItemFromAniList } from '../anime-ani-list-item-utility.js';
 import { AnimeSeason, changeSeasonWithoutRefresh, dispatchSeasonChangeEvent, getSelectedSeason, Season } from '../seasons.js';
 import type { PaginationIndicator } from '../nui/pagination-indicator/pagination-indicator';
+import { activeFilter, onFilterChange, updateFilterButtons } from '../home/filter.js';
 
 const loadedAnimesBySeason = new Map<string, Map<number, AniListAnime>>();
 
@@ -27,7 +28,10 @@ function onPageLoaded() {
   console.log('page loaded');
   changeItem(undefined);
 
-  document.addEventListener('seasonChange', onSeasonChange);
+  document.addEventListener('filterChange', onFilterChange, false);
+  document.addEventListener('seasonChange', onSeasonChange, false);
+  // if for example coming from home -> item -> home
+  activeFilter.buttons.all = undefined;
 
   const season = getSelectedSeason();
 
@@ -38,8 +42,8 @@ function onPageLoaded() {
 function onSeasonChange(e: Event) {
   const event = e as CustomEvent<AnimeSeason>;
 
+  void fetchSeason(event.detail);
   setSeasonInfoHeader(event.detail);
-  fetchSeason(event.detail).then();
 }
 
 function initSeasonInfoHeader() {
@@ -127,17 +131,13 @@ async function fetchSeason(season: AnimeSeason) {
   }
 
   for (const anime of animes) {
-    if (anime.isAdult) {
-      continue;
-    }
     loadedAnimes.set(anime.id, anime);
   }
 
   // Clear current items... needs more work!
   appState.items = {};
   onCurrentSeasonLoaded(loadedAnimes);
-  sortItems();
-  renderAllItems(loadedAnimes);
+  doRenderAnimeList();
 }
 
 function onCurrentSeasonLoaded(animesById: Map<number, AniListAnime>) {
@@ -151,7 +151,8 @@ function onCurrentSeasonLoaded(animesById: Map<number, AniListAnime>) {
 
   for (const anime of animes) {
     // It could be anything if type is null but movies have less items, so it would stand out more there.
-    const type = anime.format || 'Movie';
+    const type = (anime.format || 'MOVIE').toLowerCase() as ItemsKey;
+    anime.format = type;
     switch (type.toLowerCase()) {
       case 'tv':
       case 'tv_short':
@@ -183,6 +184,13 @@ function onCurrentSeasonLoaded(animesById: Map<number, AniListAnime>) {
   fetchAllModels(ids).then().catch(e => console.error('Fetching all anime models failed', e));
 }
 
+function doRenderAnimeList() {
+  onFilterChange();
+  sortItems();
+  renderAllItems();
+  updateFilterButtons(appState.items);
+}
+
 const ratingSortValues = {
   [Rating.Bad]: 0,
   [Rating.NoRating]: 1,
@@ -212,7 +220,7 @@ function sortItems() {
   }
 }
 
-function renderAllItems(animes: Map<number, AniListAnime>) {
+function renderAllItems() {
   const itemsContainer = document.querySelector('.animes-list');
   if (!itemsContainer) {
     return;
@@ -285,6 +293,5 @@ async function fetchAllModels(ids: Set<number>): Promise<void> {
     addItemModel(animeItem, model);
   }
 
-  sortItems();
-  renderAllItems();
+  doRenderAnimeList();
 }

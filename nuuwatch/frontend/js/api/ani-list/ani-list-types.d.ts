@@ -19,7 +19,7 @@ export interface AniListAnime {
   countryOfOrigin: 'JP' | string,
   description: string,
   episodes: number | null,
-  format: 'TV' | 'TV_SHORT' | 'MOVIE' | 'SPECIAL' | 'OVA' | 'ONA' | 'MUSIC' | 'MANGA' | 'NOVEL' | 'ONE_SHOT'
+  format: Lowercase<'TV' | 'TV_SHORT' | 'MOVIE' | 'SPECIAL' | 'OVA' | 'ONA' | 'MUSIC' | 'MANGA' | 'NOVEL' | 'ONE_SHOT'>
   isAdult: boolean,
   popularity: number,
   nextAiringEpisode: {

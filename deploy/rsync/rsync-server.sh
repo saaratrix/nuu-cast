@@ -9,7 +9,7 @@ fi
 source "./rsync-variables.sh"
 
 # cd to root of the projects.
-# nuufluff
+# nuuhub
 # - nui-web-components
 # - nuufetch
 # - nuu-cast

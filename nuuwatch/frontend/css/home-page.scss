@@ -173,6 +173,9 @@ pagination-indicator {
   flex-wrap: wrap;
   gap: 0.75rem;
 
+  button {
+    text-transform: capitalize;
+  }
 }
 
 .animes-list {

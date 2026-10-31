@@ -41,7 +41,7 @@ export interface AnimeItem<T = unknown> {
 //   activeMalId: number | undefined;
 // }
 
-export type ItemsKey = Lowercase<AniListAnime['format']>;
+export type ItemsKey = AniListAnime['format'];
 export interface AnimeAppState {
   animeModels: Map<number, AnimeModel>;
   itemsById: Map<number, AnimeItem<AniListAnime>>;
