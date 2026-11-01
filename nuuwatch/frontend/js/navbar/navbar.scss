@@ -43,3 +43,23 @@
 .seasons-select {
     margin-top: 2rem;
 }
+
+.search-bar-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.search-poster {
+    max-width: 64px;
+    max-height: 64px;
+    flex: 0 0 64px;
+    // Because the flex: 0 0 64; will stretch image otherwise.
+    object-fit: contain;
+}
+
+search-bar {
+    &::part(popover) {
+        max-height: min(80vh, 720px);
+    }
+}

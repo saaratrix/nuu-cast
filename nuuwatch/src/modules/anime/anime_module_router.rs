@@ -23,7 +23,7 @@ pub fn get_anime_routes() -> Router<AppState> {
     // api prefix = anime, jikan api = anime! so we get anime/anime :3
     .route("/anime/anime/{id}/full", get(handle_load_anime_full))
     .route("/anime/info/{id}", get(handle_load_anime_full))
-    .route("/anime/search", get(handle_search_anime))
+    .route("/anime/search/{search}", get(handle_search_anime))
     .route("/anime/malimage/{*image_url}", get(handle_mal_image))
     .route("/anime/anilist-image/{id}/{*image_url}", get(handle_ani_list_image));
 

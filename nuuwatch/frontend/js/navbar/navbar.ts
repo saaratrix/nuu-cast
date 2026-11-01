@@ -1,13 +1,26 @@
 import { changeSeasonRefresh, getCurrentAnimeSeason, getSelectedSeason, getStoredAnimeSeason, Season, setStoredAnimeSeason } from '../seasons.js';
+import type { SearchBar, SearchChangeEvent } from '../nui/search-bar/search-bar';
+import type { AniListAnime } from '../api/ani-list/ani-list-types';
+import { escapeHtml } from '../utility.js';
 
 export function initNavbar() {
-  const seasons = document.querySelector<HTMLAnchorElement>('.navbar-top .link-seasons') as HTMLAnchorElement;
+  const navbarTop = document.querySelector<HTMLAnchorElement>('.navbar-top') as HTMLAnchorElement;
+
+  const seasons = navbarTop.querySelector<HTMLAnchorElement>('.link-seasons') as HTMLAnchorElement;
   seasons.addEventListener('click', (e) => {
     e.stopPropagation();
     e.preventDefault();
 
     openSeasonDialog();
   });
+
+  const advancedSearch = navbarTop.querySelector('.link-advanced-search') as HTMLAnchorElement;
+  advancedSearch.href = 'https://anilist.co/search/anime';
+  advancedSearch.title = 'Goto Anilist and search';
+
+  const searchBar = navbarTop.querySelector('search-bar') as SearchBar;
+  initSearchBar(searchBar);
+
 }
 
 function openSeasonDialog() {
@@ -120,8 +133,80 @@ function openSeasonDialog() {
   function setClearDefaultVisibility(): void {
     const storedSeason = getStoredAnimeSeason();
     clearDefaultButton.hidden = storedSeason == null;
-
   }
+}
+
+let _currentSearch = '';
+let _lastSearchValue = '';
+function initSearchBar(searchBar: SearchBar) {
+  searchBar.parentElement!.style.marginRight = '3rem';
+
+  searchBar.addEventListener('change', (e) => {
+    const event = e as CustomEvent<SearchChangeEvent>;
+    const searchValue = event.detail.value;
+    // For example if old value was 'Hellsing' and new value is 'Hell' then
+    const isDelete = _lastSearchValue.startsWith(searchValue);
+    _lastSearchValue = searchValue;
+    if (searchValue.length <= 2) {
+      if (!isDelete) {
+        searchBar.clearSearchResult();
+        searchBar.hideSearchResult();
+      }
+      return;
+    }
+    _currentSearch = searchValue;
+    // If backspace etc no need to make a new search query.
+    if (isDelete) {
+      return;
+    }
+
+    fetch(`/anime/search/${encodeURIComponent(searchValue)}`).then(response => {
+      if (_currentSearch !== searchValue) {
+        return Promise.resolve(null);
+      }
+      return response.json();
+    }).then((json: string | null) => {
+      if (!json) {
+        searchBar.clearSearchResult();
+        return;
+      }
+      const items = JSON.parse(json) as AniListAnime[];
+      if (items.length === 0) {
+        searchBar.clearSearchResult();
+        return;
+      }
+
+      const elements = items.map(item => {
+        const id = Number(item.id);
+        const title = item.title.english || item.title.romaji;
+        const hoverTitle = item.title.english ? item.title.romaji : '';
+        const imageUrl = `/anime/anilist-image/${id}/${encodeURIComponent(item.coverImage.large)}`;
+
+        const element = document.createElement('a');
+        element.classList.add('search-bar-item');
+        element.href = `${window.location.pathname}#/view/${id}`;
+        if (hoverTitle) {
+          element.title = hoverTitle;
+        }
+        element.innerHTML = `
+<img src="${imageUrl}" class="search-poster">
+<span>${escapeHtml(title)}</span>
+`;
+
+        return element;
+      });
+
+      searchBar.addSearchResult(...elements);
+      searchBar.showSearchResult();
+    }).catch(err => {
+      console.log('Failed searching', err);
+      if (_currentSearch === searchValue) {
+        searchBar.clearSearchResult();
+        searchBar.hideSearchResult();
+      }
+    });
+
+  }, false);
 }
 
 

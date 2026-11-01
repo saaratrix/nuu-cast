@@ -18,6 +18,8 @@ pub trait AnimeApi: Send + Sync {
         &self,
         id: u32,
     ) -> Result<String, reqwest::Error>;
+
+    async fn search_anime_simple(&self, search: &str) -> Result<String, reqwest::Error>;
 }
 
 #[derive(Clone)]
@@ -45,6 +47,13 @@ impl AnimeApi for AnimeApiClient {
         match self {
             Self::Jikan(api) => api.load_anime(id).await,
             Self::AniList(api) => api.load_anime(id).await,
+        }
+    }
+    
+    async fn search_anime_simple(&self, search: &str) -> Result<String, reqwest::Error> {
+        match self {
+            Self::Jikan(api) => api.search_anime_simple(&search).await,
+            Self::AniList(api) => api.search_anime_simple(&search).await,
         }
     }
 }

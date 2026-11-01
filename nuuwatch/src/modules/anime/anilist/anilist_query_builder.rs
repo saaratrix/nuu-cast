@@ -69,3 +69,20 @@ query Anime($id: Int!) {
     }
 }
 "#;
+
+pub const SEARCH_SIMPLE_QUERY: &str = r#"
+query ($search: String!) {
+  Page(page: 1, perPage: 15) {
+    media(search: $search, type: ANIME, isAdult: false) {
+      id
+      title {
+        romaji
+        english
+      }
+      coverImage {
+        large
+      }
+    }
+  }
+}
+"#;

@@ -57,4 +57,10 @@ impl AnimeApi for Jikan {
             ignore_cache: false,
         }).await
     }
+
+    async fn search_anime_simple(&self, search: &str) -> Result<String, reqwest::Error> {
+        Ok("".to_string())
+    }
+    
+    
 }

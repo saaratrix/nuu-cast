@@ -49,7 +49,7 @@ pub struct AniListAnime {
     pub description: Option<String>,
     pub episodes: Option<u32>,
     pub format: Option<String>,
-    pub is_adult: bool,
+    pub is_adult: Option<bool>,
     pub popularity: Option<u32>,
     pub next_airing_episode: Option<AiringEpisode>,
 }
@@ -74,3 +74,16 @@ pub struct AiringEpisode {
     pub episode: u32,
 }
 
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SearchSimplePage {
+    pub media: Vec<AniListSearchSimpleAnime>,
+}
+
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AniListSearchSimpleAnime {
+    pub id: u32,
+    pub title: AnimeTitle,
+    pub cover_image: Option<CoverImage>,
+}

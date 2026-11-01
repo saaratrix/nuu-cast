@@ -18,11 +18,9 @@ pub struct AnimeParams {
 }
 
 #[derive(Debug, Clone, Deserialize)]
-pub struct AnimeSearchParams {
+pub struct AnimeSimpleSearchParams {
     #[serde(default = "default_query")]
     query: String,
-    #[serde(default = "default_limit")]
-    limit: u16,
 }
 
 fn default_page() -> u16 {
@@ -57,10 +55,11 @@ pub async fn handle_load_anime_full(Path(id): Path<u32>, State(state): State<App
 }
 
 pub async fn handle_search_anime(
-    Query(params): Query<AnimeSearchParams>,
+    Path(search): Path<String>,
     State(state): State<AppState>,
 ) -> impl IntoResponse {
-    (StatusCode::INTERNAL_SERVER_ERROR, "Not Implemented.").into_response()
+    let response = state.anime_api.search_anime_simple(&search).await.unwrap();
+    (StatusCode::OK, Json(response)).into_response()
 }
 
 /// Fetch image from local server cache if it exists, else fetch it from MAL.

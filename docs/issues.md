@@ -25,6 +25,9 @@
 
 # Nuuwatch
 
+TODO:
+?
+
 ## Bugs
 * Search duplicated the search window.
 
@@ -39,20 +42,21 @@
 * Add sources
     - .env file or so.
 * Season picker - fix metaballs animations
+    - Disabled them for now, can fix later, low prio and it looks nice with no animation.
 * Anime card:
     * Have rating etc be clickable again, favourite card!
 * Find cards from previous season, only works if you saw last season tho.
         * Continuing API?
 * Improve items handling now that there are multiple seasons and seasons loading without page refresh.
-    
-* Api improvements: 
+
+* Api improvements:
     * Add name to /anime/fetch route so it looks nicer.
     * Dynamically calculate episodes based on the airing data
         * Since the result from API is cached we need to dynamically calculate it.
     * Once a week allow fetching new rating, if it's for the current season.
         * Maybe episodes available?
     * RSS Feed visit once a day?
-    
+
 # Nuufetch
 
 ## Bugs

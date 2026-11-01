@@ -1,5 +1,6 @@
-use crate::modules::anime::anilist::anilist_models::{AniListAnime, AniListResponse, Media, Page, SeasonPage};
-use crate::modules::anime::anilist::anilist_query_builder::{ANIME_QUERY, SEASON_QUERY};
+use std::time::Duration;
+use crate::modules::anime::anilist::anilist_models::{AniListAnime, AniListResponse, Media, Page, SearchSimplePage, SeasonPage};
+use crate::modules::anime::anilist::anilist_query_builder::{ANIME_QUERY, SEARCH_SIMPLE_QUERY, SEASON_QUERY};
 use crate::modules::anime::anilist::anilist_request::AniListRequest;
 use crate::modules::anime::anilist::anilist_response_models::AniListSeasonResult;
 use crate::modules::anime::anime_request_cacher::{add_cached_result_json, try_get_cached_result, CacheOptions};
@@ -147,5 +148,50 @@ impl AnimeApi for AniList {
         add_cached_result_json(&cache_key, cache_options.cache_prefix.as_deref(), &json_result).await.expect("Failed to save anime cached result");
 
         Ok(json_result)
+    }
+
+    async fn search_anime_simple(&self, search: &str) -> Result<String, reqwest::Error> {
+        let cache_key = format!("search_{}", search);
+        let cache_options = CacheOptions {
+            cache_prefix: Some("ani_list_search".to_string()),
+            // Cache the search for ~90 days. ROughly length of a season.
+            ttl: Some(Duration::from_secs(90 * 60 * 24 * 60)),
+            ignore_cache: false,
+        };
+
+        if let Some(response) = try_get_cached_result(Some(cache_key.clone()), &cache_options).await {
+            return Ok(response);
+        }
+
+        let body = serde_json::json!({
+            "query": SEARCH_SIMPLE_QUERY,
+            "variables": {
+                "search": search
+            }
+        });
+
+        let json_response = self.anilist_request.send(&format!("{}_req", &cache_key), &body, &cache_options).await?;
+        let response: AniListResponse<Page<SearchSimplePage>> =
+            match serde_json::from_str(&json_response) {
+                Ok(response) => response,
+                Err(err) => {
+                    eprintln!("Failed to parse AniList simple search response: {err}");
+                    return Ok(String::new());
+                }
+            };
+
+        if response.errors.is_some() {
+            return Ok(String::new());
+        }
+
+        let Some(data) = response.data else {
+            return Ok(String::new());
+        };
+
+        let json_result = serde_json::to_string(&data.page.media).expect("Failed to serialize AniList simple search response");
+        add_cached_result_json(&cache_key, cache_options.cache_prefix.as_deref(), &json_result).await.expect("Failed to save anime simple search cached result");
+
+        Ok(json_result)
+
     }
 }
