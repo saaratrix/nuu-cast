@@ -75,6 +75,15 @@ function initSeasonInfoHeader() {
     seasonIndicator.setAttribute('progress', season.toString());
     changeSeasonWithoutRefresh(year, season);
   });
+
+  const seasonIndicator = document.querySelector('.season-info-categories-header pagination-indicator') as PaginationIndicator;
+    seasonIndicator.addEventListener('indicatorClick', (event) => {
+      const newSeason = event.detail.index;
+      let { year, season } = getSelectedSeason();
+      if (season !== newSeason) {
+        changeSeasonWithoutRefresh(year, newSeason);
+      }
+    });
 }
 
 function setSeasonInfoHeader(season: AnimeSeason): void {
