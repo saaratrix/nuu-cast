@@ -4,12 +4,13 @@
   "description": "nuuwatch package",
   "main": "index.js",
   "scripts": {
-    "build": "tsc && npm run sass:production && node scripts/build_and_copy_nuuwatch.mjs",
+    "build": "tsc && npm run sass:build && node scripts/build_and_copy_nuuwatch.mjs",
     "build:dev": "(npm run build && npm run build:watch) & npm run tsc:watch & npm run sass:watch",
     "build:watch": "node scripts/watch.mjs",
     "clean-ts-output": "find ./js -type f \\( -name '*.js' -o -name '*.js.map' \\) -delete",
     "tsc:watch": "tsc -w",
     "tsc": "tsc",
+    "sass:build": "sass css:css",
     "sass:production": "sass css/styles.scss:../static/css/styles.css",
     "sass:watch": "sass --watch .",
     "test": "echo \"Error: no test specified\" && exit 1"
