@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Nuucast" pattern="file[nuu-cast]:nuucast//*" />
+</component>

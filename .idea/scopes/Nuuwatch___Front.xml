@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Nuuwatch - Front" pattern="file[nuu-cast]:nuuwatch/frontend//*" />
+</component>
